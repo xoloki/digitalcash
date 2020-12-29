@@ -10,6 +10,8 @@
 \paragraph{There are many papers which outline, define, use, mutate, expand on, or cite the following techniques.  But these papers invariably use different terminology, swapping variable names and using various subsets as needed.  In this document, I will endeavor to be both thorough and strongly consistent, which should not only make the math easier to understand, but also expose the deep connections and demonstrate how each piece builds on the previous. }
 \newpage
 
+
+
 \section{Schnorr Proofs and the Fiat Shamir Transform}
 
 \paragraph{Schnorr proofs allow the owner of a private key to demonstrate that ownership to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform.  This allows the protocol to function as a signature.}
@@ -41,6 +43,7 @@
 \end{eqnarray}
 
 \paragraph{So if $t = g^r y^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $r$, allowing the equation to balance.  The set $(r,c,t)$ thus forms the proof of ownership of $y$.}
+
 
 
 \section{Ring signatures}
@@ -82,6 +85,7 @@
 \paragraph{We can do the same for any number of additional public keys $y_k$: choose a random $(r_k,c_k)$ which is added to the hash in the form of $g^{r_k}y_k^{c_k}$ then subtracting the new $c_k$ from the hash to form the real $c$. Then $c$ will be equal to the hash for both prover and verifier.}
 
 
+
 \subsection{Linkable Ring Signatures}
 
 \paragraph{Now that we can use ring signatures to hide which public key is being signed, we have a new problem: assuming each public key corresponds to a spendable output, how do we know which output was actually spent?  We need a way to track this to prevent double spends, but in such a way that we preserve the privacy which the ring signature grants.}
@@ -95,9 +99,9 @@
 \paragraph{We then add a term to the hash for each $y$ that uses the key image.  For the real $y$, we know that}
 
 \begin{eqnarray}
-  H(y)^v = H(y)^r H(y)^{cx}\\
-  H(y)^v = H(y)^r (H(y)^x)^c\\
-  H(y)^v = H(y)^r I^c
+  H(y)^v &=& H(y)^r H(y)^{cx}\\
+  H(y)^v &=& H(y)^r (H(y)^x)^c\\
+  H(y)^v &=& H(y)^r I^c
 \end{eqnarray}
 
 \paragraph{Putting the real $y$ first, the prover hash becomes:}
@@ -109,8 +113,8 @@
 \paragraph{We define $c$ as before, then solve for the hash:}
 
 \begin{eqnarray}
-  c = H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1}) - c_1\\
-  c + c_1 = H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
+  c &=& H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1}) - c_1\\
+  c + c_1 &=& H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
 \end{eqnarray}
 
 \paragraph{So as before, $c$ is equal to the hash.  The prover now sends $(I, y, r, c, y_1, r_1, c_1)$ to the verifier, who can check that their hash is still equal to $c$:}
@@ -129,99 +133,101 @@
 \paragraph{Consider a set of public keys $y_i, i \in \{0, …, n-1\}$ with a secret index $j$ which denotes the public key to which we know the corresponding private key.  As before, choose random $v$, and $r_i$ $\forall i \ne j$.  Then define}
 
 \begin{eqnarray}
-  L_j = g^v\\
-  R_j = H(y_j)^v\\
-  c_{j+1} = H(L_j,R_j)
+      L_j &=& g^v\\
+      R_j &=& H(y_j)^v\\
+  c_{j+1} &=& H(L_j,R_j)
 \end{eqnarray}
 
-\paragraph{For the remaining i ∈ {j+1, …, n, …, j-1} (mod n so n goes to zero, then back to j)}
+\paragraph{For the remaining $i \in {j+1, …, n, …, j-1}$ ($mod n$ so $n$ goes to zero, then back to $j$)}
 
 \begin{eqnarray}
-  Li=griyci\\
-  Ri=griyci\\
-  ci+1=H(Li,Ri)\\
-  … \\
-  cj=H(Lj-1,Rj-1)
+  Li &=& g^{r_i} y^{c_i}\\
+  Ri &=& g^{r_i} y^{c_i}\\
+  ci+1 &=& H(L_i,R_i)\\
+  &...& \\
+  cj &=& H(L_{j-1}, R_{j-1})
 \end{eqnarray}
 
-\paragraph{Now that we have cj, we can define}
+\paragraph{Now that we have $c_j$, we can define}
 
 \begin{eqnarray}
-  rj=v-cjx
+  r_j = v - c_j x
 \end{eqnarray}
 
-\paragraph{Then we can calculate Ljand Rj as we did for all Li and Ri, using rj and cj, and the values should be equal to the original Lj and Rj calculated using v. The prover now sends (I, y0, r0, …, yn-1, rn-1, c0)to the verifier.  The verifier can reconstruct all (ci, Li, Ri) and then check that c0=cn.}
+\paragraph{Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $r_j$ and $c_j$, and the values should be equal to the original $L_j$ and $R_j$ calculated using $v$. The prover now sends $(I, y_0, r_0, …, y_{n-1}, r_{n-1}, c_0)$ to the verifier.  The verifier can reconstruct all $(c_i, L_i, R_i)$ and then check that $c_0 = c_n$.}
 
 
 \subsection{Multilayered LSAG Signatures}
 
 \paragraph{LSAG signatures allow a compact representation of a linked ring signature, but each real key needs its own signature, and there is no way to associate the real keys with interleaved data.}
 
-\paragraph{The MLSAG solves this by using key vectors rather than single keys.  So key yi is instead a vector of m keys}
+\paragraph{The MLSAG solves this by using key vectors rather than single keys.  So key $y_i$ is instead a vector of $m$ keys}
 
 \begin{eqnarray}
-  yi = (yi,0, …, yi,m-1)
+  y_i = (y_{i,0}, ..., y_{i,m-1})
 \end{eqnarray}
 
-\paragraph{As before, there exists a secret index j, for which we know the private keys to each public key.  Each ri is now also a vector, and}
+\paragraph{As before, there exists a secret index $j$, for which we know the private keys to each public key.  Each $r_i$ is now also a vector, and}
 
 \begin{eqnarray}
-  ri = (ri,0, …, ri,m-1)
+  r_i = (r_{i,0}, ..., r_{i,m-1})
 \end{eqnarray}
 
-\paragraph{i j, ri consists of random numbers.}
+\paragraph{$\forall i \ne j$, $r_i$ consists of random numbers.}
 
-\paragraph{The prover proceeds as with an LSAG, starting with index j.  v is now a vector of m elements.  The Lj,k and Rj,k entries are calculated in the same way, but using yj,k and vk.  cj+1 is calculated using all Lj,k and Rj,k:}
+\paragraph{The prover proceeds as with an LSAG, starting with index $j$.  $v$ is now a vector of $m$ elements.  The $L_{j,k}$ and $R_{j,k}$ entries are calculated in the same way, but using $y_{j,k}$ and $v_k$.  $c_{j+1}$ is calculated using all $L_{j,k}$ and $R_{j,k}$:}
 
 \begin{eqnarray}
-  Lj,k=gvk\\
-  Rj,k=H(yj,k)vk\\
-  cj+1=H(Lj,0,Rj,0,... ,Lj,m-1,Rj,m-1)\\
+  L_{j,k} &=& g^{v_k}\\
+  R_{j,k} &=& H(y_{j,k})^{v_k}\\
+  c_{j+1} &=& H(L_{j,0}, R_{j,0}, ..., L_{j,m-1}, R_{j,m-1})
 \end{eqnarray}
 
-\paragraph{As before, the prover calculates the remaining Li and Ri using the corresponding ci, ri, and I, and the hash for ci+1 contains the full set of Li,k and Ri,k:}
+\paragraph{As before, the prover calculates the remaining $L_i$ and $R_i$ using the corresponding $c_i$, $r_i$, and $I$, and the hash for $c_{i+1}$ contains the full set of $L_{i,k}$ and $R_{i,k}$:}
 
 \begin{eqnarray}
-  Li,k=gri,kyci\\
-  Ri,k=H(yi)ri,kIci\\
-  ci+1=H(Li,0,Ri,0,... ,Li,m-1,Ri,m-1) \\
-  … \\
-  cj=H(Lj-1,0,Rj-1,0,... ,Lj-1,m-1,Rj-1,m-1) 
+  L_{i,k} &=& g^{r_{i,k}} y^{c_i}\\
+  R_{i,k} &=& H(y_i)^{r_{i,k}} I^{c_i}\\
+  ci+1 &=& H(L_{i,0}, R_{i,0}, ..., L_{i,m-1}, R_{i,m-1}) \\
+  &...& \\
+  c_j &=& H(L_{j-1,0}, R_{j-1,0}, ..., L_{j-1,m-1}, R_{j-1,m-1}) 
 \end{eqnarray}
 
-\paragraph{Now that we have cj, we can calculate the rj,k as before}
+\paragraph{Now that we have $c_j$, we can calculate the $r_{j,k}$ as before:}
 
 \begin{eqnarray}
-  rj,k=vk-cjxk
+  r_{j,k} = v_k - c_j x_k
 \end{eqnarray}
 
-\paragraph{The prover sends the same set of (I, y0, r0, …, ym-1, rm-1, c0)as for LSAG, but each yi and ri is now a vector.  The verifier again calculates the full set of ci, with corresponding Li and Ri, and checks that c0=cn.}
+\paragraph{The prover sends the same set of $(I, y_0, r_0, ..., y_{m-1}, r_{m-1}, c_0)$ as for LSAG, but each $y_i$ and $r_i$ is now a vector.  The verifier again calculates the full set of $c_i$, with corresponding $L_i$ and $R_i$, and checks that $c_0 = c_n$.}
 
 
-2.4 Signing external data
+\subsection{Signing external data}
 
 \paragraph{Schnorr proofs and ring signatures do a good job of signing public keys, with a variety of options for obfuscating mixins and consolidating space.  But it is often desirable to sign external data, such as a transaction body.  This way the signature validates not only ownership of the inputs, but also locks the signature to the spent outputs, amounts, or any other metadata which is necessary to prevent transaction malleability.}
 
-\paragraph{To sign external data d, take a hash of it then prepend it to the signature hash.  But hashing the external data directly can lead to collisions, which obviates the point of hashing.  So it is common to use domain separators in the hash:}
+\paragraph{To sign external data $d$, take a hash of it then prepend it to the signature hash.  But hashing the external data directly can lead to collisions, which obviates the point of hashing.  So it is common to use domain separators in the hash:}
 
 \begin{eqnarray}
-  m = H("transaction body" || d)
+  m = H(\textsf{"transaction body"}, d)
 \end{eqnarray}
 
 \paragraph{For a standard linkable ring signature, the prover would do the following:}
 
 \begin{eqnarray}
-  c+c1=H(m, gv, H(y)v, gr1yc1, H(y)r1Ic1)
+  c + c1 = H(m, g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
 \end{eqnarray}
 
 \paragraph{The verifier also has access to the external data, and does the same calculation:}
 
 \begin{eqnarray}
-  m = H("transaction body" || d)\\
-  c+c1=H(m, gryc, H(y)rIc, gr1yc1, H(y)r1Ic1)
+  m &=& H(\textsf{"transaction body"}, d)\\
+  c+c1 &=& H(m, g^r y^c, H(y)^r I^c, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
 \end{eqnarray}
 
 \paragraph{This links the signature to the external data, and if the data is altered the verifier signature will fail validation.}
+
+
 
 \section{Confidential Transactions}
 
@@ -230,160 +236,161 @@
 
 \subsection{Pedersen Commitments}
 
-We can again use the difficulty of solving discrete logarithms to hide the real amounts behind a commitment.  The naive approach would be to simply raise our group generator g to the value:
+\paragraph{We can again use the difficulty of solving discrete logarithms to hide the real amounts behind a commitment.  The naive approach would be to simply raise our group generator $g$ to the value:}
 
 \begin{eqnarray}
-  C=gv
+  C=g^v
 \end{eqnarray}
 
-Then we can check that the sum of the input values is equal to the sum of the outputs:
+\paragraph{Then we can check that the sum of the input values is equal to the sum of the outputs:}
 
 \begin{eqnarray}
-  vi1+vi2=vo1+vo2\\
-  g(vi1+vi2)=g(vo1+vo2)\\
-  gvi1gvi2=gvo1gvo2\\
-  Ci1Ci2=Co1Co2
-\end{eqnarray}
-  
-So to check that the transaction is balanced, we check the product of the input commitments against the product of the output commitments: if they are equal, then the transaction is balanced.
-
-This simple approach does not work, however, because the range of values in a cryptocurrency is usually only [0, 264).  So an attacker can brute force any commitment by trying all 264 possible values.  To prevent this, we add a random blinding factor s to the commitment:
-
-\begin{eqnarray}
-  C=gshv
+  v_{i_1} + v_{i_2} &=& v_{o_1} + v_{o_2}\\
+  g^{v_{i_1} + v_{i_2}} &=& g^{v_{o_1} + v_{o_2}}\\
+  g^{v_{i_1}} g^{v_{i_2}} &=& g^{v_{o_1}} g^{v_{o_2}}\\
+  C_{i_1} C_{i_2} &=& C_{o_1} C_{o_2}
 \end{eqnarray}
   
-This requires another generatorh, which is usually defined as a hash-to-group of the generator g.  If the group is a prime order group, then any element of the group is a generator, and so a simple hash will suffice.  Otherwise, care must be made to assure that h is orthogonal to g. 
+\paragraph{So to check that the transaction is balanced, we check the product of the input commitments against the product of the output commitments: if they are equal, then the transaction is balanced.}
 
-Now when we check the transaction balance, we end up with 
+\paragraph{This simple approach does not work, however, because the range of values in a cryptocurrency is usually only $[0, 264)$.  So an attacker can brute force any commitment by trying all $264$ possible values.  To prevent this, we add a random blinding factor s to the commitment:}
 
 \begin{eqnarray}
-  Ci1Ci2Co1Co2=gsi1hvi1gsi2hvi2gso1hvo1gso2hvo2=gsi1+ si2- so1- so2hvi1+ vi2- vo1- vo2
+  C = g^s h^v
+\end{eqnarray}
+  
+\paragraph{This requires another generatorh, which is usually defined as a hash-to-group of the generator $g$.  If the group is a prime order group, then any element of the group is a generator, and so a simple hash will suffice.  Otherwise, care must be made to assure that $h$ is orthogonal to $g$.}
+
+\paragraph{Now when we check the transaction balance, we end up with}
+
+\begin{eqnarray}
+  C_{i_1} C_{i_2} C_{o_1} C_{o_2} &=& g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}} g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}
+  \cr &=& g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} h^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
 \end{eqnarray}
 
-But if the transaction is balanced, then vi1+ vi2- vo1- vo2=0, so 
+\paragraph{But if the transaction is balanced, then $v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2} =0$, so}
 
 \begin{eqnarray}
   Ci1Ci2Co1Co2=gsi1+ si2- so1- so2
 \end{eqnarray}
 
-We define the sum of the input blinding factors minus the output blinding factors to be
+\paragraph{We define the sum of the input blinding factors minus the output blinding factors to be}
 
 \begin{eqnarray}
   z=si1+ si2- so1- so2
 \end{eqnarray}
 
-Which means that the ratio of the product of the commitments is now just gz, and thus we know the private key z which corresponds to the public key generated from the commitments:
+\paragraph{Which means that the ratio of the product of the commitments is now just gz, and thus we know the private key z which corresponds to the public key generated from the commitments:}
 
 \begin{eqnarray}
   Ci1Ci2Co1Co2=gz
 \end{eqnarray}
 
-We already know how to sign a public key if we know the private key, which means we can sign this commitment to zero, and a verifier can check it.  This allows a verifier to validate the transaction is balanced.
+\paragraph{We already know how to sign a public key if we know the private key, which means we can sign this commitment to zero, and a verifier can check it.  This allows a verifier to validate the transaction is balanced.}
 
 
-3.2 Range Proofs
+\subsection{Range Proofs}
 
-Now that the values can be hidden, we have a new problem.  Since we are checking that the sum of the inputs matches the sum of the outputs, what happens if one of the output values is negative?  The transaction will be balanced, but we will end up minting new coins.  How can we prevent this?
+\paragraph{Now that the values can be hidden, we have a new problem.  Since we are checking that the sum of the inputs matches the sum of the outputs, what happens if one of the output values is negative?  The transaction will be balanced, but we will end up minting new coins.  How can we prevent this?}
 
-First, consider a n-bit binary expansion of v:
+\paragraph{First, consider a n-bit binary expansion of v:}
 
 \begin{eqnarray}
   v=b020+ b121+ … + bn-12n-1
 \end{eqnarray}
 
-If v is in the range [0, 264) then we know that each bk ∈ {0, 1}.  Remember that we committed to v withC=gshv.  Choose a series of sksuch that
+\paragraph{If v is in the range [0, 264) then we know that each bk ∈ {0, 1}.  Remember that we committed to v withC=gshv.  Choose a series of sksuch that}
 
 \begin{eqnarray}
   0n-1sk=s 
 \end{eqnarray}
 
-Then write commitments for each bit in the binary expansion thus
+\paragraph{Then write commitments for each bit in the binary expansion thus}
 
 \begin{eqnarray}
   Ck=gskhbk2k
 \end{eqnarray}
 
-As before, the sum of the values in these commitments will be equal to v, but also the sum of the bit blinding factors sk will also equal s.  So
+\paragraph{As before, the sum of the values in these commitments will be equal to v, but also the sum of the bit blinding factors sk will also equal s.  So}
 
 \begin{eqnarray}
   Ck=C
 \end{eqnarray}
 
-This allows the validator to check that the binary expansion is valid.  And if each bk ∈ {0, 1}, then one of the following must be a commitment to zero:
+\paragraph{This allows the validator to check that the binary expansion is valid.  And if each bk ∈ {0, 1}, then one of the following must be a commitment to zero:}
 
 \begin{eqnarray}
   {gskhbk2k,gskhbk2k-2k} 
 \end{eqnarray}
 
-So either the first or the second terms will reduce to gsk, and since the prover know skhe can sign the ring.  We don’t need linkability, so we can use basic ring signatures of size 2. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.
+\paragraph{So either the first or the second terms will reduce to gsk, and since the prover know skhe can sign the ring.  We don’t need linkability, so we can use basic ring signatures of size 2. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.}
 
-The range proof thus consists of the n bit commitments Ci and corresponding ring signatures.  The verifier checks that the product of the Ci equals C, and then checks each bit ring signature.
-
-
-
-4. Bulletproofs
-
-Range proofs allow us to verify that output commitments are not negative, but they use a lot of space; each output range proof consists of 64 separate ring signatures.  It would be preferable to somehow consolidate them, and there are a variety of techniques to do so.  Bulletproofs are a compact way to represent aggregated range proofs, and result in significant space savings.
-
-Bulletproofs are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.
+\paragraph{The range proof thus consists of the n bit commitments Ci and corresponding ring signatures.  The verifier checks that the product of the Ci equals C, and then checks each bit ring signature.}
 
 
-4.1 Improved Inner Product Argument
 
-The heart of a bulletproof is a vector commitment that links a committed value with an inner product.  The prover uses a recursive protocol that at every step cuts the size of the vectors in half and generates a new commitment, until only a single element remains, then sends the final values with the corresponding generators and commitment as the proof.  The verifier checks that the final commitment is valid, then unwinds the stack.
+\section{Bulletproofs}
 
-So for (g, h) ∈ Gn, (a, b) ∈ Zpn, (u, P) ∈ G, c ∈ Zp, let P = ga hb and c = <a, b>.  The goal is to find a way to prove knowledge of a and b to someone who knows P and c, without revealing them.  To do this, the prover adds the inner product to the commitment itself:
+\paragraph{Range proofs allow us to verify that output commitments are not negative, but they use a lot of space; each output range proof consists of 64 separate ring signatures.  It would be preferable to somehow consolidate them, and there are a variety of techniques to do so.  Bulletproofs are a compact way to represent aggregated range proofs, and result in significant space savings.}
+
+\paragraph{Bulletproofs are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.}
+
+
+\subsection{Improved Inner Product Argument}
+
+\paragraph{The heart of a bulletproof is a vector commitment that links a committed value with an inner product.  The prover uses a recursive protocol that at every step cuts the size of the vectors in half and generates a new commitment, until only a single element remains, then sends the final values with the corresponding generators and commitment as the proof.  The verifier checks that the final commitment is valid, then unwinds the stack.}
+
+\paragraph{So for (g, h) ∈ Gn, (a, b) ∈ Zpn, (u, P) ∈ G, c ∈ Zp, let P = ga hb and c = <a, b>.  The goal is to find a way to prove knowledge of a and b to someone who knows P and c, without revealing them.  To do this, the prover adds the inner product to the commitment itself:}
 
 \begin{eqnarray}
   P = ga hb u<a, b>
 \end{eqnarray}
 
-Since the goal is to shrink the problem in half, let n’ = n/2.  Since (g, h) are still size n, split each into left (gL, hL) and right (gR, hR), with first n’ elements in the left vector and the second n’ in the right.  Then for some a1, a2, b1, b2 ∈ Zpn’, define the function H to operate on the split vectors. 
+\paragraph{Since the goal is to shrink the problem in half, let n’ = n/2.  Since (g, h) are still size n, split each into left (gL, hL) and right (gR, hR), with first n’ elements in the left vector and the second n’ in the right.  Then for some a1, a2, b1, b2 ∈ Zpn’, define the function H to operate on the split vectors. }
 
 \begin{eqnarray}
   H(a1, a2, b1, b2, c) = gLa.1 gRa.2 hLb.1 hRb.2 uc
 \end{eqnarray}
 
-We can define P in terms of H, splitting the real (a, b) as well into left and right:
+\paragraph{We can define P in terms of H, splitting the real (a, b) as well into left and right:}
 
 \begin{eqnarray}
   P = H(aL, aR, bL, bR, <a, b>) = gLa.L gRa.R hLb.L hRb.R u<a, b> = ga hb u<a, b>
 \end{eqnarray}
 
-Note that H is additively homomorphic in its inputs:
+\paragraph{Note that H is additively homomorphic in its inputs:}
 
 \begin{eqnarray}
   H(a1, a2, b1, b2, c1)*H(a3, a4, b3, b4, c2) = H(a1 + a3, a2 + a4, b1 + b3, b2 + b4, c1+c2)
 \end{eqnarray}
 
-Now define L, R ∈ G:
+\paragraph{Now define L, R ∈ G:}
 
 \begin{eqnarray}
   L = H(0n’, aL, bR, 0n’, <aL, bR>)\\
   R = H(aR, 0n’, 0n’, bL, <aR, bL>)
 \end{eqnarray}
 
-Prover sends (L, R) to the verifier, who responds with the challenge x ∈ Zp.  Prover then combines the left and right parts of (a, b) into single vectors using the challenge:
+\paragraph{Prover sends (L, R) to the verifier, who responds with the challenge x ∈ Zp.  Prover then combines the left and right parts of (a, b) into single vectors using the challenge:}
 
 \begin{eqnarray}
   a’ = x aL + x-1 aR\\
   b’ = x-1 bL + x bR
 \end{eqnarray}
 
-Prover sends (a’, b’) to verifier, who first computes P' from (P, L, R, x):
+\paragraph{Prover sends (a’, b’) to verifier, who first computes P' from (P, L, R, x):}
 
 \begin{eqnarray}
   P'=Lx2PRx-2
 \end{eqnarray}
 
-Verifier then uses (x, a’, b’) to calculate Q’, and and validates if P’ = Q’: 
+\paragraph{Verifier then uses (x, a’, b’) to calculate Q’, and and validates if P’ = Q’: }
 
 \begin{eqnarray}
   Q’ = H(x-1 a’, x a’, x b’, x-1 b’, <a’, b’>)
 \end{eqnarray}
 
-This works because if we expand Q’:
+\paragraph{This works because if we expand Q’:}
 
 \begin{eqnarray}
   Q’ = H(x-1(x aL + x-1 aR), x(x aL + x-1 aR), x(x-1 bL + x bR), x-1(x-1 bL + x bR), 
@@ -392,7 +399,7 @@ This works because if we expand Q’:
   x2<aL , bR> + <aL, bL> + <aR, bR> + x-2 <aR, bL>)
 \end{eqnarray}
 
-We get the same thing as when we expand P’:
+\paragraph{We get the same thing as when we expand P’:}
 
 \begin{eqnarray}
   P’ = H(0n’, x2 aL, x2 bR, 0n’, x2 <aL, bR>) * H(aL, aR, bL, bR, <a, b>) *
@@ -401,50 +408,50 @@ We get the same thing as when we expand P’:
   x2 <aL, bR> + <a, b> + x-2 <aR, bL>)
 \end{eqnarray}
 
-So if the prover can construct (L, R, a’, b’) such that P’ = Q’, then he must have known (a, b).
+\paragraph{So if the prover can construct (L, R, a’, b’) such that P’ = Q’, then he must have known (a, b).}
 
 
-4.2 Range Proof Using Inner Product
+\subsection{Range Proof Using Inner Product}
 
-Let aL be a vector with the n bits of v.  Then the following must all be true:
+\paragraph{Let aL be a vector with the n bits of v.  Then the following must all be true:}
 
 \begin{eqnarray}
   <aL, 2n> = v ; aL aR = 0n ; aR = aL - 1n
 \end{eqnarray}
   
-aR is defined to be the negation of aL: 0 where 1, and -1 where 0.  So any pairwise multiplication between aR and aL will be 0.
+\paragraph{aR is defined to be the negation of aL: 0 where 1, and -1 where 0.  So any pairwise multiplication between aR and aL will be 0.}
 
-Given a verifier chosen y ∈ G, these relations are equivalent to:
+\paragraph{Given a verifier chosen y ∈ G, these relations are equivalent to:}
 
 \begin{eqnarray}
   <aL, 2n> = v ; <aL,  aRyn> = 0 ; <aL - 1n - aR, yn> = 0
 \end{eqnarray}
 
-As before, pairwise multiplication between aR and aL will be 0, regardless of multiplying by yn, and summing the dot product will likewise be 0. And solving the third relation for 0 gives us another dot product of 0 with our new yn.
+\paragraph{As before, pairwise multiplication between aR and aL will be 0, regardless of multiplying by yn, and summing the dot product will likewise be 0. And solving the third relation for 0 gives us another dot product of 0 with our new yn.}
 
-Using another verifier chosen z ∈ G, we can combine these into one relation:
+\paragraph{Using another verifier chosen z ∈ G, we can combine these into one relation:}
 
 \begin{eqnarray}
   z2 <aL, 2n> + z <aL - 1n - aR, yn> + <aL,  aRyn> = z2 v
 \end{eqnarray}
 
-Multiplying the first relation by z2 gives us the z2v term, and since the other two relations were 0 we can add them for free (swapping order and multiplying one by z).
+\paragraph{Multiplying the first relation by z2 gives us the z2v term, and since the other two relations were 0 we can add them for free (swapping order and multiplying one by z).}
 
-If we expand the inner products, then start isolating prover and verifier terms, we get:
+\paragraph{If we expand the inner products, then start isolating prover and verifier terms, we get:}
 
 \begin{eqnarray}
   z2 <aL, 2n> + z <aL, yn> - z <1n, yn> - z <aR, yn> + <aL,  aRyn> = z2 v\\
   z2 <aL, 2n> + z <aL, yn> - z <aR, yn> + <aL,  aRyn> = z2 v + z <1n, yn>
 \end{eqnarray}
 
-Since an inner product <a, b> can be broken into a pairwise/inner product <1n, ab>:
+\paragraph{Since an inner product <a, b> can be broken into a pairwise/inner product <1n, ab>:}
 
 \begin{eqnarray}
   z2 <aL, 2n> + z <aL, yn> - z <1n, aRyn> + <aL,  aRyn> = z2 v + z <1n, yn>\\
   <aL, z2 2n + z yn> + <aL - z 1n, aRyn> = z2 v + z <1n, yn>
 \end{eqnarray}
 
-In order to merge the inner products via the first term, add <-z 1n, z2 2n + z yn>:
+\paragraph{In order to merge the inner products via the first term, add <-z 1n, z2 2n + z yn>:}
 
 \begin{eqnarray}
   <aL - z 1n, z2 2n + z yn + aRyn> = z2 v + z <1n, yn> + <-z 1n, z2 2n + z yn>\\
@@ -453,64 +460,64 @@ In order to merge the inner products via the first term, add <-z 1n, z2 2n + z y
   <aL - z 1n, z2 2n + z yn + aRyn> = z2 v + (z - z2) <1n, yn> - z3 <1n, 2n>
 \end{eqnarray}
   
-Let d(y,z) = (z - z2) <1n, yn> - z3 <1n, 2n>, and we get the final form:
+\paragraph{Let d(y,z) = (z - z2) <1n, yn> - z3 <1n, 2n>, and we get the final form:}
 
 \begin{eqnarray}
   <aL - z 1n, z2 2n + z yn + aRyn> = z2 v + d(y,z)
 \end{eqnarray}
 
-The verifier can calculate the right side (using the commitment V for v), and the problem is now reduced to an inner product argument.
+\paragraph{The verifier can calculate the right side (using the commitment V for v), and the problem is now reduced to an inner product argument.}
 
 
-4.3 Blinding the inner product
+\subsection{Blinding the inner product}
 
-We have shown how to make a logarithmically efficient inner product argument, and how to reduce a range proof to an inner product.  But the inner product argument is not zero knowledge, so we can’t use it directly; we must first blind the parameters.
+\paragraph{We have shown how to make a logarithmically efficient inner product argument, and how to reduce a range proof to an inner product.  But the inner product argument is not zero knowledge, so we can’t use it directly; we must first blind the parameters.}
 
-Let (sL, sR) be vectors of integers:
+\paragraph{Let (sL, sR) be vectors of integers:}
 
 \begin{eqnarray}
   (sL, sR) <- Zpn
 \end{eqnarray}
 
-Replace aL with (aL + sL x) and aR with (aR + sR x), and the inner product becomes:
+\paragraph{Replace aL with (aL + sL x) and aR with (aR + sR x), and the inner product becomes:}
 
 \begin{eqnarray}
   <(aL + sL x) - z 1n, z2 2n + z yn + (aR+ sR x)yn> = z2 v + d(y,z)
 \end{eqnarray}
 
-Then construct vector polynomials l(x) and r(x) from the two sides of the inner product:
+\paragraph{Then construct vector polynomials l(x) and r(x) from the two sides of the inner product:}
 
 \begin{eqnarray}
   l(x) = aL + sL x - z 1n\\
   r(x) = z2 2n + z yn + (aR+ sR x)yn
 \end{eqnarray}
 
-The zeros of these vector polynomials are just the unblinded inner product terms:
+\paragraph{The zeros of these vector polynomials are just the unblinded inner product terms:}
 
 \begin{eqnarray}
   l(0) = aL - z 1n\\
   r(0) = z2 2n + z yn + aRyn
 \end{eqnarray}
 
-The inner product then becomes
+\paragraph{The inner product then becomes}
 
 \begin{eqnarray}
   <l(0), r(0)> = z2 v + d(y,z)
 \end{eqnarray}
 
-If we define t(x) as the inner product of the blinded vector polynomials, we get
+\paragraph{If we define t(x) as the inner product of the blinded vector polynomials, we get}
 
 \begin{eqnarray}
   t(x) = <l(x), r(x)> 
 \end{eqnarray}
 
-We can express this in terms of x:
+\paragraph{We can express this in terms of x:}
 
 \begin{eqnarray}
   t(x) = t0 + t1 x + t2 x2
 \end{eqnarray}
 
-Where
+\paragraph{Where}
 
 \begin{eqnarray}
   t0 = <l(0), r(0)> = z2 v + d(y,z)\\
@@ -518,7 +525,7 @@ Where
   t0 = <l(0) + l(1), r(0) + r(1)> - t0 - t1
 \end{eqnarray}
 
-Proving the blinded inner product range proof now depends on simply verifying that both 
+\paragraph{Proving the blinded inner product range proof now depends on simply verifying that both }
 
 \begin{eqnarray}
   t0 = z2 v + d(y,z)\\
@@ -526,307 +533,392 @@ Proving the blinded inner product range proof now depends on simply verifying th
 \end{eqnarray}
 
 
-5. CryptoNote
 
-CryptoNote is a privacy focused cryptocurrency system which implements many of the techniques explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but I will break with that to maintain consistency with the rest of the document, and use exponentials in this section.
+\section{CryptoNote}
+
+\paragraph{CryptoNote is a privacy focused cryptocurrency system which implements many of the techniques explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but I will break with that to maintain consistency with the rest of the document, and use exponentials in this section.}
 
 
-5.1 One time addresses
+\subsection{One time addresses}
 
-A CryptoNote key consists of a pair of public keys (A, B) with their associated private keys (a, b).  To construct a one time address, the creator of a transaction starts with a transaction private key r, and an associated transaction public key R:
+\paragraph{A CryptoNote key consists of a pair of public keys (A, B) with their associated private keys (a, b).  To construct a one time address, the creator of a transaction starts with a transaction private key r, and an associated transaction public key R:}
 
-	R=gr
+\begin{eqnarray}
+  R=gr
+\end{eqnarray}
 
-The creator then uses this, with the destination public key (A, B), to construct the one time address y.  This address is a public key, with an associated private key x:
+\paragraph{The creator then uses this, with the destination public key (A, B), to construct the one time address y.  This address is a public key, with an associated private key x:}
 
-y=gx=gH(Ar)B
+\begin{eqnarray}
+  y=gx=gH(Ar)B
+\end{eqnarray}
 
-The owner of the destination key (A, B) can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key (a, b) to attempt to recover the one time private key x:
+\paragraph{The owner of the destination key (A, B) can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key (a, b) to attempt to recover the one time private key x:}
 
+\begin{eqnarray}
 	x=H(Ra)+b
+\end{eqnarray}
 
-Then raise g to this power to reconstruct the public key y:
+\paragraph{Then raise g to this power to reconstruct the public key y:}
 
-	gx=gH(Ra)gb
+\begin{eqnarray}
+  gx=gH(Ra)gb
+\end{eqnarray}
 
-If gx=y, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key x, he is able to sign the key y in a ring signature, allowing him to spend it.
-
-
-5.2 View keys
-
-One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, this can be problematic.  It would be preferable to allow a trusted node to do the scanning for the user, while preventing the node from being able to spend the output.
-
-To do this, the user can pass a tuple of his private key a with his public key B:
-
-	V = (a, B)
-
-The node can then look at each transaction, and use the view key with the transaction public key R to attempt to reconstruct the one time public key y:
-
-	Y=gH(Ra)B
-
-If Y = y, then the node knows that the one time key belongs to the user, and returns it.
+\paragraph{If gx=y, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key x, he is able to sign the key y in a ring signature, allowing him to spend it.}
 
 
-5.3 Ring signatures
+\subsection{View keys}
 
-CryptoNote uses linkable ring signatures, with external data.  It defines a transaction prefix to be all of the transaction data except for the ring signatures themselves, which includes the input and output public keys, with the transaction public key and amounts.  The transaction prefix is serialized then hashed to create the signed message m.
+\paragraph{One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, this can be problematic.  It would be preferable to allow a trusted node to do the scanning for the user, while preventing the node from being able to spend the output.}
+
+\paragraph{To do this, the user can pass a tuple of his private key a with his public key B:}
+
+\begin{eqnarray}
+  V = (a, B)
+\end{eqnarray}
+
+\paragraph{The node can then look at each transaction, and use the view key with the transaction public key R to attempt to reconstruct the one time public key y:}
+
+\begin{eqnarray}
+  Y=gH(Ra)B
+\end{eqnarray}
+
+\paragraph{If Y = y, then the node knows that the one time key belongs to the user, and returns it.}
 
 
+\subsection{Ring signatures}
 
-6. Monero
-
-Monero is a privacy focused cryptocurrency.  In its initial implementation, it used a vanilla implementation of cryptonote.  Later iterations added confidential transactions, with standard range proofs.  Recent work includes upgrading the range proofs with bulletproofs for significant space savings.
-
-
-6.1 RingCT
-
-The Monero implementation of confidential transactions is called RingCT.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recovergz.  Without the MLSAG, any attempt to include the commitments would either be unable to recover gz, or would expose the real input keys.
-
-To accomplish this, the MLSAG signature adds the corresponding commitments to the public key vectors, then passes them in the signature output:
-
-	yi=((yi,0,Ci,0), ... , (yi,m-1,Ci,m-1))
-
-When constructing the hashes, the prover signs a final term which is the sum of the input commitments minus the sum of the output commitments:
-
-	gz= Ci Co
-	Lj,m=gvm
-	cj+1=H(Lj,0, Rj, 0, ... , Lj,m-1, Rj, m-1, Lj,m)
-
-As before, if this sum is a commitment to zero, then it will take the form of a public key gz, where the user knows the private key z.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a Rj,mterm, or a key image.  It will be necessary to create a newvmand include an additional rj,m in the signature:
-
-	rj,m=vm-cjz
-
-The verifier uses this additional rj,m and cj to build a standard Schnorr term:
-
-	cj+1=H(Lj,0, Lj,0, ... , Lj,0, Lj,0, grj,m ycj)
-
-As before, if the sum was a commitment to zero, then this term will be the same in the prover and verifier hashes.
+\paragraph{CryptoNote uses linkable ring signatures, with external data.  It defines a transaction prefix to be all of the transaction data except for the ring signatures themselves, which includes the input and output public keys, with the transaction public key and amounts.  The transaction prefix is serialized then hashed to create the signed message m.}
 
 
 
-7. Zcash
+\section{Monero}
 
-Zcash is one of the more technically advanced cryptosystems available on current exchanges.  It uses zero-knowledge proofs to allow for completely hidden transactions, that can still be validated externally.  It divides its address space into t-addresses, whose details are transparent, and z-addresses, which are hidden from all but the participants.  Money that passes from a t-address to a z-address cannot be tracked, even if it later goes back to a t-address.
-
-
-7.1 zkSNARKs
-
-A zkSNARK is a zero-knowledge, short, non-interactive argument of knowledge.  It allows the prover to create a representation of an arbitrary arithmetic or logic circuit, then make proofs about assertions relative to that circuit.  The proofs are computationally difficult to construct, though easier to evaluate, and require a trusted setup between prover and verifier.
+\paragraph{Monero is a privacy focused cryptocurrency.  In its initial implementation, it used a vanilla implementation of cryptonote.  Later iterations added confidential transactions, with standard range proofs.  Recent work includes upgrading the range proofs with bulletproofs for significant space savings.}
 
 
+\subsection{RingCT}
 
-8. Lelantus
+\paragraph{The Monero implementation of confidential transactions is called RingCT.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recovergz.  Without the MLSAG, any attempt to include the commitments would either be unable to recover gz, or would expose the real input keys.}
 
-There is a new Zerocoin based cryptocurrency system called Lelantus, released 2018-12-22.  It uses confidential transactions, and claims to be able to hide the inputs fully while still being auditable.  
+\paragraph{To accomplish this, the MLSAG signature adds the corresponding commitments to the public key vectors, then passes them in the signature output:}
 
-As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/outputs themselves, rather than associating the commitments with a one time address as in RingCT.  It is thus necessary to reveal the commitment secret during the spend, similar to the way that CryptoNote reveals the key image.  So it is necessary to make the commitments double blind, or else after secret reveal it would be possible to brute force the values as per the naive approach to Pedersen commitments.  Adapting Lelantus to a more CryptoNote-ish system could obviate this need, and allow single blinded commitments.
+\begin{eqnarray}
+  yi=((yi,0,Ci,0), ... , (yi,m-1,Ci,m-1))
+\end{eqnarray}
+
+\paragraph{When constructing the hashes, the prover signs a final term which is the sum of the input commitments minus the sum of the output commitments:}
+
+\begin{eqnarray}
+  gz= Ci Co
+  Lj,m=gvm
+  cj+1=H(Lj,0, Rj, 0, ... , Lj,m-1, Rj, m-1, Lj,m)
+\end{eqnarray}
+
+\paragraph{As before, if this sum is a commitment to zero, then it will take the form of a public key gz, where the user knows the private key z.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a Rj,mterm, or a key image.  It will be necessary to create a newvmand include an additional rj,m in the signature:}
+
+\begin{eqnarray}
+  rj,m=vm-cjz
+\end{eqnarray}
+
+\paragraph{The verifier uses this additional rj,m and cj to build a standard Schnorr term:}
+
+\begin{eqnarray}
+  cj+1=H(Lj,0, Lj,0, ... , Lj,0, Lj,0, grj,m ycj)
+\end{eqnarray}
+
+\paragraph{As before, if the sum was a commitment to zero, then this term will be the same in the prover and verifier hashes.}
 
 
-8.1 -protocol for commitment to 0 or 1
 
-Consider a commitment to a message m with random blinding factor r:
+\section{Zcash}
 
-	c=Com(m, r)
+\paragraph{Zcash is one of the more technically advanced cryptosystems available on current exchanges.  It uses zero-knowledge proofs to allow for completely hidden transactions, that can still be validated externally.  It divides its address space into t-addresses, whose details are transparent, and z-addresses, which are hidden from all but the participants.  Money that passes from a t-address to a z-address cannot be tracked, even if it later goes back to a t-address.}
 
-To prove that c opens to 0 or 1, pick random (a,s,t) and use them to construct (ca,cb):
 
-	a,s,tZp
-	ca=Com(a, s)
-	cb=Com(am,t)
+\subsection{zkSNARKs}
 
-In an interactive protocol, the prover would send (ca,cb) to the verifier, who would respond with the challenge x.  To make it non-interactive, hash (c,ca,cb):
+\paragraph{A zkSNARK is a zero-knowledge, short, non-interactive argument of knowledge.  It allows the prover to create a representation of an arbitrary arithmetic or logic circuit, then make proofs about assertions relative to that circuit.  The proofs are computationally difficult to construct, though easier to evaluate, and require a trusted setup between prover and verifier.}
 
-	x=H(c,ca,cb)
 
-Either way, the prover uses x to construct (f,za,zb) and sends it to the verifier:
+
+\section{Lelantus}
+
+\paragraph{There is a new Zerocoin based cryptocurrency system called Lelantus, released 2018-12-22.  It uses confidential transactions, and claims to be able to hide the inputs fully while still being auditable.  }
+
+\paragraph{As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/outputs themselves, rather than associating the commitments with a one time address as in RingCT.  It is thus necessary to reveal the commitment secret during the spend, similar to the way that CryptoNote reveals the key image.  So it is necessary to make the commitments double blind, or else after secret reveal it would be possible to brute force the values as per the naive approach to Pedersen commitments.  Adapting Lelantus to a more CryptoNote-ish system could obviate this need, and allow single blinded commitments.}
+
+
+\subsection{-protocol for commitment to 0 or 1}
+
+\paragraph{Consider a commitment to a message m with random blinding factor r:}
+
+\begin{eqnarray}
+  c=Com(m, r)
+\end{eqnarray}
+
+\paragraph{To prove that c opens to 0 or 1, pick random (a,s,t) and use them to construct (ca,cb):}
+
+\begin{eqnarray}
+  a,s,tZp
+  ca=Com(a, s)
+  cb=Com(am,t)
+\end{eqnarray}
+
+\paragraph{In an interactive protocol, the prover would send (ca,cb) to the verifier, who would respond with the challenge x.  To make it non-interactive, hash (c,ca,cb):}
+
+\begin{eqnarray}
+  x=H(c,ca,cb)
+\end{eqnarray}
+
+\paragraph{Either way, the prover uses x to construct (f,za,zb) and sends it to the verifier:}
  
-	f =mx+a
-	za=rx+s
-	zb=r (x-f)+t
+\begin{eqnarray}
+  f =mx+a
+  za=rx+s
+  zb=r (x-f)+t
+\end{eqnarray}
 
-The verifier now has the full set of (c,ca,cb,x,f,za,zb) and accepts the proof if both of the following are true:
+\paragraph{The verifier now has the full set of (c,ca,cb,x,f,za,zb) and accepts the proof if both of the following are true:}
 
-	cxca=Com(f,za)
-	cx-fcb=Com(0,zb)
+\begin{eqnarray}
+  c^x c_a = Com(f,z_a)
+  c^{x-f} c_b = Com(0,z_b)
+\end{eqnarray}
 
-This follows as 
+\paragraph{This follows as }
 
-	cxca=Com(xm,xr) Com(a,s)=Com(xm+a,xr+s)= Com(f,za)
+\begin{eqnarray}
+  c^x c_a &=& Com(xm,xr) Com(a,s)
+  \cr &=& Com(xm+a,xr+s)
+  \cr &=& Com(f,za)
+  c^{x-f} c_b = Com((x-f)m,(x-f)r) Com(am,t)
+  \cr &=& Com(xm-fm+am,(x-f)r+t)
+  \cr &=& Com(xm-(mx+a)m+am,zb)
+  \cr &=& Com(xm-m2x,zb)
+\end{eqnarray}
 
-	cx-fcb=Com((x-f)m,(x-f)r) Com(am,t)=Com(xm-fm+am,(x-f)r+t)
-	         =Com(xm-(mx+a)m+am,zb)=Com(xm-m2x,zb)
+\paragraph{Since $x$ is not $0$, then $x (m-m^2)$ is only $0$ when $(m-m^2)$ is $0$, or when}
 
-Since x is not 0, then x (m-m2) is only 0 when (m-m2) is 0, or when
+\begin{eqnarray}
+  m = m^2
+\end{eqnarray}
 
-	m=m2
-
-This is only true m ∈ {0,1}.  So if cx-fcb=Com(0,zb), m ∈ {0,1}.
-
-
-8.2 One out of Many -proofs
-
-Ring signatures allow hiding a signature in a set of mixins.  But they grow in size linearly with the mixin set size.  So the mixin set must be limited, and cannot contain every transaction in the ledger.  Merkle proofs offer a logarithmic sized proof for ledger inclusion, but are not zero knowledge.  It would be ideal to be able to demonstrate both ownership and leder inclusion with a single proof.  One out of many proofs do this, in logarithmic size.  So every output in the ledger functions as a mixin, and the proof size scales logarithmically with the ledger size.
-
-Consider a set of N commitments:
-
-	ci=gsihvi
-
-If we know that this set contains a commitment to 0, then we know an index l such that
-
-	cl=i=0N-1ciil
-
-is a commitment to zero.  This is true because ll=1, while all other il=0. So this product is simply cl as the rest of the ci are canceled by raising to 0.
-
-Assuming N=2n, extending as necessary, expand i and l in binary:
-
-	i=i1...in
-	l=l1...ln
-
-We can now express il in terms of these bits:
-
-	il=j=1nijlj
-
-Combining these two terms, our commitment to 0 C becomes
-
-	C=i=0N-1cij=1nijlj
-
-Next we iterate over all n bits, committing to the bits of l and proving they are all zero or one using the previous protocol.  After getting the challenge x we will generate an f, but now there is one for each bit of l:
-
-	fj=ljx+aj
-
-We can further define fj,ij as a function of fj that depends on ij:
-
-	fj,1=fj=ljx+aj
-	fj,0=x-fj=(1-lj) x -aj
-
-For each i, we can take the product pi(x) of the fj,ij terms:
-
-	pi(x)=j=1nfj,ij
-
-In all cases, fj,ijwill be a linear function of x, so pi(x) will be a polynomial in x  of degree n; but the x term will cancel  j such that ljij.  So  i l, at least one of the x terms will cancel; thus
-
-	pi(x)=j=1nfj,ij=j=1nijljx+ k=0n-1pi,k xk
-
-If we have x, then we can calculate this product directly.  But before we have x, we can still evaluate this polynomial algebraically.  If we do so, we can determine the pi,k parameters in terms of aj.  This allows us to use pi,k once we have aj:
-
-For all j=(1, ..., n) with k=j-1:
-
-	(rj,aj,sj,tj,j) Zq
-	clj=Com(lj;rj)
-	caj=Com(aj;sj)
-	cbj=Com(ljaj;tj)
-	cdk=i=0N-1cipi,k Com(0;k)
-
-The verifier responds with the challenge x, or it is generated via Fiat-Shamir.  Prover then uses x as per the previous protocol to construct, for each j:
-
-	fj=ljx+aj
-	zaj=rjx+sj
-	zbj=rj(x-fj)+tj
-
-The prover then constructs the final value:
-
-	zd=rxn-k=0n-1kxk
-
-The verifier must check the individual bit proofs:
-
-	cljx caj=Com(fj;zaj)
-	cljx-fjcbj=Com(0;zbj)
-
-As before, the first line proves knowledge of lj, and the second proves it was binary.  Finally, the verifier checks zd against cdk using ci and fj,ij:
-
-	i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=Com(0;zd)
-
-If we simplify using pi(x) and expand we can see why this is true:
-
-	i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=i=0N-1cipi(x)  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk
-	                            =i=0N-1cij=1nijljx+ k=0n-1pi,k xk  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk
-	                            =clxn i=0N-1cik=0n-1pi,k xk  k=0n-1Com(0;k)-xk k=0n-1(i=0N-1cipi,k)-xk
-	                            =Com(0;rxn) k=0n-1Com(0;k)-xk  k=0n-1i=0N-1cipi,k xk  k=0n-1i=0N-1ci-pi,kxk
-	                            =Com(0;rxn) k=0n-1Com(0;k)-xk
-	Com(0;zd)=Com(0;rxn-k=0n-1kxk)=Com(0;rxn) k=0n-1Com(0;k)-xk
+\paragraph{This is only true $\forall m \in {0,1}$.  So if $c^{x-f} c_b = Com(0,zb)$, $m \in {0,1}$.}
 
 
-8.3 Hiding Transaction Amounts and Origins
+\subsection{One out of Many -proofs}
+
+\paragraph{Ring signatures allow hiding a signature in a set of mixins.  But they grow in size linearly with the mixin set size.  So the mixin set must be limited, and cannot contain every transaction in the ledger.  Merkle proofs offer a logarithmic sized proof for ledger inclusion, but are not zero knowledge.  It would be ideal to be able to demonstrate both ownership and leder inclusion with a single proof.  One out of many proofs do this, in logarithmic size.  So every output in the ledger functions as a mixin, and the proof size scales logarithmically with the ledger size.}
+
+\paragraph{Consider a set of N commitments:}
+
+\begin{eqnarray}
+  ci=gsihvi
+\end{eqnarray}
+
+\paragraph{If we know that this set contains a commitment to 0, then we know an index l such that}
+
+\begin{eqnarray}
+  cl=i=0N-1ciil
+\end{eqnarray}
+
+\paragraph{is a commitment to zero.  This is true because ll=1, while all other il=0. So this product is simply cl as the rest of the ci are canceled by raising to 0.}
+
+\paragraph{Assuming N=2n, extending as necessary, expand i and l in binary:}
+
+\begin{eqnarray}
+  i = i1...in
+  l = l1...ln
+\end{eqnarray}
+
+\paragraph{We can now express il in terms of these bits:}
+
+\begin{eqnarray}
+  il=j=1nijlj
+\end{eqnarray}
+  
+\paragraph{Combining these two terms, our commitment to 0 C becomes}
+
+\begin{eqnarray}
+  C=i=0N-1cij=1nijlj
+\end{eqnarray}
+
+\paragraph{Next we iterate over all n bits, committing to the bits of l and proving they are all zero or one using the previous protocol.  After getting the challenge x we will generate an f, but now there is one for each bit of l:}
+
+\begin{eqnarray}
+  fj=ljx+aj
+\end{eqnarray}
+
+\paragraph{We can further define fj,ij as a function of fj that depends on ij:}
+
+\begin{eqnarray}
+  fj,1=fj=ljx+aj
+  fj,0=x-fj=(1-lj) x -aj
+\end{eqnarray}
+
+\paragraph{For each i, we can take the product pi(x) of the fj,ij terms:}
+
+\begin{eqnarray}
+  pi(x)=j=1nfj,ij
+\end{eqnarray}
+
+\paragraph{In all cases, fj,ijwill be a linear function of x, so pi(x) will be a polynomial in x  of degree n; but the x term will cancel  j such that ljij.  So  i l, at least one of the x terms will cancel; thus}
+
+\begin{eqnarray}
+  pi(x)=j=1nfj,ij=j=1nijljx+ k=0n-1pi,k xk
+\end{eqnarray}
+
+\paragraph{If we have x, then we can calculate this product directly.  But before we have x, we can still evaluate this polynomial algebraically.  If we do so, we can determine the pi,k parameters in terms of aj.  This allows us to use pi,k once we have aj:}
+
+\paragraph{For all j=(1, ..., n) with k=j-1:}
+
+\begin{eqnarray}
+  (rj,aj,sj,tj,j) Zq
+  clj=Com(lj;rj)
+  caj=Com(aj;sj)
+  cbj=Com(ljaj;tj)
+  cdk=i=0N-1cipi,k Com(0;k)
+\end{eqnarray}
+
+\paragraph{The verifier responds with the challenge x, or it is generated via Fiat-Shamir.  Prover then uses x as per the previous protocol to construct, for each j:}
+
+\begin{eqnarray}
+  fj=ljx+aj
+  zaj=rjx+sj
+  zbj=rj(x-fj)+tj
+\end{eqnarray}
+
+\paragraph{The prover then constructs the final value:}
+
+\begin{eqnarray}
+  zd=rxn-k=0n-1kxk
+\end{eqnarray}
+
+\paragraph{The verifier must check the individual bit proofs:}
+
+\begin{eqnarray}
+  cljx caj=Com(fj;zaj)
+  cljx-fjcbj=Com(0;zbj)
+\end{eqnarray}
+    
+\paragraph{As before, the first line proves knowledge of lj, and the second proves it was binary.  Finally, the verifier checks zd against cdk using ci and fj,ij:}
+
+\begin{eqnarray}
+  i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=Com(0;zd)
+\end{eqnarray}
+
+\paragraph{If we simplify using pi(x) and expand we can see why this is true:}
+
+\begin{eqnarray}
+  i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=i=0N-1cipi(x)  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk
+  =i=0N-1cij=1nijljx+ k=0n-1pi,k xk  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk
+  =clxn i=0N-1cik=0n-1pi,k xk  k=0n-1Com(0;k)-xk k=0n-1(i=0N-1cipi,k)-xk
+  =Com(0;rxn) k=0n-1Com(0;k)-xk  k=0n-1i=0N-1cipi,k xk  k=0n-1i=0N-1ci-pi,kxk
+  =Com(0;rxn) k=0n-1Com(0;k)-xk
+  Com(0;zd)=Com(0;rxn-k=0n-1kxk)=Com(0;rxn) k=0n-1Com(0;k)-xk
+\end{eqnarray}
+
+
+\subsection{Hiding Transaction Amounts and Origins}
  
-Confidential Transactions are good at hiding amounts, but it is necessary to reveal the commitments themselves in order to prove that a transaction is balanced, i.e. that the sum of the inputs equals the sum of the outputs.  RingCT obfuscates the actual input commitments in a ring of mixins (with both addresses and commitments), but the data is still present and subject to analysis.  It would be better to be able to prove both input ownership and transaction balance without ever showing the input commitments.
+\paragraph{Confidential Transactions are good at hiding amounts, but it is necessary to reveal the commitments themselves in order to prove that a transaction is balanced, i.e. that the sum of the inputs equals the sum of the outputs.  RingCT obfuscates the actual input commitments in a ring of mixins (with both addresses and commitments), but the data is still present and subject to analysis.  It would be better to be able to prove both input ownership and transaction balance without ever showing the input commitments.}
 
-Lelantus accomplishes this via a two step process.  It establishes input ownership via a set of one out of many -proofs, then uses elements of the -proofs to to establish a balance proof.  At no time are the input commitments themselves revealed to the verifier.
+\paragraph{Lelantus accomplishes this via a two step process.  It establishes input ownership via a set of one out of many -proofs, then uses elements of the -proofs to to establish a balance proof.  At no time are the input commitments themselves revealed to the verifier.}
 
-To show how the balance proof arises from the elements of the -proofs, consider the following values:
+\paragraph{To show how the balance proof arises from the elements of the -proofs, consider the following values:}
 
-	zi=vixn-k=0n-1kixk
-	Com(0,ki)=g0hki
+\begin{eqnarray}
+  zi=vixn-k=0n-1kixk
+  Com(0,ki)=g0hki
+\end{eqnarray}
 
-The verifier can then compute the following:
+\paragraph{The verifier can then compute the following:}
 
-	A=(i=1NnewCoi)xn=(i=1Nnewgsoihvoi)xn=g( so) xnh( vo) xn
-	B=Com(0,i=1Noldzi) i=1Nold(k=0n-1Com(0,ki)xk)
-	  =g0h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(k=0n-1g0hkixk)
-	  =h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(hk=0n-1kixk)=h( vi) xn
+\begin{eqnarray}
+  A=(i=1NnewCoi)xn=(i=1Nnewgsoihvoi)xn=g( so) xnh( vo) xn
+  B=Com(0,i=1Noldzi) i=1Nold(k=0n-1Com(0,ki)xk)
+  =g0h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(k=0n-1g0hkixk)
+  =h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(hk=0n-1kixk)=h( vi) xn
+\end{eqnarray}
 
-The ratio of A to B is thus:
+\paragraph{The ratio of A to B is thus:}
 
-	AB=g( so) xnh( vo) xnh( vi) xn
+\begin{eqnarray}
+  AB=g( so) xnh( vo) xnh( vi) xn
+\end{eqnarray}
+  
+\paragraph{As before, if the transaction is balanced then }
 
-As before, if the transaction is balanced then 
+\begin{eqnarray}
+  vi= vo
+\end{eqnarray}
 
-	 vi= vo
+\paragraph{And thus}
 
-And thus
+\begin{eqnarray}
+  AB=g( so) xn
+\end{eqnarray}
 
-	AB=g( so) xn
-
-Since the prover knows the output serial numbers, this is a public key to which he knows the private key.  So it suffices to provide a regular Schnorr proof for this ratio to prove that the transaction is balanced, and no input commitments have been revealed.
-9. Mimblewimble
-
-Some of the most recently released cryptocurrencies use a relatively new system called Mimblewimble.  The goals are to implement a system with the benefits of RingCT, but with a pruned blockchain that still verifies even after removing spent outputs.  As a downside, the sender and receiver of a transaction must complete an interactive protocol.
-
-
-9.1 One Way Aggregate Signatures
-
-While RingCT uses ring signatures with mixins to obscure the links between inputs and outputs, Mimblewimble rather aggregates all of the transactions in a block.  Thus the individual links between the inputs and outputs of the transactions is lost, and only the block level linking is still present.  This happens naturally as a result of the transaction format.
-
-Consider a transaction with input commitments Ci and output commitments Co.  As with all implementations of confidential transactions, the sum of the input commitments minus the outputs will be the ratio of their products, and this will be a public key to which the owner knows the private key:
-
-	 Ci Co=g si -  so=gz=CT
-
-The transaction format is thus the set (Ci1,..., CiN,Co1,...,CoM,CT), with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:
-
-	(  Ci Co)k= (CT)k
-
-A verifier can check the signatures on the individual CT and the aggregated balance check; if they all succeed, the aggregated transaction set is still valid.
-
-Using this technique, miners will aggregate all of the transactions in a block into a single set with a single aggregated signature.  After the new block is formed, nodes can again merge the transactions from the new block into the set of all transactions.  Once this is done, any spent outputs will appear in both the output list and the input list.  Such outputs can be safely pruned from both lists, and a balance check over the entire ledger will still be valid.  This is clear, as any such transactions will appear in both the top and bottom of the input/output ratio, and will thus cancel each other out.  
-
-Thanks to this pruning, Mimblewimble achieves its goal of maintaining a lightweight ledger, with only unspent outputs and no inputs.  This makes the ledger small, only growing with the UTXO set.  And for observers who want to analyze the ledger, there is no way to link transactions.
-
-However, any observer who sees the advertised transactions (either a peer or a miner) has full visibility into the money flow, and can easily link transactions, since the inputs and outputs are directly listed with no obfuscation.  And all node operators get a list of the inputs and outputs in every block, which gives them obfuscated access to the same data (though on a per block rather than per transaction level).
-
-Since spent outputs will be removed, it will no longer be possible to validate a block using normal merkle tree semantics, since this requires having all leaf nodes to construct the root hash.  So every output will need a separate merkle proof, to tie it to the root hash at time of block creation.  Validating a block will require validating each remaining output’s merkle proof.
-
-Finally, while there are indeed space savings from removing inputs and spent outputs, it is necessary to store all balance commitments CT and their associated Schnorr proofs forever.  This set grows monotonically with each added transaction.  
+\paragraph{Since the prover knows the output serial numbers, this is a public key to which he knows the private key.  So it suffices to provide a regular Schnorr proof for this ratio to prove that the transaction is balanced, and no input commitments have been revealed.}
 
 
 
+\section{Mimblewimble}
 
-10. MobileCoin
-
-MobileCoin is a new cryptocurrency, whose goals are privacy, convenience, and provable correctness.  The proof of concept implementation uses CryptoNote as a transaction format, with the Stellar Consensus Protocol to achieve blockchain consensus, rather than a wasteful proof of work.  All computation on the nodes uses a secure enclave, to prevent even node operators from having access to view keys or rings.  
-
-For maximal convenience, MobileCoin will be introduced directly into secure messaging apps, using mobile devices’ secure storage for keys.  Since there is no mining, transactions will be confirmed quickly.  A user will be able to open a messaging app and quickly send untraceable money, usually within a matter of seconds.
-
-The main weakness of CryptoNote is that the ring signatures contain the actual inputs used in the transaction, though these are obscured by a number of mixins.  So anyone with access to the ledger can perform a number of attacks, linking payments to their eventual destinations.  This can be used in the common Overseer scenario, where collusion between two parties can unmask the owners of coins sent by one and cashed out at the other.  So the FBI could send coins to a suspect address, then wait for those coins to make their way to an exchange, at which point the identity of the owner of the suspect address can be determined.
-
-To address this, MobileCoin currently drops the inputs from transactions before writing them to the ledger, indeed before the transactions even leave the secure enclave.  This guarantees full privacy from ledger analysis, at the cost of external verifiability.  The consensus quorum becomes the arbiter of correctness, and since the software is open source and anyone can run a node, this functions to attest to the correctness of the ledger.
+\paragraph{Some of the most recently released cryptocurrencies use a relatively new system called Mimblewimble.  The goals are to implement a system with the benefits of RingCT, but with a pruned blockchain that still verifies even after removing spent outputs.  As a downside, the sender and receiver of a transaction must complete an interactive protocol.}
 
 
+\subsection{One Way Aggregate Signatures}
 
-Acknowledgements
+\paragraph{While RingCT uses ring signatures with mixins to obscure the links between inputs and outputs, Mimblewimble rather aggregates all of the transactions in a block.  Thus the individual links between the inputs and outputs of the transactions is lost, and only the block level linking is still present.  This happens naturally as a result of the transaction format.}
 
-The author would like to thank Toby Segaran for initial help on ring signatures.
+\paragraph{Consider a transaction with input commitments Ci and output commitments Co.  As with all implementations of confidential transactions, the sum of the input commitments minus the outputs will be the ratio of their products, and this will be a public key to which the owner knows the private key:}
+
+\begin{eqnarray}
+  Ci Co=g si -  so=gz=CT
+\end{eqnarray}
+
+\paragraph{The transaction format is thus the set (Ci1,..., CiN,Co1,...,CoM,CT), with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:}
+
+\begin{eqnarray}
+  (  Ci Co)k= (CT)k
+\end{eqnarray}
+
+\paragraph{A verifier can check the signatures on the individual CT and the aggregated balance check; if they all succeed, the aggregated transaction set is still valid.}
+
+\paragraph{Using this technique, miners will aggregate all of the transactions in a block into a single set with a single aggregated signature.  After the new block is formed, nodes can again merge the transactions from the new block into the set of all transactions.  Once this is done, any spent outputs will appear in both the output list and the input list.  Such outputs can be safely pruned from both lists, and a balance check over the entire ledger will still be valid.  This is clear, as any such transactions will appear in both the top and bottom of the input/output ratio, and will thus cancel each other out.  }
+
+\paragraph{Thanks to this pruning, Mimblewimble achieves its goal of maintaining a lightweight ledger, with only unspent outputs and no inputs.  This makes the ledger small, only growing with the UTXO set.  And for observers who want to analyze the ledger, there is no way to link transactions.}
+
+\paragraph{However, any observer who sees the advertised transactions (either a peer or a miner) has full visibility into the money flow, and can easily link transactions, since the inputs and outputs are directly listed with no obfuscation.  And all node operators get a list of the inputs and outputs in every block, which gives them obfuscated access to the same data (though on a per block rather than per transaction level).}
+
+\paragraph{Since spent outputs will be removed, it will no longer be possible to validate a block using normal merkle tree semantics, since this requires having all leaf nodes to construct the root hash.  So every output will need a separate merkle proof, to tie it to the root hash at time of block creation.  Validating a block will require validating each remaining output’s merkle proof.}
+
+\paragraph{Finally, while there are indeed space savings from removing inputs and spent outputs, it is necessary to store all balance commitments CT and their associated Schnorr proofs forever.  This set grows monotonically with each added transaction.  }
 
 
-References
+
+\section{MobileCoin}
+
+\paragraph{MobileCoin is a new cryptocurrency, whose goals are privacy, convenience, and provable correctness.  The proof of concept implementation uses CryptoNote as a transaction format, with the Stellar Consensus Protocol to achieve blockchain consensus, rather than a wasteful proof of work.  All computation on the nodes uses a secure enclave, to prevent even node operators from having access to view keys or rings.  }
+
+\paragraph{For maximal convenience, MobileCoin will be introduced directly into secure messaging apps, using mobile devices’ secure storage for keys.  Since there is no mining, transactions will be confirmed quickly.  A user will be able to open a messaging app and quickly send untraceable money, usually within a matter of seconds.}
+
+\paragraph{The main weakness of CryptoNote is that the ring signatures contain the actual inputs used in the transaction, though these are obscured by a number of mixins.  So anyone with access to the ledger can perform a number of attacks, linking payments to their eventual destinations.  This can be used in the common Overseer scenario, where collusion between two parties can unmask the owners of coins sent by one and cashed out at the other.  So the FBI could send coins to a suspect address, then wait for those coins to make their way to an exchange, at which point the identity of the owner of the suspect address can be determined.}
+
+\paragraph{To address this, MobileCoin currently drops the inputs from transactions before writing them to the ledger, indeed before the transactions even leave the secure enclave.  This guarantees full privacy from ledger analysis, at the cost of external verifiability.  The consensus quorum becomes the arbiter of correctness, and since the software is open source and anyone can run a node, this functions to attest to the correctness of the ledger.}
+
+
+
+\section{Acknowledgements}
+
+\paragraph{The author would like to thank Toby Segaran for initial help on ring signatures.}
+
+
+
+\section{References}
 
 Nicolas van Saberhagen. CryptoNote v 2.0. October 17, 2013. https://cryptonote.org/whitepaper.pdf
 

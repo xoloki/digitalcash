@@ -772,7 +772,7 @@
 \paragraph{In all cases, $f_{j, i_j}$ will be a linear function of $x$, so $p_i(x)$ will be a polynomial in $x$ of degree $n$; but the $x$ term will cancel $\forall j$ such that $l_j \ne i_j$.  So $\forall i \ne l$, at least one of the $x$ terms will cancel; thus}
 
 \begin{eqnarray}
-  p_i(x) = j=1nfj,ij=j=1nijljx+ k=0n-1pi,k xk
+  p_i(x) = \prod_{j=1}^n f_{j,i_j} = \prod_{j=1}^n \delta_{i_jl_j} x + \Sigma_{k=0}^{n-1} p_{i,k} x^k
 \end{eqnarray}
 
 \paragraph{If we have x, then we can calculate this product directly.  But before we have x, we can still evaluate this polynomial algebraically.  If we do so, we can determine the pi,k parameters in terms of aj.  This allows us to use pi,k once we have aj:}

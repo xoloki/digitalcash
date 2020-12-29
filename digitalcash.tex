@@ -142,11 +142,11 @@
 \paragraph{For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to zero, then back to $j$)}
 
 \begin{eqnarray}
-  Li &=& g^{r_i} y^{c_i}\\
-  Ri &=& g^{r_i} y^{c_i}\\
-  ci+1 &=& H(L_i,R_i)\\
+  L_i &=& g^{r_i} y^{c_i}\\
+  R_i &=& g^{r_i} y^{c_i}\\
+  c_{i+1} &=& H(L_i,R_i)\\
   &...& \\
-  cj &=& H(L_{j-1}, R_{j-1})
+  c_j &=& H(L_{j-1}, R_{j-1})
 \end{eqnarray}
 
 \paragraph{Now that we have $c_j$, we can define}
@@ -254,13 +254,13 @@
   
 \paragraph{So to check that the transaction is balanced, we check the product of the input commitments against the product of the output commitments: if they are equal, then the transaction is balanced.}
 
-\paragraph{This simple approach does not work, however, because the range of values in a cryptocurrency is usually only $[0, 264)$.  So an attacker can brute force any commitment by trying all $264$ possible values.  To prevent this, we add a random blinding factor s to the commitment:}
+\paragraph{This simple approach does not work, however, because the range of values in a cryptocurrency is usually only $[0, 2^{64})$.  So an attacker can brute force any commitment by trying all $2^{64}$ possible values.  To prevent this, we add a random blinding factor $s$ to the commitment:}
 
 \begin{eqnarray}
   C = g^s h^v
 \end{eqnarray}
   
-\paragraph{This requires another generatorh, which is usually defined as a hash-to-group of the generator $g$.  If the group is a prime order group, then any element of the group is a generator, and so a simple hash will suffice.  Otherwise, care must be made to assure that $h$ is orthogonal to $g$.}
+\paragraph{This requires another generator $h$, which is usually defined as a hash-to-group of the generator $g$.  If the group is a prime order group, then any element of the group is a generator, and so a simple hash will suffice.  Otherwise, care must be made to assure that $h$ is orthogonal to $g$.}
 
 \paragraph{Now when we check the transaction balance, we end up with}
 
@@ -284,7 +284,7 @@
 \paragraph{Which means that the ratio of the product of the commitments is now just $g^z$, and thus we know the private key $z$ which corresponds to the public key generated from the commitments:}
 
 \begin{eqnarray}
-  C_{i_1} C_{i_2} C_{o_1} C_{o_2} = g^z
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = g^z
 \end{eqnarray}
 
 \paragraph{We already know how to sign a public key if we know the private key, which means we can sign this commitment to zero, and a verifier can check it.  This allows a verifier to validate the transaction is balanced.}
@@ -300,7 +300,7 @@
   v = b_0 2^0 + b_1 2^1 + ... + b_{n-1} 2^{n-1}
 \end{eqnarray}
 
-\paragraph{If $v$ is in the range $[0, 264)$ then we know that each $b_k \in {0, 1}$.  Remember that we committed to $v$ with $C = g^s h^v$.  Choose a series of $s_k$ such that}
+\paragraph{If $v$ is in the range $[0, 2^{64})$ then we know that each $b_k \in {0, 1}$.  Remember that we committed to $v$ with $C = g^s h^v$.  Choose a series of $s_k$ such that}
 
 \begin{eqnarray}
   \sum_0^{n-1} s_k = s 
@@ -312,7 +312,7 @@
   C_k = g^{s_k} h^{b_k 2^k}
 \end{eqnarray}
 
-\paragraph{As before, the sum of the values in these commitments will be equal to $v$, but also the sum of the bit blinding factors sk will also equal $s$.  So}
+\paragraph{As before, the sum of the values in these commitments will be equal to $v$, but also the sum of the bit blinding factors $s_k$ will also equal $s$.  So}
 
 \begin{eqnarray}
   C_k = C
@@ -321,12 +321,16 @@
 \paragraph{This allows the validator to check that the binary expansion is valid.  And if each $b_k \in {0, 1}$, then one of the following must be a commitment to zero:}
 
 \begin{eqnarray}
-  \{g^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
+  \{G^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
 \end{eqnarray}
 
 \paragraph{So either the first or the second terms will reduce to $g^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don’t need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.}
 
-\paragraph{The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding ring signatures.  The verifier checks that the product of the $C_i$ equals $C$, and then checks each bit ring signature.}
+\paragraph{The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding ring signatures.  The verifier checks the validity of each bit proof, and then verifies that}
+
+\begin{eqnarray}
+  C = \prod{C_i}
+\end{eqnarray}
 
 
 
@@ -542,50 +546,50 @@
 
 \subsection{One time addresses}
 
-\paragraph{A CryptoNote key consists of a pair of public keys (A, B) with their associated private keys (a, b).  To construct a one time address, the creator of a transaction starts with a transaction private key r, and an associated transaction public key R:}
+\paragraph{A CryptoNote key consists of a pair of public keys $(A, B)$ with their associated private keys $(a, b)$.  To construct a one time address, the creator of a transaction starts with a transaction private key $r$, and an associated transaction public key $R$:}
 
 \begin{eqnarray}
-  R=gr
+  R=g^r
 \end{eqnarray}
 
-\paragraph{The creator then uses this, with the destination public key (A, B), to construct the one time address y.  This address is a public key, with an associated private key x:}
+\paragraph{The creator then uses this, with the destination public key $(A, B)$, to construct the one time address $y$.  This address is a public key, with an associated private key $x$:}
 
 \begin{eqnarray}
-  y=gx=gH(Ar)B
+  y = g^x = g^{H(rA)} B
 \end{eqnarray}
 
-\paragraph{The owner of the destination key (A, B) can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key (a, b) to attempt to recover the one time private key x:}
+\paragraph{The owner of the destination key $(A, B)$ can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key $(a, b)$ to attempt to recover the one time private key $x$:}
 
 \begin{eqnarray}
-	x=H(Ra)+b
+	x = H(Ra) + b
 \end{eqnarray}
 
-\paragraph{Then raise g to this power to reconstruct the public key y:}
+\paragraph{Then raise $g$ to this power to reconstruct the public key $y$:}
 
 \begin{eqnarray}
-  gx=gH(Ra)gb
+  g^x = g^{H(Ra)} g^b
 \end{eqnarray}
 
-\paragraph{If gx=y, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key x, he is able to sign the key y in a ring signature, allowing him to spend it.}
+\paragraph{If $y = g^x$, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key $x$, he is able to sign the key $y$ in a ring signature, allowing him to spend it.}
 
 
 \subsection{View keys}
 
 \paragraph{One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, this can be problematic.  It would be preferable to allow a trusted node to do the scanning for the user, while preventing the node from being able to spend the output.}
 
-\paragraph{To do this, the user can pass a tuple of his private key a with his public key B:}
+\paragraph{To do this, the user can pass a tuple of his private key $a$ with his public key $B$:}
 
 \begin{eqnarray}
   V = (a, B)
 \end{eqnarray}
 
-\paragraph{The node can then look at each transaction, and use the view key with the transaction public key R to attempt to reconstruct the one time public key y:}
+\paragraph{The node can then look at each transaction, and use the view key with the transaction public key $R$ to attempt to reconstruct the one time public key $y$:}
 
 \begin{eqnarray}
-  Y=gH(Ra)B
+  Y = g^{H(Ra)} B
 \end{eqnarray}
 
-\paragraph{If Y = y, then the node knows that the one time key belongs to the user, and returns it.}
+\paragraph{If $Y = y$, then the node knows that the one time key belongs to the user, and returns it.}
 
 
 \subsection{Ring signatures}

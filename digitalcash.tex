@@ -616,9 +616,9 @@
 \paragraph{When constructing the hashes, the prover signs a final term which is the sum of the input commitments minus the sum of the output commitments:}
 
 \begin{eqnarray}
-  g^{z} = \frac{C_i}{C_o}
-  L_{j,m} = g^{v_m}
-  c_{j+1} = H(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
+  g^z &=& \frac{C_i}{C_o}\\
+  L_{j,m} &=& g^{v_m}\\
+  c_{j+1} &=& H(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
 \end{eqnarray}
 
 \paragraph{As before, if this sum is a commitment to zero, then it will take the form of a public key $g^z$, where the user knows the private key $z$.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a $R_{j,m}$ term, or a key image.  It will be necessary to create a new $v_m$ and include an additional $r_{j,m}$ in the signature:}
@@ -655,53 +655,53 @@
 \paragraph{As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/outputs themselves, rather than associating the commitments with a one time address as in RingCT.  It is thus necessary to reveal the commitment secret during the spend, similar to the way that CryptoNote reveals the key image.  So it is necessary to make the commitments double blind, or else after secret reveal it would be possible to brute force the values as per the naive approach to Pedersen commitments.  Adapting Lelantus to a more CryptoNote-ish system could obviate this need, and allow single blinded commitments.}
 
 
-\subsection{$\sigma$-protocol for commitment to 0 or 1}
+\subsection{$\sigma$-protocol for commitment to $0$ or $1$}
 
-\paragraph{Consider a commitment to a message m with random blinding factor r:}
+\paragraph{Consider a commitment to a message $m$ with random blinding factor $r$:}
 
 \begin{eqnarray}
   c=Com(m, r)
 \end{eqnarray}
 
-\paragraph{To prove that c opens to 0 or 1, pick random (a,s,t) and use them to construct (ca,cb):}
+\paragraph{To prove that $c$ opens to $0$ or $1$, pick random $(a,s,t)$ and use them to construct $(c_a, c_b)$:}
 
 \begin{eqnarray}
-  a,s,tZp
-  ca=Com(a, s)
-  cb=Com(am,t)
+  a,s,t &\in& Z_p\\
+  c_a &=& Com(a, s)\\
+  c_b &=& Com(am, t)
 \end{eqnarray}
 
-\paragraph{In an interactive protocol, the prover would send (ca,cb) to the verifier, who would respond with the challenge x.  To make it non-interactive, hash (c,ca,cb):}
+\paragraph{In an interactive protocol, the prover would send $(c_a,c_b)$ to the verifier, who would respond with the challenge $x$.  To make it non-interactive, hash $(c, c_a, c_b)$:}
 
 \begin{eqnarray}
-  x=H(c,ca,cb)
+  x = H(c, c_a, c_b)
 \end{eqnarray}
 
-\paragraph{Either way, the prover uses x to construct (f,za,zb) and sends it to the verifier:}
+\paragraph{Either way, the prover uses $x$ to construct $(f, z_a, z_b)$ and sends it to the verifier:}
  
 \begin{eqnarray}
-  f =mx+a
-  za=rx+s
-  zb=r (x-f)+t
+  f &=& mx + a\\
+  z_a &=& rx + s\\
+  z_b &=& r(x-f) + t
 \end{eqnarray}
 
-\paragraph{The verifier now has the full set of (c,ca,cb,x,f,za,zb) and accepts the proof if both of the following are true:}
+\paragraph{The verifier now has the full set of $(c, c_a, c_b, x, f, z_a, z_b)$ and accepts the proof if both of the following are true:}
 
 \begin{eqnarray}
-  c^x c_a = Com(f,z_a)
-  c^{x-f} c_b = Com(0,z_b)
+  c^x c_a &=& Com(f, z_a)\\
+  c^{x-f} c_b &=& Com(0, z_b)
 \end{eqnarray}
 
 \paragraph{This follows as }
 
 \begin{eqnarray}
-  c^x c_a &=& Com(xm,xr) Com(a,s)
-  \cr &=& Com(xm+a,xr+s)
-  \cr &=& Com(f,za)
-  c^{x-f} c_b = Com((x-f)m,(x-f)r) Com(am,t)
-  \cr &=& Com(xm-fm+am,(x-f)r+t)
-  \cr &=& Com(xm-(mx+a)m+am,zb)
-  \cr &=& Com(xm-m2x,zb)
+  c^x c_a &=& Com(xm,xr) Com(a,s)\\
+  \cr &=& Com(xm+a, xr+s)\\
+  \cr &=& Com(f, za)\\
+  c^{x-f} c_b &=& Com((x-f)m, (x-f)r) Com(am, t)\\
+  \cr &=& Com(xm - fm + am, (x-f)r + t)\\
+  \cr &=& Com(xm - (mx + a)m + am, z_b)\\
+  \cr &=& Com(xm - m^2 x, z_b)
 \end{eqnarray}
 
 \paragraph{Since $x$ is not $0$, then $x (m-m^2)$ is only $0$ when $(m-m^2)$ is $0$, or when}
@@ -713,7 +713,7 @@
 \paragraph{This is only true $\forall m \in {0,1}$.  So if $c^{x-f} c_b = Com(0,zb)$, $m \in {0,1}$.}
 
 
-\subsection{One out of Many $\sigma$-proofs}
+\subsection{One out of Many $\Sigma$-proofs}
 
 \paragraph{Ring signatures allow hiding a signature in a set of mixins.  But they grow in size linearly with the mixin set size.  So the mixin set must be limited, and cannot contain every transaction in the ledger.  Merkle proofs offer a logarithmic sized proof for ledger inclusion, but are not zero knowledge.  It would be ideal to be able to demonstrate both ownership and leder inclusion with a single proof.  One out of many proofs do this, in logarithmic size.  So every output in the ledger functions as a mixin, and the proof size scales logarithmically with the ledger size.}
 
@@ -723,10 +723,10 @@
   c_i = g^{s_i} h^{v_i}
 \end{eqnarray}
 
-\paragraph{If we know that this set contains a commitment to 0, then we know an index l such that}
+\paragraph{If we know that this set contains a commitment to $0$, then we know an index $l$ such that}
 
 \begin{eqnarray}
-  cl=i=0N-1ciil
+  c_l = \prod_{i=0}{N-1} c_i^{\delta{il}}
 \end{eqnarray}
 
 \paragraph{is a commitment to zero.  This is true because ll=1, while all other il=0. So this product is simply cl as the rest of the ci are canceled by raising to 0.}

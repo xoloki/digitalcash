@@ -100,8 +100,8 @@
 
 \begin{eqnarray}
   H(y)^v &=& H(y)^r H(y)^{cx}\\
-  H(y)^v &=& H(y)^r (H(y)^x)^c\\
-  H(y)^v &=& H(y)^r I^c
+  \cr &=& H(y)^r (H(y)^x)^c\\
+  \cr &=& H(y)^r I^c
 \end{eqnarray}
 
 \paragraph{Putting the real $y$ first, the prover hash becomes:}
@@ -264,26 +264,26 @@
 \paragraph{Now when we check the transaction balance, we end up with}
 
 \begin{eqnarray}
-  C_{i_1} C_{i_2} C_{o_1} C_{o_2} &=& g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}} g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} &=& \frac{g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}}}{g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}}
   \cr &=& g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} h^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
 \end{eqnarray}
 
 \paragraph{But if the transaction is balanced, then $v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2} =0$, so}
 
 \begin{eqnarray}
-  Ci1Ci2Co1Co2=gsi1+ si2- so1- so2
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}}
 \end{eqnarray}
 
 \paragraph{We define the sum of the input blinding factors minus the output blinding factors to be}
 
 \begin{eqnarray}
-  z=si1+ si2- so1- so2
+  z = s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}
 \end{eqnarray}
 
-\paragraph{Which means that the ratio of the product of the commitments is now just gz, and thus we know the private key z which corresponds to the public key generated from the commitments:}
+\paragraph{Which means that the ratio of the product of the commitments is now just $g^z$, and thus we know the private key $z$ which corresponds to the public key generated from the commitments:}
 
 \begin{eqnarray}
-  Ci1Ci2Co1Co2=gz
+  C_{i_1} C_{i_2} C_{o_1} C_{o_2} = g^z
 \end{eqnarray}
 
 \paragraph{We already know how to sign a public key if we know the private key, which means we can sign this commitment to zero, and a verifier can check it.  This allows a verifier to validate the transaction is balanced.}
@@ -293,45 +293,45 @@
 
 \paragraph{Now that the values can be hidden, we have a new problem.  Since we are checking that the sum of the inputs matches the sum of the outputs, what happens if one of the output values is negative?  The transaction will be balanced, but we will end up minting new coins.  How can we prevent this?}
 
-\paragraph{First, consider a n-bit binary expansion of v:}
+\paragraph{First, consider a $n$-bit binary expansion of $v$:}
 
 \begin{eqnarray}
-  v=b020+ b121+ … + bn-12n-1
+  v = b_0 2^0 + b_1 2^1 + ... + b_{n-1} 2^{n-1}
 \end{eqnarray}
 
-\paragraph{If v is in the range [0, 264) then we know that each bk ∈ {0, 1}.  Remember that we committed to v withC=gshv.  Choose a series of sksuch that}
+\paragraph{If $v$ is in the range $[0, 264)$ then we know that each $b_k \in {0, 1}$.  Remember that we committed to $v$ with $C = g^s h^v$.  Choose a series of $s_k$ such that}
 
 \begin{eqnarray}
-  0n-1sk=s 
+  \sum_0^{n-1} s_k = s 
 \end{eqnarray}
 
 \paragraph{Then write commitments for each bit in the binary expansion thus}
 
 \begin{eqnarray}
-  Ck=gskhbk2k
+  C_k = g^{s_k} h^{b_k 2^k}
 \end{eqnarray}
 
-\paragraph{As before, the sum of the values in these commitments will be equal to v, but also the sum of the bit blinding factors sk will also equal s.  So}
+\paragraph{As before, the sum of the values in these commitments will be equal to $v$, but also the sum of the bit blinding factors sk will also equal $s$.  So}
 
 \begin{eqnarray}
-  Ck=C
+  C_k = C
 \end{eqnarray}
 
-\paragraph{This allows the validator to check that the binary expansion is valid.  And if each bk ∈ {0, 1}, then one of the following must be a commitment to zero:}
+\paragraph{This allows the validator to check that the binary expansion is valid.  And if each $b_k \in {0, 1}$, then one of the following must be a commitment to zero:}
 
 \begin{eqnarray}
-  {gskhbk2k,gskhbk2k-2k} 
+  \{g^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
 \end{eqnarray}
 
-\paragraph{So either the first or the second terms will reduce to gsk, and since the prover know skhe can sign the ring.  We don’t need linkability, so we can use basic ring signatures of size 2. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.}
+\paragraph{So either the first or the second terms will reduce to $g^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don’t need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.}
 
-\paragraph{The range proof thus consists of the n bit commitments Ci and corresponding ring signatures.  The verifier checks that the product of the Ci equals C, and then checks each bit ring signature.}
+\paragraph{The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding ring signatures.  The verifier checks that the product of the $C_i$ equals $C$, and then checks each bit ring signature.}
 
 
 
 \section{Bulletproofs}
 
-\paragraph{Range proofs allow us to verify that output commitments are not negative, but they use a lot of space; each output range proof consists of 64 separate ring signatures.  It would be preferable to somehow consolidate them, and there are a variety of techniques to do so.  Bulletproofs are a compact way to represent aggregated range proofs, and result in significant space savings.}
+\paragraph{Range proofs allow us to verify that output commitments are not negative, but they use a lot of space; each output range proof consists of $64$ separate ring signatures.  It would be preferable to somehow consolidate them, and there are a variety of techniques to do so.  Bulletproofs are a compact way to represent aggregated range proofs, and result in significant space savings.}
 
 \paragraph{Bulletproofs are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.}
 
@@ -340,7 +340,7 @@
 
 \paragraph{The heart of a bulletproof is a vector commitment that links a committed value with an inner product.  The prover uses a recursive protocol that at every step cuts the size of the vectors in half and generates a new commitment, until only a single element remains, then sends the final values with the corresponding generators and commitment as the proof.  The verifier checks that the final commitment is valid, then unwinds the stack.}
 
-\paragraph{So for (g, h) ∈ Gn, (a, b) ∈ Zpn, (u, P) ∈ G, c ∈ Zp, let P = ga hb and c = <a, b>.  The goal is to find a way to prove knowledge of a and b to someone who knows P and c, without revealing them.  To do this, the prover adds the inner product to the commitment itself:}
+\paragraph{So for some $(\textbf{g}, \textbf{h}) \in \textbf{G}^n$, $(\textbf{a}, \textbf{b}) \in \textbf{Z}_p^n$, $(u, P) \in G$, $c \in Z_p$, let $P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b}$ and $c = <a, b>$.  The goal is to find a way to prove knowledge of $a$ and $b$ to someone who knows $P$ and $c$, without revealing them.  To do this, the prover adds the inner product to the commitment itself:}
 
 \begin{eqnarray}
   P = ga hb u<a, b>

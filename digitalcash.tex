@@ -655,7 +655,7 @@
 \paragraph{As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/outputs themselves, rather than associating the commitments with a one time address as in RingCT.  It is thus necessary to reveal the commitment secret during the spend, similar to the way that CryptoNote reveals the key image.  So it is necessary to make the commitments double blind, or else after secret reveal it would be possible to brute force the values as per the naive approach to Pedersen commitments.  Adapting Lelantus to a more CryptoNote-ish system could obviate this need, and allow single blinded commitments.}
 
 
-\subsection{$\sigma$-protocol for commitment to $0$ or $1$}
+\subsection{$\Sigma$-protocol for commitment to $0$ or $1$}
 
 \paragraph{Consider a commitment to a message $m$ with random blinding factor $r$:}
 
@@ -726,53 +726,53 @@
 \paragraph{If we know that this set contains a commitment to $0$, then we know an index $l$ such that}
 
 \begin{eqnarray}
-  c_l = \prod_{i=0}{N-1} c_i^{\delta{il}}
+  c_l = \prod_{i=0}^{N-1} c_i^{\delta_{il}}
 \end{eqnarray}
 
-\paragraph{is a commitment to zero.  This is true because ll=1, while all other il=0. So this product is simply cl as the rest of the ci are canceled by raising to 0.}
+\paragraph{is a commitment to zero.  This is true because $\delta_{ll} = 1$, while all other $\delta_{il} = 0$. So this product is simply $c_l$ as the rest of the $c_i$ are canceled by raising to $0$.}
 
-\paragraph{Assuming N=2n, extending as necessary, expand i and l in binary:}
+\paragraph{Assuming $N = 2^n$, extending as necessary, expand $i$ and $l$ in binary:}
 
 \begin{eqnarray}
-  i = i1...in
-  l = l1...ln
+  i = i_1...i_n\\
+  l = l_1...l_n
 \end{eqnarray}
 
-\paragraph{We can now express il in terms of these bits:}
+\paragraph{We can now express $\delta_{il}$ in terms of these bits:}
 
 \begin{eqnarray}
-  il=j=1nijlj
+  \delta_{il} = \prod_{j=1}^{n} \delta_{i_jl_j}
 \end{eqnarray}
   
-\paragraph{Combining these two terms, our commitment to 0 C becomes}
+\paragraph{Combining these two terms, our commitment to $0$ $C$ becomes}
 
 \begin{eqnarray}
-  C=i=0N-1cij=1nijlj
+  C = \prod_{i=0}^{N-1}c_i^{\prod_{j=1}^{n} \delta_{i_jl_j}}
 \end{eqnarray}
 
-\paragraph{Next we iterate over all n bits, committing to the bits of l and proving they are all zero or one using the previous protocol.  After getting the challenge x we will generate an f, but now there is one for each bit of l:}
+\paragraph{Next we iterate over all $n$ bits, committing to the bits of $l$ and proving they are all zero or one using the previous protocol.  After getting the challenge $x$ we will generate an $f$, but now there is one for each bit of $l$:}
 
 \begin{eqnarray}
-  fj=ljx+aj
+  f_j = l_j x + a_j
 \end{eqnarray}
 
-\paragraph{We can further define fj,ij as a function of fj that depends on ij:}
+\paragraph{We can further define $f_{j, i_j}$ as a function of $f_j$ that depends on $i_j$:}
 
 \begin{eqnarray}
-  fj,1=fj=ljx+aj
-  fj,0=x-fj=(1-lj) x -aj
+  f_{j,1} = f_j = l_j x + a_j\\
+  f_{j,0} = x - f_j = (1 - l_j) x - a_j
 \end{eqnarray}
 
-\paragraph{For each i, we can take the product pi(x) of the fj,ij terms:}
+\paragraph{For each $i$, we can take the product $p_i(x)$ of the $f_{j, i_j}$ terms:}
 
 \begin{eqnarray}
-  pi(x)=j=1nfj,ij
+  p_i(x) = \prod_{j=1}^{n} f_{j, i_j}
 \end{eqnarray}
 
-\paragraph{In all cases, fj,ijwill be a linear function of x, so pi(x) will be a polynomial in x  of degree n; but the x term will cancel  j such that ljij.  So  i l, at least one of the x terms will cancel; thus}
+\paragraph{In all cases, $f_{j, i_j}$ will be a linear function of $x$, so $p_i(x)$ will be a polynomial in $x$ of degree $n$; but the $x$ term will cancel $\forall j$ such that $l_j \ne i_j$.  So $\forall i \ne l$, at least one of the $x$ terms will cancel; thus}
 
 \begin{eqnarray}
-  pi(x)=j=1nfj,ij=j=1nijljx+ k=0n-1pi,k xk
+  p_i(x) = j=1nfj,ij=j=1nijljx+ k=0n-1pi,k xk
 \end{eqnarray}
 
 \paragraph{If we have x, then we can calculate this product directly.  But before we have x, we can still evaluate this polynomial algebraically.  If we do so, we can determine the pi,k parameters in terms of aj.  This allows us to use pi,k once we have aj:}
@@ -780,18 +780,18 @@
 \paragraph{For all j=(1, ..., n) with k=j-1:}
 
 \begin{eqnarray}
-  (rj,aj,sj,tj,j) Zq
-  clj=Com(lj;rj)
-  caj=Com(aj;sj)
-  cbj=Com(ljaj;tj)
+  (rj,aj,sj,tj,j) Zq\\
+  clj=Com(lj;rj)\\
+  caj=Com(aj;sj)\\
+  cbj=Com(ljaj;tj)\\
   cdk=i=0N-1cipi,k Com(0;k)
 \end{eqnarray}
 
 \paragraph{The verifier responds with the challenge x, or it is generated via Fiat-Shamir.  Prover then uses x as per the previous protocol to construct, for each j:}
 
 \begin{eqnarray}
-  fj=ljx+aj
-  zaj=rjx+sj
+  fj=ljx+aj\\
+  zaj=rjx+sj\\
   zbj=rj(x-fj)+tj
 \end{eqnarray}
 
@@ -804,7 +804,7 @@
 \paragraph{The verifier must check the individual bit proofs:}
 
 \begin{eqnarray}
-  cljx caj=Com(fj;zaj)
+  cljx caj=Com(fj;zaj)\\
   cljx-fjcbj=Com(0;zbj)
 \end{eqnarray}
     
@@ -817,11 +817,11 @@
 \paragraph{If we simplify using pi(x) and expand we can see why this is true:}
 
 \begin{eqnarray}
-  i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=i=0N-1cipi(x)  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk
-  =i=0N-1cij=1nijljx+ k=0n-1pi,k xk  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk
-  =clxn i=0N-1cik=0n-1pi,k xk  k=0n-1Com(0;k)-xk k=0n-1(i=0N-1cipi,k)-xk
-  =Com(0;rxn) k=0n-1Com(0;k)-xk  k=0n-1i=0N-1cipi,k xk  k=0n-1i=0N-1ci-pi,kxk
-  =Com(0;rxn) k=0n-1Com(0;k)-xk
+  i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=i=0N-1cipi(x)  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk\\
+  =i=0N-1cij=1nijljx+ k=0n-1pi,k xk  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk\\
+  =clxn i=0N-1cik=0n-1pi,k xk  k=0n-1Com(0;k)-xk k=0n-1(i=0N-1cipi,k)-xk\\
+  =Com(0;rxn) k=0n-1Com(0;k)-xk  k=0n-1i=0N-1cipi,k xk  k=0n-1i=0N-1ci-pi,kxk\\
+  =Com(0;rxn) k=0n-1Com(0;k)-xk\\
   Com(0;zd)=Com(0;rxn-k=0n-1kxk)=Com(0;rxn) k=0n-1Com(0;k)-xk
 \end{eqnarray}
 
@@ -835,16 +835,16 @@
 \paragraph{To show how the balance proof arises from the elements of the -proofs, consider the following values:}
 
 \begin{eqnarray}
-  zi=vixn-k=0n-1kixk
+  zi=vixn-k=0n-1kixk\\
   Com(0,ki)=g0hki
 \end{eqnarray}
 
 \paragraph{The verifier can then compute the following:}
 
 \begin{eqnarray}
-  A=(i=1NnewCoi)xn=(i=1Nnewgsoihvoi)xn=g( so) xnh( vo) xn
-  B=Com(0,i=1Noldzi) i=1Nold(k=0n-1Com(0,ki)xk)
-  =g0h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(k=0n-1g0hkixk)
+  A=(i=1NnewCoi)xn=(i=1Nnewgsoihvoi)xn=g( so) xnh( vo) xn\\
+  B=Com(0,i=1Noldzi) i=1Nold(k=0n-1Com(0,ki)xk)\\
+  =g0h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(k=0n-1g0hkixk)\\
   =h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(hk=0n-1kixk)=h( vi) xn
 \end{eqnarray}
 

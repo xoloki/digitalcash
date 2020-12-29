@@ -2,6 +2,7 @@
 \title{The Mathematics of Digital Cash}
 \date{2018-12-23}
 \author{Joey Yandle}
+\usepackage{mathtools}
 
 \begin{document}
 \maketitle
@@ -138,7 +139,7 @@
   c_{j+1} &=& H(L_j,R_j)
 \end{eqnarray}
 
-\paragraph{For the remaining $i \in {j+1, …, n, …, j-1}$ ($mod n$ so $n$ goes to zero, then back to $j$)}
+\paragraph{For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to zero, then back to $j$)}
 
 \begin{eqnarray}
   Li &=& g^{r_i} y^{c_i}\\

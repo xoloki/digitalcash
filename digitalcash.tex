@@ -616,9 +616,9 @@
 \paragraph{When constructing the hashes, the prover signs a final term which is the sum of the input commitments minus the sum of the output commitments:}
 
 \begin{eqnarray}
-  g^{z} $=$ \frac{C_i}{C_o}
-  L_{j,m} $=$ g^{v_m}
-  c_{j+1} $=$ H(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
+  g^{z} = \frac{C_i}{C_o}
+  L_{j,m} = g^{v_m}
+  c_{j+1} = H(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
 \end{eqnarray}
 
 \paragraph{As before, if this sum is a commitment to zero, then it will take the form of a public key $g^z$, where the user knows the private key $z$.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a $R_{j,m}$ term, or a key image.  It will be necessary to create a new $v_m$ and include an additional $r_{j,m}$ in the signature:}

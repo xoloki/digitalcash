@@ -336,14 +336,14 @@ Note that $H$ is additively homomorphic in its inputs:
 
 Now define $L, R \in \mathbb{G}$:
 \begin{eqnarray}
-  L = H(\textbf{0}^{n'}, \textbf{a}_{[n':]}, \textbf{b}_{[:n']}, \textbf{0}^{n'}, <\textbf{a}{[n':]}, \textbf{b}{[:n']}>)\\
-  R = H(\textbf{a}{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, \textbf{b}{[n':]}, <\textbf{a}{[:n']}, \textbf{b}{[n':]}>)
+  L &=& H(\textbf{0}^{n'}, \textbf{a}_{[n':]}, \textbf{b}_{[:n']}, \textbf{0}^{n'}, \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>)\\
+  R &=& H(\textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, \textbf{b}_{[n':]}, \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
 \end{eqnarray}
 
 Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (\textbf{a}, \textbf{b}) into single vectors using the challenge:
 \begin{eqnarray}
-  \textbf{a}' = x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}\\
-  \textbf{b}' = x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}
+  \textbf{a}' &=& x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}\\
+  \textbf{b}' &=& x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}
 \end{eqnarray}
 
 Prover sends $(\textbf{a}', \textbf{b}')$ to verifier, who first computes $P'$ from $(P, L, R, x)$:
@@ -351,16 +351,16 @@ Prover sends $(\textbf{a}', \textbf{b}')$ to verifier, who first computes $P'$ f
   P' = L^{(x^2)} \cdot P \cdot R^{(x^{-2})}
 \end{eqnarray}
 
-Verifier then uses (x, \textbf{a}', \textbf{b}') to calculate Q', and and validates if P' = Q': 
+Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
 \begin{eqnarray}
-  Q' = H(x-1 \textbf{a}', x \textbf{a}', x \textbf{b}', x-1 \textbf{b}', <\textbf{a}', \textbf{b}'>)
+  Q' = H(x^{-1} \textbf{a}', x \textbf{a}', x \textbf{b}', x^{-1} \textbf{b}', \left<\textbf{a}', \textbf{b}'\right>)
 \end{eqnarray}
 
-This works because if we expand Q':
+Verifier validates if $P' = Q'$.  This works because if we expand $Q'$:
 \begin{eqnarray}
-  Q' = H(x-1(x \textbf{a}L + x-1 \textbf{a}R), x(x \textbf{a}L + x-1 \textbf{a}R), x(x-1 \textbf{b}L + x \textbf{b}R), x-1(x-1 \textbf{b}L + x \textbf{b}R), 
+  Q' &=& H(x^{-1}(x \textbf{a}L + x-1 \textbf{a}R), x(x \textbf{a}L + x-1 \textbf{a}R), x(x-1 \textbf{b}L + x \textbf{b}R), x-1(x-1 \textbf{b}L + x \textbf{b}R), 
   <x \textbf{a}L + x-1 \textbf{a}R, x-1 \textbf{b}L + x \textbf{b}R>)\\
-  Q' = H(\textbf{a}L + x-2 \textbf{a}R, x2 \textbf{a}L + \textbf{a}R, \textbf{b}L + x2 \textbf{b}R, x-2 \textbf{b}L + \textbf{b}R, 
+  \cr &=& H(\textbf{a}L + x-2 \textbf{a}R, x2 \textbf{a}L + \textbf{a}R, \textbf{b}L + x2 \textbf{b}R, x-2 \textbf{b}L + \textbf{b}R, 
   x2<\textbf{a}L , \textbf{b}R> + <\textbf{a}L, \textbf{b}L> + <\textbf{a}R, \textbf{b}R> + x-2 <\textbf{a}R, \textbf{b}L>)
 \end{eqnarray}
 

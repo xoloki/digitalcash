@@ -22,7 +22,7 @@ There are many papers which outline, define, use, mutate, expand on, or cite the
 
 Schnorr proofs allow the owner of a private key to demonstrate that ownership to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform.  This allows the protocol to function as a signature.
 
-Let $g$ be a generator in a group $G$, with private key $x \in Z_p$, and public key $y = g^x$. The prover chooses a random $v \in Z_p$, then sets $t = g^v$.
+Let $g$ be a generator in a group $G$, with private key $x \in \mathbb{Z}_p$, and public key $y = g^x$. The prover chooses a random $v \in Z_p$, then sets $t = g^v$.
 
 In the interactive version of the protocol, the prover sends $t$ to the verifier, who responds with the challenge $c$.  This way the prover cannot choose $t$ after seeing $c$, which would allow the prover to cheat.  To make this non-interactive, Fiat and Shamir proposed to choose $c$ based on a hash including $t$, which prevents the prover from cheating, since $c$ depends on $t$:
 \begin{eqnarray}
@@ -52,7 +52,7 @@ So if $t = g^r y^c$, then the prover must have known $x$.  Otherwise the prover 
 
 A Schnorr proof allows us to sign a public key, proving we know the corresponding private key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct a one out of many signature, to prove that we knew the private key for one out of $N$ public keys.
 
-Start with public key $y$ for which the prover knows the private key $x$, and as before, choose a random $v \in Z_p$ . To mix in an additional key $y_1$ whose private key $x_1$ is unknown, select a random $r_1$ and $c_1$.  The prover sets $c$ as follows, using the values known to calculate it:
+Start with public key $y$ for which the prover knows the private key $x$, and as before, choose a random $v \in \mathbb{Z}_p$ . To mix in an additional key $y_1$ whose private key $x_1$ is unknown, select a random $r_1$ and $c_1$.  The prover sets $c$ as follows, using the values known to calculate it:
 \begin{eqnarray}
   c = H(g^v, g^{r_1} y^{c_1}) - c_1
 \end{eqnarray}
@@ -312,12 +312,12 @@ Bulletproofs are not just useful as aggregated range proofs; more generally, the
 
 The heart of a bulletproof is a vector commitment that links a committed value with an inner product.  The prover uses a recursive protocol that at every step cuts the size of the vectors in half and generates a new commitment, until only a single element remains, then sends the final values with the corresponding generators and commitment as the proof.  The verifier checks that the final commitment is valid, then unwinds the stack.
 
-So for some $(\textbf{g}, \textbf{h}) \in \textbf{G}^n$, $(\textbf{a}, \textbf{b}) \in \textbf{Z}_p^n$, $(u, P) \in G$, $c \in Z_p$, let $P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b}$ and $c = <a, b>$.  The goal is to find a way to prove knowledge of $a$ and $b$ to someone who knows $P$ and $c$, without revealing them.  To do this, the prover adds the inner product to the commitment itself:
+So for some $(\textbf{g}, \textbf{h}) \in \textbf{G}^n$, $(\textbf{a}, \textbf{b}) \in \mathbb{Z}_p^n$, $(u, P) \in G$, $c \in \mathbb{Z}_p$, let $P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b}$ and $c = <a, b>$.  The goal is to find a way to prove knowledge of $a$ and $b$ to someone who knows $P$ and $c$, without revealing them.  To do this, the prover adds the inner product to the commitment itself:
 \begin{eqnarray}
   P = ga hb u<a, b>
 \end{eqnarray}
 
-Since the goal is to shrink the problem in half, let n’ = n/2.  Since (g, h) are still size n, split each into left (gL, hL) and right (gR, hR), with first n’ elements in the left vector and the second n’ in the right.  Then for some a1, a2, b1, b2 ∈ Zpn’, define the function H to operate on the split vectors. 
+Since the goal is to shrink the problem in half, let $n’ = n/2$.  Since $(g, h)$ are still size $n$, split each into left $(gL, hL)$ and right $(gR, hR)$, with first $n’$ elements in the left vector and the second $n’$ in the right.  Then for some $a1, a2, b1, b2 ∈ \mathbb{Z}pn’$, define the function $H$ to operate on the split vectors. 
 \begin{eqnarray}
   H(a1, a2, b1, b2, c) = gLa.1 gRa.2 hLb.1 hRb.2 uc
 \end{eqnarray}
@@ -338,7 +338,7 @@ Now define L, R ∈ G:
   R = H(aR, 0n’, 0n’, bL, <aR, bL>)
 \end{eqnarray}
 
-Prover sends (L, R) to the verifier, who responds with the challenge x ∈ Zp.  Prover then combines the left and right parts of (a, b) into single vectors using the challenge:
+Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (a, b) into single vectors using the challenge:
 \begin{eqnarray}
   a’ = x aL + x-1 aR\\
   b’ = x-1 bL + x bR
@@ -430,7 +430,7 @@ We have shown how to make a logarithmically efficient inner product argument, an
 
 Let (sL, sR) be vectors of integers:
 \begin{eqnarray}
-  (sL, sR) <- Zpn
+  (sL, sR) <- \mathbb{Z}pn
 \end{eqnarray}
 
 Replace aL with (aL + sL x) and aR with (aR + sR x), and the inner product becomes:
@@ -595,7 +595,7 @@ Consider a commitment to a message $m$ with random blinding factor $r$:
 
 To prove that $c$ opens to $0$ or $1$, pick random $(a,s,t)$ and use them to construct $(c_a, c_b)$:
 \begin{eqnarray}
-  a,s,t &\in& Z_p\\
+  a,s,t &\in& \mathbb{Z}_p\\
   c_a &=& Com(a, s)\\
   c_b &=& Com(am, t)
 \end{eqnarray}
@@ -694,7 +694,7 @@ If we have x, then we can calculate this product directly.  But before we have x
 
 For all j=(1, ..., n) with k=j-1:
 \begin{eqnarray}
-  (rj,aj,sj,tj,j) Zq\\
+  (rj,aj,sj,tj,j) \mathbb{Z}q\\
   clj=Com(lj;rj)\\
   caj=Com(aj;sj)\\
   cbj=Com(ljaj;tj)\\

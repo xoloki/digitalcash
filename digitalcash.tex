@@ -312,36 +312,38 @@ Bulletproofs are not just useful as aggregated range proofs; more generally, the
 
 The heart of a bulletproof is a vector commitment that links a committed value with an inner product.  The prover uses a recursive protocol that at every step cuts the size of the vectors in half and generates a new commitment, until only a single element remains, then sends the final values with the corresponding generators and commitment as the proof.  The verifier checks that the final commitment is valid, then unwinds the stack.
 
-So for some $(\textbf{g}, \textbf{h}) \in \textbf{G}^n$, $(\textbf{a}, \textbf{b}) \in \mathbb{Z}_p^n$, $(u, P) \in G$, $c \in \mathbb{Z}_p$, let $P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b}$ and $c = <a, b>$.  The goal is to find a way to prove knowledge of $a$ and $b$ to someone who knows $P$ and $c$, without revealing them.  To do this, the prover adds the inner product to the commitment itself:
+So for some $(\textbf{g}, \textbf{h}) \in \mathbb{G}^n$, $(\textbf{a}, \textbf{b}) \in \mathbb{Z}_p^n$, $(u, P) \in \mathbb{G}$, $c \in \mathbb{Z}_p$, let $P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b}$ and $c = \left<\textbf{a}, \textbf{b}\right>$.  The goal is to find a way to prove knowledge of $\textbf{a}$ and $\textbf{b}$ to someone who knows $P$ and $c$, without revealing them.  To do this, the prover adds the inner product to the commitment itself:
 \begin{eqnarray}
-  P = ga hb u<a, b>
+  P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b} \cdot u \left<\textbf{a}, \textbf{b}\right>
 \end{eqnarray}
 
-Since the goal is to shrink the problem in half, let $n’ = n/2$.  Since $(g, h)$ are still size $n$, split each into left $(gL, hL)$ and right $(gR, hR)$, with first $n’$ elements in the left vector and the second $n’$ in the right.  Then for some $a1, a2, b1, b2 ∈ \mathbb{Z}pn’$, define the function $H$ to operate on the split vectors. 
+Since the goal is to shrink the problem in half, let $n’ = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(g_{n':}, h_{n':})$ and right $(g_{:n'}, h_{:n'})$, with first $n’$ elements in the left vector and the second $n’$ in the right.  Then for some $a_1, a'_2, b_1, b'_2 \in \mathbb{Z}_p^n’$, define the function $H$ to operate on the split vectors. 
 \begin{eqnarray}
-  H(a1, a2, b1, b2, c) = gLa.1 gRa.2 hLb.1 hRb.2 uc
+  H(a_1, a'_2, b_1, b'_2, c) = g_{[n':]}^{a_1} g_{[n':]}^{a'_2} h_{[:n']}^{b_1} h_{[:n']}^{b'_2} \cdot u^c
 \end{eqnarray}
 
-We can define P in terms of H, splitting the real (a, b) as well into left and right:
+We can define $P$ in terms of $H$, splitting the real $(\textbf{a}, \textbf{b})$ as well into left and right:
 \begin{eqnarray}
-  P = H(aL, aR, bL, bR, <a, b>) = gLa.L gRa.R hLb.L hRb.R u<a, b> = ga hb u<a, b>
+  P &=& H(a_{[n':]}, a_{[:n']}, b_{[n':]}, b_{[:n']}, \left<\textbf{a}, \textbf{b}\right>)\\
+  \cr &=& g_{[n':]}^{a_{[n':]}} g_{[:n']}^{a_{[:n']}} h_{[n':]}^{b_{[n':]}} h_{[:n']}^{b_{[:n']}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
+  \cr &=& \textbf{g}^{\textbf{a}} \textbf{h}^{\textbf{b}} \cdot u^{\left<a, b\right>}
 \end{eqnarray}
 
 Note that H is additively homomorphic in its inputs:
 \begin{eqnarray}
-  H(a1, a2, b1, b2, c1)*H(a3, a4, b3, b4, c2) = H(a1 + a3, a2 + a4, b1 + b3, b2 + b4, c1+c2)
+  H(a_1, a'_1, b_1, b'_1, c_1) \cdot H(a_2, a'_2, b_2, b'_2, c_2) = H(a_1 + a_2, a'_1 + a'_2, b_1 + b_2, b'_1 + b'_2, c_1 + c_2)
 \end{eqnarray}
 
-Now define L, R ∈ G:
+Now define $L, R \in \mathbb{G}$:
 \begin{eqnarray}
-  L = H(0n’, aL, bR, 0n’, <aL, bR>)\\
-  R = H(aR, 0n’, 0n’, bL, <aR, bL>)
+  L = H(\textbf{0}^{n’}, a_{[n':]}, b_{[:n']}, \textbf{0}^{n’}, <a{[n':]}, b{[:n']}>)\\
+  R = H(a{[:n']}, 0n’, 0n’, b{[n':]}, <a{[:n']}, b{[n':]}>)
 \end{eqnarray}
 
 Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (a, b) into single vectors using the challenge:
 \begin{eqnarray}
-  a’ = x aL + x-1 aR\\
-  b’ = x-1 bL + x bR
+  a’ = x a{[n':]} + x-1 a{[:n']}\\
+  b’ = x-1 b{[n':]} + x b{[:n']}
 \end{eqnarray}
 
 Prover sends (a’, b’) to verifier, who first computes P' from (P, L, R, x):

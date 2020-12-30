@@ -317,83 +317,83 @@ So for some $(\textbf{g}, \textbf{h}) \in \mathbb{G}^n$, $(\textbf{a}, \textbf{b
   P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}
 \end{eqnarray}
 
-Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(g_{[n':]}, h_{[n':]})$ and right $(g_{[:n']}, h_{[:n']})$, with the first $n'$ elements in the left vector and the second $n'$ in the right.  Then for some $\textbf{a}_1, \textbf{a}'_2, b_1, b'_2 \in \mathbb{Z}_p^n$, define the function $H$ to operate on the split vectors. 
+Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(\textbf{g}_{[n':]}, \textbf{h}_{[n':]})$ and right $(\textbf{g}_{[:n']}, \textbf{h}_{[:n']})$, with the first $n'$ elements in the left vector and the second $n'$ in the right.  Then for some $\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2 \in \mathbb{Z}_p^n$, define the function $H$ to operate on the split vectors. 
 \begin{eqnarray}
-  H(\textbf{a}_1, \textbf{a}'_2, b_1, b'_2, c) = g_{[n':]}^{\textbf{a}_1} g_{[n':]}^{\textbf{a}'_2} h_{[:n']}^{b_1} h_{[:n']}^{b'_2} \cdot u^c
+  H(\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2, c) = \textbf{g}_{[n':]}^{\textbf{a}_1} \textbf{g}_{[n':]}^{\textbf{a}'_2} \textbf{h}_{[:n']}^{\textbf{b}_1} \textbf{h}_{[:n']}^{\textbf{b}'_2} \cdot u^c
 \end{eqnarray}
 
 We can define $P$ in terms of $H$, splitting the real $(\textbf{a}, \textbf{b})$ as well into left and right:
 \begin{eqnarray}
-  P &=& \textbf{g}^{\textbf{a}} \textbf{h}^{\textbf{b}} \cdot u^{\left<a, b\right>}\\
-  \cr &=& g_{[n':]}^{\textbf{a}_{[n':]}} g_{[:n']}^{\textbf{a}_{[:n']}} h_{[n':]}^{b_{[n':]}} h_{[:n']}^{b_{[:n']}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
-  \cr &=& H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, b_{[n':]}, b_{[:n']}, \left<\textbf{a}, \textbf{b}\right>)
+  P &=& \textbf{g}^{\textbf{a}} \textbf{h}^{\textbf{b}} \cdot u^{\left<a, \textbf{b}\right>}\\
+  \cr &=& \textbf{g}_{[n':]}^{\textbf{a}_{[n':]}} \textbf{g}_{[:n']}^{\textbf{a}_{[:n']}} \textbf{h}_{[n':]}^{\textbf{b}_{[n':]}} \textbf{h}_{[:n']}^{\textbf{b}_{[:n']}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
+  \cr &=& H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>)
 \end{eqnarray}
 
-Note that H is additively homomorphic in its inputs:
+Note that $H$ is additively homomorphic in its inputs:
 \begin{eqnarray}
-  H(\textbf{a}_1, \textbf{a}'_1, b_1, b'_1, c_1) \cdot H(\textbf{a}_2, \textbf{a}'_2, b_2, b'_2, c_2) = H(\textbf{a}_1 + \textbf{a}_2, \textbf{a}'_1 + \textbf{a}'_2, b_1 + b_2, b'_1 + b'_2, c_1 + c_2)
+  H(\textbf{a}_1, \textbf{a}'_1, \textbf{b}_1, \textbf{b}'_1, c_1) \cdot H(\textbf{a}_2, \textbf{a}'_2, \textbf{b}_2, \textbf{b}'_2, c_2) = H(\textbf{a}_1 + \textbf{a}_2, \textbf{a}'_1 + \textbf{a}'_2, \textbf{b}_1 + \textbf{b}_2, \textbf{b}'_1 + \textbf{b}'_2, c_1 + c_2)
 \end{eqnarray}
 
 Now define $L, R \in \mathbb{G}$:
 \begin{eqnarray}
-  L = H(\textbf{0}^{n'}, \textbf{a}_{[n':]}, b_{[:n']}, \textbf{0}^{n'}, <\textbf{a}{[n':]}, b{[:n']}>)\\
-  R = H(\textbf{a}{[:n']}, 0n', 0n', b{[n':]}, <\textbf{a}{[:n']}, b{[n':]}>)
+  L = H(\textbf{0}^{n'}, \textbf{a}_{[n':]}, \textbf{b}_{[:n']}, \textbf{0}^{n'}, <\textbf{a}{[n':]}, \textbf{b}{[:n']}>)\\
+  R = H(\textbf{a}{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, \textbf{b}{[n':]}, <\textbf{a}{[:n']}, \textbf{b}{[n':]}>)
 \end{eqnarray}
 
 Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (\textbf{a}, \textbf{b}) into single vectors using the challenge:
 \begin{eqnarray}
   \textbf{a}' = x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}\\
-  b' = x^{-1} b_{[n':]} + x b_{[:n']}
+  \textbf{b}' = x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}
 \end{eqnarray}
 
-Prover sends (\textbf{a}', b') to verifier, who first computes P' from (P, L, R, x):
+Prover sends $(\textbf{a}', \textbf{b}')$ to verifier, who first computes $P'$ from $(P, L, R, x)$:
 \begin{eqnarray}
-  P'=Lx2PRx-2
+  P' = L^{(x^2)} \cdot P \cdot R^{(x^{-2})}
 \end{eqnarray}
 
-Verifier then uses (x, \textbf{a}', b') to calculate Q', and and validates if P' = Q': 
+Verifier then uses (x, \textbf{a}', \textbf{b}') to calculate Q', and and validates if P' = Q': 
 \begin{eqnarray}
-  Q' = H(x-1 \textbf{a}', x \textbf{a}', x b', x-1 b', <\textbf{a}', b'>)
+  Q' = H(x-1 \textbf{a}', x \textbf{a}', x \textbf{b}', x-1 \textbf{b}', <\textbf{a}', \textbf{b}'>)
 \end{eqnarray}
 
 This works because if we expand Q':
 \begin{eqnarray}
-  Q' = H(x-1(x \textbf{a}L + x-1 \textbf{a}R), x(x \textbf{a}L + x-1 \textbf{a}R), x(x-1 bL + x bR), x-1(x-1 bL + x bR), 
-  <x \textbf{a}L + x-1 \textbf{a}R, x-1 bL + x bR>)\\
-  Q' = H(\textbf{a}L + x-2 \textbf{a}R, x2 \textbf{a}L + \textbf{a}R, bL + x2 bR, x-2 bL + bR, 
-  x2<\textbf{a}L , bR> + <\textbf{a}L, bL> + <\textbf{a}R, bR> + x-2 <\textbf{a}R, bL>)
+  Q' = H(x-1(x \textbf{a}L + x-1 \textbf{a}R), x(x \textbf{a}L + x-1 \textbf{a}R), x(x-1 \textbf{b}L + x \textbf{b}R), x-1(x-1 \textbf{b}L + x \textbf{b}R), 
+  <x \textbf{a}L + x-1 \textbf{a}R, x-1 \textbf{b}L + x \textbf{b}R>)\\
+  Q' = H(\textbf{a}L + x-2 \textbf{a}R, x2 \textbf{a}L + \textbf{a}R, \textbf{b}L + x2 \textbf{b}R, x-2 \textbf{b}L + \textbf{b}R, 
+  x2<\textbf{a}L , \textbf{b}R> + <\textbf{a}L, \textbf{b}L> + <\textbf{a}R, \textbf{b}R> + x-2 <\textbf{a}R, \textbf{b}L>)
 \end{eqnarray}
 
 We get the same thing as when we expand P':
 \begin{eqnarray}
-  P' = H(0n', x2 \textbf{a}L, x2 bR, 0n', x2 <\textbf{a}L, bR>) * H(\textbf{a}L, \textbf{a}R, bL, bR, <\textbf{a}, b>) *
-  H(x-2 \textbf{a}R, 0n', 0n', x-2 bL, x-2 <\textbf{a}R, bL>)\\
-  P' = H(\textbf{a}L + x-2 \textbf{a}R, x2 \textbf{a}L + \textbf{a}R, bL + x2 bR, x-2 bL + bR, 
-  x2 <\textbf{a}L, bR> + <\textbf{a}, b> + x-2 <\textbf{a}R, bL>)
+  P' = H(0n', x2 \textbf{a}L, x2 \textbf{b}R, 0n', x2 <\textbf{a}L, \textbf{b}R>) * H(\textbf{a}L, \textbf{a}R, \textbf{b}L, \textbf{b}R, <\textbf{a}, \textbf{b}>) *
+  H(x-2 \textbf{a}R, 0n', 0n', x-2 \textbf{b}L, x-2 <\textbf{a}R, \textbf{b}L>)\\
+  P' = H(\textbf{a}L + x-2 \textbf{a}R, x2 \textbf{a}L + \textbf{a}R, \textbf{b}L + x2 \textbf{b}R, x-2 \textbf{b}L + \textbf{b}R, 
+  x2 <\textbf{a}L, \textbf{b}R> + <\textbf{a}, \textbf{b}> + x-2 <\textbf{a}R, \textbf{b}L>)
 \end{eqnarray}
 
-So if the prover can construct (L, R, \textbf{a}', b') such that P' = Q', then he must have known (\textbf{a}, b).
+So if the prover can construct (L, R, \textbf{a}', \textbf{b}') such that P' = Q', then he must have known (\textbf{a}, \textbf{b}).
 
 
 \subsection{Range Proof Using Inner Product}
 
 Let \textbf{a}L be a vector with the n bits of v.  Then the following must all be true:
 \begin{eqnarray}
-  <\textbf{a}L, 2n> = v ; \textbf{a}L \textbf{a}R = 0n ; \textbf{a}R = \textbf{a}L - 1n
+  <\textbf{a}_L, 2^n> = v ; \textbf{a}_L \textbf{a}_R = 0^n ; \textbf{a}_R = \textbf{a}_L - 1^n
 \end{eqnarray}
   
-\textbf{a}R is defined to be the negation of \textbf{a}L: 0 where 1, and -1 where 0.  So any pairwise multiplication between \textbf{a}R and \textbf{a}L will be 0.
+$\textbf{a}_R$ is defined to be the negation of $\textbf{a}_L$: $0$ where $1$, and $-1$ where $0$.  So any pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$.
 
-Given \textbf{a} verifier chosen y ∈ G, these relations are equivalent to:
+Given \textbf{a} verifier chosen $y \in \mathbb{G}$, these relations are equivalent to:
 \begin{eqnarray}
-  <\textbf{a}L, 2n> = v ; <\textbf{a}L,  \textbf{a}Ryn> = 0 ; <\textbf{a}L - 1n - \textbf{a}R, yn> = 0
+  <\textbf{a}_L, 2^n> = v ; <\textbf{a}_L,  \textbf{a}_R y^n> = 0 ; <\textbf{a}_L - 1^n - \textbf{a}_R, y^n> = 0
 \end{eqnarray}
 
 As before, pairwise multiplication between \textbf{a}R and \textbf{a}L will be 0, regardless of multiplying by yn, and summing the dot product will likewise be 0. And solving the third relation for 0 gives us another dot product of 0 with our new yn.
 
 Using another verifier chosen z ∈ G, we can combine these into one relation:
 \begin{eqnarray}
-  z2 <\textbf{a}L, 2n> + z <\textbf{a}L - 1n - \textbf{a}R, yn> + <\textbf{a}L,  \textbf{a}Ryn> = z2 v
+  z^2 <\textbf{a}_L, 2^n> + z <\textbf{a}_L - 1^n - \textbf{a}_R, y^n> + <\textbf{a}_L,  \textbf{a}_R y^n> = z^2 v
 \end{eqnarray}
 
 Multiplying the first relation by z2 gives us the z2v term, and since the other two relations were 0 we can add them for free (swapping order and multiplying one by z).

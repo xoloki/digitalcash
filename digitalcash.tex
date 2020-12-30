@@ -314,10 +314,10 @@ The heart of a bulletproof is a vector commitment that links a committed value w
 
 So for some $(\textbf{g}, \textbf{h}) \in \mathbb{G}^n$, $(\textbf{a}, \textbf{b}) \in \mathbb{Z}_p^n$, $(u, P) \in \mathbb{G}$, $c \in \mathbb{Z}_p$, let $P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b}$ and $c = \left<\textbf{a}, \textbf{b}\right>$.  The goal is to find a way to prove knowledge of $\textbf{a}$ and $\textbf{b}$ to someone who knows $P$ and $c$, without revealing them.  To do this, the prover adds the inner product to the commitment itself:
 \begin{eqnarray}
-  P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b} \cdot u \left<\textbf{a}, \textbf{b}\right>
+  P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}
 \end{eqnarray}
 
-Since the goal is to shrink the problem in half, let $n’ = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(g_{n':}, h_{n':})$ and right $(g_{:n'}, h_{:n'})$, with first $n’$ elements in the left vector and the second $n’$ in the right.  Then for some $a_1, a'_2, b_1, b'_2 \in \mathbb{Z}_p^n’$, define the function $H$ to operate on the split vectors. 
+Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(g_{[n':]}, h_{[n':]})$ and right $(g_{[:n']}, h_{[:n']})$, with first $n’$ elements in the left vector and the second $n’$ in the right.  Then for some $a_1, a'_2, b_1, b'_2 \in \mathbb{Z}_p^n’$, define the function $H$ to operate on the split vectors. 
 \begin{eqnarray}
   H(a_1, a'_2, b_1, b'_2, c) = g_{[n':]}^{a_1} g_{[n':]}^{a'_2} h_{[:n']}^{b_1} h_{[:n']}^{b'_2} \cdot u^c
 \end{eqnarray}
@@ -340,10 +340,10 @@ Now define $L, R \in \mathbb{G}$:
   R = H(a{[:n']}, 0n’, 0n’, b{[n':]}, <a{[:n']}, b{[n':]}>)
 \end{eqnarray}
 
-Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (a, b) into single vectors using the challenge:
+Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (\textbf{a}, \textbf{b}) into single vectors using the challenge:
 \begin{eqnarray}
-  a’ = x a{[n':]} + x-1 a{[:n']}\\
-  b’ = x-1 b{[n':]} + x b{[:n']}
+  a' = x a_{[n':]} + x^{-1} a_{[:n']}\\
+  b' = x^{-1} b_{[n':]} + x b_{[:n']}
 \end{eqnarray}
 
 Prover sends (a’, b’) to verifier, who first computes P' from (P, L, R, x):

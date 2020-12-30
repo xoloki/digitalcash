@@ -292,7 +292,7 @@ This allows the validator to check that the binary expansion is valid.  And if e
   \{G^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
 \end{eqnarray}
 
-So either the first or the second terms will reduce to $g^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don’t need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.
+So either the first or the second terms will reduce to $g^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don't need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.
 
 The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding ring signatures.  The verifier checks the validity of each bit proof, and then verifies that
 \begin{eqnarray}
@@ -317,7 +317,7 @@ So for some $(\textbf{g}, \textbf{h}) \in \mathbb{G}^n$, $(\textbf{a}, \textbf{b
   P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}
 \end{eqnarray}
 
-Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(g_{[n':]}, h_{[n':]})$ and right $(g_{[:n']}, h_{[:n']})$, with first $n’$ elements in the left vector and the second $n’$ in the right.  Then for some $a_1, a'_2, b_1, b'_2 \in \mathbb{Z}_p^n’$, define the function $H$ to operate on the split vectors. 
+Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(g_{[n':]}, h_{[n':]})$ and right $(g_{[:n']}, h_{[:n']})$, with the first $n'$ elements in the left vector and the second $n'$ in the right.  Then for some $a_1, a'_2, b_1, b'_2 \in \mathbb{Z}_p^n'$, define the function $H$ to operate on the split vectors. 
 \begin{eqnarray}
   H(a_1, a'_2, b_1, b'_2, c) = g_{[n':]}^{a_1} g_{[n':]}^{a'_2} h_{[:n']}^{b_1} h_{[:n']}^{b'_2} \cdot u^c
 \end{eqnarray}
@@ -336,8 +336,8 @@ Note that H is additively homomorphic in its inputs:
 
 Now define $L, R \in \mathbb{G}$:
 \begin{eqnarray}
-  L = H(\textbf{0}^{n’}, a_{[n':]}, b_{[:n']}, \textbf{0}^{n’}, <a{[n':]}, b{[:n']}>)\\
-  R = H(a{[:n']}, 0n’, 0n’, b{[n':]}, <a{[:n']}, b{[n':]}>)
+  L = H(\textbf{0}^{n'}, a_{[n':]}, b_{[:n']}, \textbf{0}^{n'}, <a{[n':]}, b{[:n']}>)\\
+  R = H(a{[:n']}, 0n', 0n', b{[n':]}, <a{[:n']}, b{[n':]}>)
 \end{eqnarray}
 
 Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (\textbf{a}, \textbf{b}) into single vectors using the challenge:
@@ -346,33 +346,33 @@ Prover sends (L, R) to the verifier, who responds with the challenge $x \in \mat
   b' = x^{-1} b_{[n':]} + x b_{[:n']}
 \end{eqnarray}
 
-Prover sends (a’, b’) to verifier, who first computes P' from (P, L, R, x):
+Prover sends (a', b') to verifier, who first computes P' from (P, L, R, x):
 \begin{eqnarray}
   P'=Lx2PRx-2
 \end{eqnarray}
 
-Verifier then uses (x, a’, b’) to calculate Q’, and and validates if P’ = Q’: 
+Verifier then uses (x, a', b') to calculate Q', and and validates if P' = Q': 
 \begin{eqnarray}
-  Q’ = H(x-1 a’, x a’, x b’, x-1 b’, <a’, b’>)
+  Q' = H(x-1 a', x a', x b', x-1 b', <a', b'>)
 \end{eqnarray}
 
-This works because if we expand Q’:
+This works because if we expand Q':
 \begin{eqnarray}
-  Q’ = H(x-1(x aL + x-1 aR), x(x aL + x-1 aR), x(x-1 bL + x bR), x-1(x-1 bL + x bR), 
+  Q' = H(x-1(x aL + x-1 aR), x(x aL + x-1 aR), x(x-1 bL + x bR), x-1(x-1 bL + x bR), 
   <x aL + x-1 aR, x-1 bL + x bR>)\\
-  Q’ = H(aL + x-2 aR, x2 aL + aR, bL + x2 bR, x-2 bL + bR, 
+  Q' = H(aL + x-2 aR, x2 aL + aR, bL + x2 bR, x-2 bL + bR, 
   x2<aL , bR> + <aL, bL> + <aR, bR> + x-2 <aR, bL>)
 \end{eqnarray}
 
-We get the same thing as when we expand P’:
+We get the same thing as when we expand P':
 \begin{eqnarray}
-  P’ = H(0n’, x2 aL, x2 bR, 0n’, x2 <aL, bR>) * H(aL, aR, bL, bR, <a, b>) *
-  H(x-2 aR, 0n’, 0n’, x-2 bL, x-2 <aR, bL>)\\
-  P’ = H(aL + x-2 aR, x2 aL + aR, bL + x2 bR, x-2 bL + bR, 
+  P' = H(0n', x2 aL, x2 bR, 0n', x2 <aL, bR>) * H(aL, aR, bL, bR, <a, b>) *
+  H(x-2 aR, 0n', 0n', x-2 bL, x-2 <aR, bL>)\\
+  P' = H(aL + x-2 aR, x2 aL + aR, bL + x2 bR, x-2 bL + bR, 
   x2 <aL, bR> + <a, b> + x-2 <aR, bL>)
 \end{eqnarray}
 
-So if the prover can construct (L, R, a’, b’) such that P’ = Q’, then he must have known (a, b).
+So if the prover can construct (L, R, a', b') such that P' = Q', then he must have known (a, b).
 
 
 \subsection{Range Proof Using Inner Product}
@@ -428,7 +428,7 @@ The verifier can calculate the right side (using the commitment V for v), and th
 
 \subsection{Blinding the inner product}
 
-We have shown how to make a logarithmically efficient inner product argument, and how to reduce a range proof to an inner product.  But the inner product argument is not zero knowledge, so we can’t use it directly; we must first blind the parameters.
+We have shown how to make a logarithmically efficient inner product argument, and how to reduce a range proof to an inner product.  But the inner product argument is not zero knowledge, so we can't use it directly; we must first blind the parameters.
 
 Let (sL, sR) be vectors of integers:
 \begin{eqnarray}
@@ -803,7 +803,7 @@ Thanks to this pruning, Mimblewimble achieves its goal of maintaining a lightwei
 
 However, any observer who sees the advertised transactions (either a peer or a miner) has full visibility into the money flow, and can easily link transactions, since the inputs and outputs are directly listed with no obfuscation.  And all node operators get a list of the inputs and outputs in every block, which gives them obfuscated access to the same data (though on a per block rather than per transaction level).
 
-Since spent outputs will be removed, it will no longer be possible to validate a block using normal merkle tree semantics, since this requires having all leaf nodes to construct the root hash.  So every output will need a separate merkle proof, to tie it to the root hash at time of block creation.  Validating a block will require validating each remaining output’s merkle proof.
+Since spent outputs will be removed, it will no longer be possible to validate a block using normal merkle tree semantics, since this requires having all leaf nodes to construct the root hash.  So every output will need a separate merkle proof, to tie it to the root hash at time of block creation.  Validating a block will require validating each remaining output's merkle proof.
 
 Finally, while there are indeed space savings from removing inputs and spent outputs, it is necessary to store all balance commitments CT and their associated Schnorr proofs forever.  This set grows monotonically with each added transaction.  
 
@@ -813,7 +813,7 @@ Finally, while there are indeed space savings from removing inputs and spent out
 
 MobileCoin is a new cryptocurrency, whose goals are privacy, convenience, and provable correctness.  The proof of concept implementation uses CryptoNote as a transaction format, with the Stellar Consensus Protocol to achieve blockchain consensus, rather than a wasteful proof of work.  All computation on the nodes uses a secure enclave, to prevent even node operators from having access to view keys or rings.  
 
-For maximal convenience, MobileCoin will be introduced directly into secure messaging apps, using mobile devices’ secure storage for keys.  Since there is no mining, transactions will be confirmed quickly.  A user will be able to open a messaging app and quickly send untraceable money, usually within a matter of seconds.
+For maximal convenience, MobileCoin will be introduced directly into secure messaging apps, using mobile devices' secure storage for keys.  Since there is no mining, transactions will be confirmed quickly.  A user will be able to open a messaging app and quickly send untraceable money, usually within a matter of seconds.
 
 The main weakness of CryptoNote is that the ring signatures contain the actual inputs used in the transaction, though these are obscured by a number of mixins.  So anyone with access to the ledger can perform a number of attacks, linking payments to their eventual destinations.  This can be used in the common Overseer scenario, where collusion between two parties can unmask the owners of coins sent by one and cashed out at the other.  So the FBI could send coins to a suspect address, then wait for those coins to make their way to an exchange, at which point the identity of the owner of the suspect address can be determined.
 

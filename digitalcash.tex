@@ -367,10 +367,10 @@ Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
 
 It's because we get the same thing when we expand P':
 \begin{eqnarray}
-  P' = H(0n', x2 \textbf{a}L, x2 \textbf{b}R, 0n', x2 <\textbf{a}L, \textbf{b}R>) * H(\textbf{a}L, \textbf{a}R, \textbf{b}L, \textbf{b}R, <\textbf{a}, \textbf{b}>) *
-  H(x-2 \textbf{a}R, 0n', 0n', x-2 \textbf{b}L, x-2 <\textbf{a}R, \textbf{b}L>)\\
-  P' = H(\textbf{a}L + x-2 \textbf{a}R, x2 \textbf{a}L + \textbf{a}R, \textbf{b}L + x2 \textbf{b}R, x-2 \textbf{b}L + \textbf{b}R, 
-  x2 <\textbf{a}L, \textbf{b}R> + <\textbf{a}, \textbf{b}> + x-2 <\textbf{a}R, \textbf{b}L>)
+  P' &=& H(0n', x^2 \textbf{a}_{[n':]}, x^2 \textbf{b}_{[:n']}, 0n', x^2 <\textbf{a}_{[n':]}, \textbf{b}_{[:n']}>) * H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, <\textbf{a}, \textbf{b}>) *
+  H(x^{-2} \textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{[n':]}, x^{-2} <\textbf{a}_{[:n']}, \textbf{b}_{[n':]}>)\\
+  \cr &=& H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[:n']}, \textbf{b}_{[n':]} + x^2 \textbf{b}_{[:n']}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, 
+  x2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
 \end{eqnarray}
 
 So if the prover can construct (L, R, \textbf{a}', \textbf{b}') such that P' = Q', then he must have known (\textbf{a}, \textbf{b}).

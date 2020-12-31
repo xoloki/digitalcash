@@ -358,127 +358,122 @@ Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
 
 Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
 \begin{eqnarray}
-  Q' &=& H(x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}),
-  x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}),
-  \left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
-  \cr &=& H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]}, \textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']},
-  x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[:n']}, \textbf{b}_{[:n']}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+  Q' &=& H(x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), \left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
+  \cr &=& H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]}, \textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[:n']}, \textbf{b}_{[:n']}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
 \end{eqnarray}
 
-It's because we get the same thing when we expand P':
+It's because we get the same thing when we expand $P'$:
 \begin{eqnarray}
-  P' &=& H(0n', x^2 \textbf{a}_{[n':]}, x^2 \textbf{b}_{[:n']}, 0n', x^2 <\textbf{a}_{[n':]}, \textbf{b}_{[:n']}>) * H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, <\textbf{a}, \textbf{b}>) *
-  H(x^{-2} \textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{[n':]}, x^{-2} <\textbf{a}_{[:n']}, \textbf{b}_{[n':]}>)\\
-  \cr &=& H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[:n']}, \textbf{b}_{[n':]} + x^2 \textbf{b}_{[:n']}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, 
-  x2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+  P' &=& H(\textbf{0}^{n'}, x^2 \textbf{a}_{[n':]}, x^2 \textbf{b}_{[:n']}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>) \cdot H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>) \cdot H(x^{-2} \textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{[n':]}, x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)\\
+  \cr &=& H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[:n']}, \textbf{b}_{[n':]} + x^2 \textbf{b}_{[:n']}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
 \end{eqnarray}
 
-So if the prover can construct (L, R, \textbf{a}', \textbf{b}') such that P' = Q', then he must have known (\textbf{a}, \textbf{b}).
+So if the prover can construct $(L, R, \textbf{a}', \textbf{b}')$ such that $P' = Q'$, then he must have known $(\textbf{a}, \textbf{b})$.
 
 
 \subsection{Range Proof Using Inner Product}
 
-Let \textbf{a}L be a vector with the n bits of v.  Then the following must all be true:
+Let $\textbf{a}_L$ be a vector with the $n$ bits of $v$.  Then the following must all be true:
 \begin{eqnarray}
-  <\textbf{a}_L, 2^n> = v ; \textbf{a}_L \textbf{a}_R = 0^n ; \textbf{a}_R = \textbf{a}_L - 1^n
+  \left<\textbf{a}_L, 2^n\right> = v ; \textbf{a}_L \textbf{a}_R = \textbf{0}^n ; \textbf{a}_R = \textbf{a}_L - \textbf{1}^n
 \end{eqnarray}
   
 $\textbf{a}_R$ is defined to be the negation of $\textbf{a}_L$: $0$ where $1$, and $-1$ where $0$.  So any pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$.
 
-Given \textbf{a} verifier chosen $y \in \mathbb{G}$, these relations are equivalent to:
+Given a verifier chosen $y \in \mathbb{G}$, these relations are equivalent to:
 \begin{eqnarray}
-  <\textbf{a}_L, 2^n> = v ; <\textbf{a}_L,  \textbf{a}_R y^n> = 0 ; <\textbf{a}_L - 1^n - \textbf{a}_R, y^n> = 0
+  \left<\textbf{a}_L, 2^n\right> = v ; \left<\textbf{a}_L,  \textbf{a}_R y^n\right> = 0 ; \left<\textbf{a}_L - \textbf{1}^n - \textbf{a}_R, \textbf{y}^n\right> = 0
 \end{eqnarray}
 
-As before, pairwise multiplication between \textbf{a}R and \textbf{a}L will be 0, regardless of multiplying by yn, and summing the dot product will likewise be 0. And solving the third relation for 0 gives us another dot product of 0 with our new yn.
+As before, pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$, regardless of multiplying by $\textbf{y}^n$, and summing the dot product will likewise be $0$. And solving the third relation for $0$ gives us another dot product of $0$ with our new $\textbf{y}^n$.
 
-Using another verifier chosen z ∈ G, we can combine these into one relation:
+Using another verifier chosen $z \in \mathbb{G}$, we can combine these into one relation:
 \begin{eqnarray}
-  z^2 <\textbf{a}_L, 2^n> + z <\textbf{a}_L - 1^n - \textbf{a}_R, y^n> + <\textbf{a}_L,  \textbf{a}_R y^n> = z^2 v
+  z^2 \left<\textbf{a}_L, 2^n\right> + z \left<\textbf{a}_L - 1^n - \textbf{a}_R, y^n\right> + \left<\textbf{a}_L,  \textbf{a}_R y^n\right> = z^2 v
 \end{eqnarray}
 
-Multiplying the first relation by z2 gives us the z2v term, and since the other two relations were 0 we can add them for free (swapping order and multiplying one by z).
+Multiplying the first relation by $z^2$ gives us the $z^2 v$ term, and since the other two relations were $0$ we can add them for free (swapping order and multiplying one by $z$).
 
 If we expand the inner products, then start isolating prover and verifier terms, we get:
 \begin{eqnarray}
-  z2 <\textbf{a}L, 2n> + z <\textbf{a}L, yn> - z <1n, yn> - z <\textbf{a}R, yn> + <\textbf{a}L,  \textbf{a}Ryn> = z2 v\\
-  z2 <\textbf{a}L, 2n> + z <\textbf{a}L, yn> - z <\textbf{a}R, yn> + <\textbf{a}L,  \textbf{a}Ryn> = z2 v + z <1n, yn>
+  z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{1}^n, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v\\
+  z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right>
 \end{eqnarray}
 
-Since an inner product <\textbf{a}, b> can be broken into a pairwise/inner product <1n, \textbf{a}b>:
+Since an inner product $\left<\textbf{a}, \textbf{b}\right>$ can be broken into a pairwise/inner product $\left<\textbf{1}^n, \textbf{a} \textbf{b}\right>$:
 \begin{eqnarray}
-  z2 <\textbf{a}L, 2n> + z <\textbf{a}L, yn> - z <1n, \textbf{a}Ryn> + <\textbf{a}L,  \textbf{a}Ryn> = z2 v + z <1n, yn>\\
-  <\textbf{a}L, z2 2n + z yn> + <\textbf{a}L - z 1n, \textbf{a}Ryn> = z2 v + z <1n, yn>
+  z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{1}^n, \textbf{a}_R \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right>\\
+  \left<\textbf{a}_L, z^2 \textbf{2}^n + z \textbf{y}^n\right> + \left<\textbf{a}_L - z \textbf{1}^n, \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right>
 \end{eqnarray}
 
-In order to merge the inner products via the first term, add <-z 1n, z2 2n + z yn>:
+In order to merge the inner products via the first term, add $\left<-z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>$:
 \begin{eqnarray}
-  <\textbf{a}L - z 1n, z2 2n + z yn + \textbf{a}Ryn> = z2 v + z <1n, yn> + <-z 1n, z2 2n + z yn>\\
-  <\textbf{a}L - z 1n, z2 2n + z yn + \textbf{a}Ryn> = z2 v + z <1n, yn> - z <1n, z2 2n + z yn>\\
-  <\textbf{a}L - z 1n, z2 2n + z yn + \textbf{a}Ryn> = z2 v + z <1n, yn> - z3 <1n, 2n> - z2 <1n, yn>\\
-  <\textbf{a}L - z 1n, z2 2n + z yn + \textbf{a}Ryn> = z2 v + (z - z2) <1n, yn> - z3 <1n, 2n>
+  \left<\textbf{a}_L - z \textbf{1}n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \textbf{1}^n, z2 \textbf{2}^n + z \textbf{y}^n\right>\\
+  \left<\textbf{a}_L - z \textbf{1}n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> - z \left<\textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>\\
+  \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> - z3 \left<\textbf{1}^n, \textbf{2}^n\right> - z^2 \left<\textbf{1}^n, \textbf{y}^n\right>\\
+  \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + (z - z^2) \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>
 \end{eqnarray}
   
-Let d(y,z) = (z - z2) <1n, yn> - z3 <1n, 2n>, and we get the final form:
+Let $d(y,z) = (z - z^2) \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>$, and we get the final form:
 \begin{eqnarray}
-  <\textbf{a}L - z 1n, z2 2n + z yn + \textbf{a}Ryn> = z2 v + d(y,z)
+  \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + d(y,z)
 \end{eqnarray}
 
-The verifier can calculate the right side (using the commitment V for v), and the problem is now reduced to an inner product argument.
+The verifier can calculate the right side (using the commitment $V$ for $v$), and the problem is now reduced to an inner product argument.
 
 
 \subsection{Blinding the inner product}
 
 We have shown how to make a logarithmically efficient inner product argument, and how to reduce a range proof to an inner product.  But the inner product argument is not zero knowledge, so we can't use it directly; we must first blind the parameters.
 
-Let (sL, sR) be vectors of integers:
+Let $(s_L, s_R)$ be vectors of integers:
 \begin{eqnarray}
-  (sL, sR) <- \mathbb{Z}pn
+  (s_L, s_R) \leftarrow \mathbb{Z}_p^n
 \end{eqnarray}
 
-Replace \textbf{a}L with (\textbf{a}L + sL x) and \textbf{a}R with (\textbf{a}R + sR x), and the inner product becomes:
+Replace $\textbf{a}_L$ with $(\textbf{a}_L + \textbf{s}_L x)$ and $\textbf{a}_R$ with $(\textbf{a}_R + \textbf{s}_R x)$, and the inner product becomes:
 \begin{eqnarray}
-  <(\textbf{a}L + sL x) - z 1n, z2 2n + z yn + (\textbf{a}R+ sR x)yn> = z2 v + d(y,z)
+  \left<(\textbf{a}_L + \textbf{s}_L x) - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x)\textbf{y}^n\right> = z^2 v + d(y,z)
 \end{eqnarray}
 
-Then construct vector polynomials l(x) and r(x) from the two sides of the inner product:
+Then construct vector polynomials $l(x)$ and $r(x)$ from the two sides of the inner product:
 \begin{eqnarray}
-  l(x) = \textbf{a}L + sL x - z 1n\\
-  r(x) = z2 2n + z yn + (\textbf{a}R+ sR x)yn
+  l(x) &=& \textbf{a}_L + \textbf{s}_L x - z \textbf{1}^n\\
+  r(x) &=& z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x) \textbf{y}^n
 \end{eqnarray}
 
 The zeros of these vector polynomials are just the unblinded inner product terms:
 \begin{eqnarray}
-  l(0) = \textbf{a}L - z 1n\\
-  r(0) = z2 2n + z yn + \textbf{a}Ryn
+  l(0) &=& \textbf{a}_L - z \textbf{1}^n\\
+  r(0) &=& z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n
 \end{eqnarray}
 
 The inner product then becomes
 \begin{eqnarray}
-  <l(0), r(0)> = z2 v + d(y,z)
+  \left<l(0), r(0)\right> = z^2 v + d(y,z)
 \end{eqnarray}
 
-If we define t(x) as the inner product of the blinded vector polynomials, we get
+If we define $t(x)$ as the inner product of the blinded vector polynomials, we get
 \begin{eqnarray}
-  t(x) = <l(x), r(x)> 
+  t(x) = \left<l(x), r(x)\right> 
 \end{eqnarray}
 
 We can express this in terms of x:
 \begin{eqnarray}
-  t(x) = t0 + t1 x + t2 x2
+  t(x) = t_0 + t_1 x + t_2 x^2
 \end{eqnarray}
 
 Where
 \begin{eqnarray}
-  t0 = <l(0), r(0)> = z2 v + d(y,z)\\
-  t2 = <l(1), r(1)>\\
-  t0 = <l(0) + l(1), r(0) + r(1)> - t0 - t1
+  t_0 = \left<l(0), r(0)\right> = z^2 v + d(y,z)\\
+  t_2 = \left<l(1), r(1)\right>\\
+  t_0 = \left<l(0) + l(1), r(0) + r(1)\right> - t_0 - t_1
 \end{eqnarray}
 
 Proving the blinded inner product range proof now depends on simply verifying that both 
 \begin{eqnarray}
-  t0 = z2 v + d(y,z)\\
-  t(x) = <l(x), r(x)> = t0 + t1 x + t2 x2
+  t_0 = z^2 v + d(y,z)\\
+  t(x) = \left<l(x), r(x)\right> = t_0 + t_1 x + t_2 x^2
 \end{eqnarray}
 
 

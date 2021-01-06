@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\newcommand\Set[2]{\{\,#1\mid#2\,\}}
 
 \begin{document}
 \maketitle
@@ -17,32 +18,47 @@ There are many papers which outline, define, use, mutate, expand on, or cite the
 
 
 \section{
+  Notation
+}
+
+We define a hash function $H_n$ as a function that maps an unbounded list of arbitrarily-sized binary inputs to a set of $n$ bits:
+\begin{align}
+  H_N: \Set{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}}{i_1, i_2, ...} \mapsto \Set{o \in {0, 1}}{o_1, o_2, o_{...}, o_{N-1}}
+\end{align}
+
+If we do not define $N$, then we assume it is implementation dependent, but that the output set is still bounded at some $N$:
+\begin{align}
+  H: \Set{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}}{i_1, i_2, ...} \mapsto \Set{o \in {0, 1} o_1, o_2, o_{...}, o_{N-1}}{}  
+\end{align}
+
+
+\section{
   Schnorr Proofs and the Fiat Shamir Transform
 }
 
 Schnorr proofs allow the owner of a private key to demonstrate that ownership to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform.  This allows the protocol to function as a signature.
 
-Let $g$ be a generator in a group $G$, with private key $x \in \mathbb{Z}_p$, and public key $y = g^x$. The prover chooses a random $v \in Z_p$, then sets $t = g^v$.
+Let $g$ be a generator in a finite group $G$ of prime order $p \in \mathbb{P}$, with private key $x \in \mathbb{Z}_p$, and public key $y = g^x$. The prover chooses a random $v \in Z_p$, then sets $t = g^v$.
 
 In the interactive version of the protocol, the prover sends $t$ to the verifier, who responds with the challenge $c$.  This way the prover cannot choose $t$ after seeing $c$, which would allow the prover to cheat.  To make this non-interactive, Fiat and Shamir proposed to choose $c$ based on a hash including $t$, which prevents the prover from cheating, since $c$ depends on $t$:
-\begin{eqnarray}
+\begin{align}
   c = H(g,y,t)
-\end{eqnarray}
+\end{align}
 
 The prover then defines $r$ as below, and calculates it from $(v, c, x)$:
-\begin{eqnarray}
+\begin{align}
   r = v - cx
-\end{eqnarray}
+\end{align}
  
 This is equivalent algebraically to
-\begin{eqnarray}
+\begin{align}
   v = r + cx
-\end{eqnarray}
+\end{align}
 
 We can use this derived expression for $v$ to expand $t$:
-\begin{eqnarray}
+\begin{align}
   t = g^v= g^r + c^x = g^r g^{cx} = g^r g^{xc} = g^r (g^x)^c = g^r y^c
-\end{eqnarray}
+\end{align}
 
 So if $t = g^r y^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $r$, allowing the equation to balance.  The set $(r,c,t)$ thus forms the proof of ownership of $y$.
 
@@ -53,29 +69,29 @@ So if $t = g^r y^c$, then the prover must have known $x$.  Otherwise the prover 
 A Schnorr proof allows us to sign a public key, proving we know the corresponding private key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct a one out of many signature, to prove that we knew the private key for one out of $N$ public keys.
 
 Start with public key $y$ for which the prover knows the private key $x$, and as before, choose a random $v \in \mathbb{Z}_p$ . To mix in an additional key $y_1$ whose private key $x_1$ is unknown, select a random $r_1$ and $c_1$.  The prover sets $c$ as follows, using the values known to calculate it:
-\begin{eqnarray}
+\begin{align}
   c = H(g^v, g^{r_1} y^{c_1}) - c_1
-\end{eqnarray}
+\end{align}
 
 This is equivalent algebraically to:
-\begin{eqnarray}
+\begin{align}
   c + c_1 = H(g^v, g^{r_1} y^{c_1})
-\end{eqnarray}
+\end{align}
 
 Now that the prover has c, r is as before:
-\begin{eqnarray}
+\begin{align}
   r = v - cx
-\end{eqnarray}
+\end{align}
 
 The prover then sends $(y, r, c, y_1, r_1, c_1)$ to the verifier, who then calculates the hash
-\begin{eqnarray}
+\begin{align}
   H(g^r y^c, g^{r_1} y_1^{c_1})
-\end{eqnarray}
+\end{align}
 
 Since $g^v = g^r y^c$, the two hashes are identical.  Thus 
-\begin{eqnarray}
+\begin{align}
   c + c_1 = H(g^r y^c, g^{r_1} y_1^{c_1})
-\end{eqnarray}
+\end{align}
 
 So if $c$ is equal to the hash, then the prover must have known $x$ for some $y$.  And since the prover can put the real $(y,r,c)$ in either position, there is no way for the verifier to know which key was actually signed.
 
@@ -88,32 +104,32 @@ We can do the same for any number of additional public keys $y_k$: choose a rand
 Now that we can use ring signatures to hide which public key is being signed, we have a new problem: assuming each public key corresponds to a spendable output, how do we know which output was actually spent?  We need a way to track this to prevent double spends, but in such a way that we preserve the privacy which the ring signature grants.
 
 First we construct a key image, which is a commitment to the public key used but cannot be used to find the public or private keys, and is unique:
-\begin{eqnarray}
+\begin{align}
   I = H(y)^x
-\end{eqnarray}
+\end{align}
 
 We then add a term to the hash for each $y$ that uses the key image.  For the real $y$, we know that
-\begin{eqnarray}
-  H(y)^v &=& H(y)^r H(y)^{cx}\\
-  \cr &=& H(y)^r (H(y)^x)^c\\
-  \cr &=& H(y)^r I^c
-\end{eqnarray}
+\begin{align}
+  H(y)^v &= H(y)^r H(y)^{cx}\\
+  \cr &= H(y)^r (H(y)^x)^c\\
+  \cr &= H(y)^r I^c
+\end{align}
 
 Putting the real $y$ first, the prover hash becomes:
-\begin{eqnarray}
+\begin{align}
   H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y_1)^{r_1} I^{c_1})
-\end{eqnarray}
+\end{align}
 
 We define $c$ as before, then solve for the hash:
-\begin{eqnarray}
-  c &=& H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1}) - c_1\\
-  c + c_1 &=& H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
-\end{eqnarray}
+\begin{align}
+  c &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1}) - c_1\\
+  c + c_1 &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
+\end{align}
 
 So as before, $c$ is equal to the hash.  The prover now sends $(I, y, r, c, y_1, r_1, c_1)$ to the verifier, who can check that their hash is still equal to $c$:
-\begin{eqnarray}
+\begin{align}
   c + c_1 = H(g^r y^c, H(y)^r I^c, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
-\end{eqnarray}
+\end{align}
 
 Since the key image $I$ is now tied to the signature, any attempt to sign two different ring signatures with the same y will result in the same $I$, so preventing double spends is easy.  You just keep track of which key images have previously been used, and reject any new signatures with a previously used $I$.
 
@@ -123,25 +139,25 @@ Since the key image $I$ is now tied to the signature, any attempt to sign two di
 Linkable ring signatures do a good job of proving ownership while obscuring origins, but they get large as the number of mixins rises. LSAG signatures address this by constructing the $c$ terms via an iterative process, so it is only necessary to send one of them.  For a large ring, this results in nearly 33\% space savings.
 
 Consider a set of public keys $y_i, i \in \{0, …, n-1\}$ with a secret index $j$ which denotes the public key to which we know the corresponding private key.  As before, choose random $v$, and $r_i$ $\forall i \ne j$.  Then define
-\begin{eqnarray}
-      L_j &=& g^v\\
-      R_j &=& H(y_j)^v\\
-  c_{j+1} &=& H(L_j,R_j)
-\end{eqnarray}
+\begin{align}
+      L_j &= g^v\\
+      R_j &= H(y_j)^v\\
+  c_{j+1} &= H(L_j,R_j)
+\end{align}
 
 For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to zero, then back to $j$)
-\begin{eqnarray}
-  L_i &=& g^{r_i} y^{c_i}\\
-  R_i &=& g^{r_i} y^{c_i}\\
-  c_{i+1} &=& H(L_i,R_i)\\
+\begin{align}
+  L_i &= g^{r_i} y^{c_i}\\
+  R_i &= g^{r_i} y^{c_i}\\
+  c_{i+1} &= H(L_i,R_i)\\
   &...& \\
-  c_j &=& H(L_{j-1}, R_{j-1})
-\end{eqnarray}
+  c_j &= H(L_{j-1}, R_{j-1})
+\end{align}
 
 Now that we have $c_j$, we can define
-\begin{eqnarray}
+\begin{align}
   r_j = v - c_j x
-\end{eqnarray}
+\end{align}
 
 Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $r_j$ and $c_j$, and the values should be equal to the original $L_j$ and $R_j$ calculated using $v$. The prover now sends $(I, y_0, r_0, …, y_{n-1}, r_{n-1}, c_0)$ to the verifier.  The verifier can reconstruct all $(c_i, L_i, R_i)$ and then check that $c_0 = c_n$.
 
@@ -151,37 +167,37 @@ Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $
 LSAG signatures allow a compact representation of a linked ring signature, but each real key needs its own signature, and there is no way to associate the real keys with interleaved data.
 
 The MLSAG solves this by using key vectors rather than single keys.  So key $y_i$ is instead a vector of $m$ keys
-\begin{eqnarray}
+\begin{align}
   y_i = (y_{i,0}, ..., y_{i,m-1})
-\end{eqnarray}
+\end{align}
 
 As before, there exists a secret index $j$, for which we know the private keys to each public key.  Each $r_i$ is now also a vector, and
-\begin{eqnarray}
+\begin{align}
   r_i = (r_{i,0}, ..., r_{i,m-1})
-\end{eqnarray}
+\end{align}
 
 $\forall i \ne j$, $r_i$ consists of random numbers.
 
 The prover proceeds as with an LSAG, starting with index $j$.  $v$ is now a vector of $m$ elements.  The $L_{j,k}$ and $R_{j,k}$ entries are calculated in the same way, but using $y_{j,k}$ and $v_k$.  $c_{j+1}$ is calculated using all $L_{j,k}$ and $R_{j,k}$:
-\begin{eqnarray}
-  L_{j,k} &=& g^{v_k}\\
-  R_{j,k} &=& H(y_{j,k})^{v_k}\\
-  c_{j+1} &=& H(L_{j,0}, R_{j,0}, ..., L_{j,m-1}, R_{j,m-1})
-\end{eqnarray}
+\begin{align}
+  L_{j,k} &= g^{v_k}\\
+  R_{j,k} &= H(y_{j,k})^{v_k}\\
+  c_{j+1} &= H(L_{j,0}, R_{j,0}, ..., L_{j,m-1}, R_{j,m-1})
+\end{align}
 
 As before, the prover calculates the remaining $L_i$ and $R_i$ using the corresponding $c_i$, $r_i$, and $I$, and the hash for $c_{i+1}$ contains the full set of $L_{i,k}$ and $R_{i,k}$:
-\begin{eqnarray}
-  L_{i,k} &=& g^{r_{i,k}} y^{c_i}\\
-  R_{i,k} &=& H(y_i)^{r_{i,k}} I^{c_i}\\
-  c_{i+1} &=& H(L_{i,0}, R_{i,0}, ..., L_{i,m-1}, R_{i,m-1}) \\
+\begin{align}
+  L_{i,k} &= g^{r_{i,k}} y^{c_i}\\
+  R_{i,k} &= H(y_i)^{r_{i,k}} I^{c_i}\\
+  c_{i+1} &= H(L_{i,0}, R_{i,0}, ..., L_{i,m-1}, R_{i,m-1}) \\
   &...& \\
-  c_j &=& H(L_{j-1,0}, R_{j-1,0}, ..., L_{j-1,m-1}, R_{j-1,m-1}) 
-\end{eqnarray}
+  c_j &= H(L_{j-1,0}, R_{j-1,0}, ..., L_{j-1,m-1}, R_{j-1,m-1}) 
+\end{align}
 
 Now that we have $c_j$, we can calculate the $r_{j,k}$ as before:
-\begin{eqnarray}
+\begin{align}
   r_{j,k} = v_k - c_j x_k
-\end{eqnarray}
+\end{align}
 
 The prover sends the same set of $(I, y_0, r_0, ..., y_{m-1}, r_{m-1}, c_0)$ as for LSAG, but each $y_i$ and $r_i$ is now a vector.  The verifier again calculates the full set of $c_i$, with corresponding $L_i$ and $R_i$, and checks that $c_0 = c_n$.
 
@@ -191,20 +207,20 @@ The prover sends the same set of $(I, y_0, r_0, ..., y_{m-1}, r_{m-1}, c_0)$ as 
 Schnorr proofs and ring signatures do a good job of signing public keys, with a variety of options for obfuscating mixins and consolidating space.  But it is often desirable to sign external data, such as a transaction body.  This way the signature validates not only ownership of the inputs, but also locks the signature to the spent outputs, amounts, or any other metadata which is necessary to prevent transaction malleability.
 
 To sign external data $d$, take a hash of it then prepend it to the signature hash.  But hashing the external data directly can lead to collisions, which obviates the point of hashing.  So it is common to use domain separators in the hash:
-\begin{eqnarray}
+\begin{align}
   m = H(\textsf{"transaction body"}, d)
-\end{eqnarray}
+\end{align}
 
 For a standard linkable ring signature, the prover would do the following:
-\begin{eqnarray}
+\begin{align}
   c + c1 = H(m, g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
-\end{eqnarray}
+\end{align}
 
 The verifier also has access to the external data, and does the same calculation:
-\begin{eqnarray}
-  m &=& H(\textsf{"transaction body"}, d)\\
-  c+c1 &=& H(m, g^r y^c, H(y)^r I^c, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
-\end{eqnarray}
+\begin{align}
+  m &= H(\textsf{"transaction body"}, d)\\
+  c+c1 &= H(m, g^r y^c, H(y)^r I^c, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
+\end{align}
 
 This links the signature to the external data, and if the data is altered the verifier signature will fail validation.
 
@@ -218,47 +234,47 @@ Using linkable ring signatures, we can obscure (but not hide) the real inputs to
 \subsection{Pedersen Commitments}
 
 We can again use the difficulty of solving discrete logarithms to hide the real amounts behind a commitment.  The naive approach would be to simply raise our group generator $g$ to the value:
-\begin{eqnarray}
+\begin{align}
   C=g^v
-\end{eqnarray}
+\end{align}
 
 Then we can check that the sum of the input values is equal to the sum of the outputs:
-\begin{eqnarray}
-  v_{i_1} + v_{i_2} &=& v_{o_1} + v_{o_2}\\
-  g^{v_{i_1} + v_{i_2}} &=& g^{v_{o_1} + v_{o_2}}\\
-  g^{v_{i_1}} g^{v_{i_2}} &=& g^{v_{o_1}} g^{v_{o_2}}\\
-  C_{i_1} C_{i_2} &=& C_{o_1} C_{o_2}
-\end{eqnarray}
+\begin{align}
+  v_{i_1} + v_{i_2} &= v_{o_1} + v_{o_2}\\
+  g^{v_{i_1} + v_{i_2}} &= g^{v_{o_1} + v_{o_2}}\\
+  g^{v_{i_1}} g^{v_{i_2}} &= g^{v_{o_1}} g^{v_{o_2}}\\
+  C_{i_1} C_{i_2} &= C_{o_1} C_{o_2}
+\end{align}
   
 So to check that the transaction is balanced, we check the product of the input commitments against the product of the output commitments: if they are equal, then the transaction is balanced.
 
 This simple approach does not work, however, because the range of values in a cryptocurrency is usually only $[0, 2^{64})$.  So an attacker can brute force any commitment by trying all $2^{64}$ possible values.  To prevent this, we add a random blinding factor $s$ to the commitment:
-\begin{eqnarray}
+\begin{align}
   C = g^s h^v
-\end{eqnarray}
+\end{align}
   
 This requires another generator $h$, which is usually defined as a hash-to-group of the generator $g$.  If the group is a prime order group, then any element of the group is a generator, and so a simple hash will suffice.  Otherwise, care must be made to assure that $h$ is orthogonal to $g$.
 
 Now when we check the transaction balance, we end up with
-\begin{eqnarray}
-  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} &=& \frac{g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}}}{g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}}
-  \cr &=& g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} h^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
-\end{eqnarray}
+\begin{align}
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} &= \frac{g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}}}{g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}}
+  \cr &= g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} h^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
+\end{align}
 
 But if the transaction is balanced, then $v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2} =0$, so
-\begin{eqnarray}
+\begin{align}
   \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}}
-\end{eqnarray}
+\end{align}
 
 We define the sum of the input blinding factors minus the output blinding factors to be
-\begin{eqnarray}
+\begin{align}
   z = s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}
-\end{eqnarray}
+\end{align}
 
 Which means that the ratio of the product of the commitments is now just $g^z$, and thus we know the private key $z$ which corresponds to the public key generated from the commitments:
-\begin{eqnarray}
+\begin{align}
   \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = g^z
-\end{eqnarray}
+\end{align}
 
 We already know how to sign a public key if we know the private key, which means we can sign this commitment to zero, and a verifier can check it.  This allows a verifier to validate the transaction is balanced.
 
@@ -268,36 +284,36 @@ We already know how to sign a public key if we know the private key, which means
 Now that the values can be hidden, we have a new problem.  Since we are checking that the sum of the inputs matches the sum of the outputs, what happens if one of the output values is negative?  The transaction will be balanced, but we will end up minting new coins.  How can we prevent this?
 
 First, consider a $n$-bit binary expansion of $v$:
-\begin{eqnarray}
+\begin{align}
   v = b_0 2^0 + b_1 2^1 + ... + b_{n-1} 2^{n-1}
-\end{eqnarray}
+\end{align}
 
 If $v$ is in the range $[0, 2^{64})$ then we know that each $b_k \in {0, 1}$.  Remember that we committed to $v$ with $C = g^s h^v$.  Choose a series of $s_k$ such that
-\begin{eqnarray}
+\begin{align}
   \sum_0^{n-1} s_k = s 
-\end{eqnarray}
+\end{align}
 
 Then write commitments for each bit in the binary expansion thus
-\begin{eqnarray}
+\begin{align}
   C_k = g^{s_k} h^{b_k 2^k}
-\end{eqnarray}
+\end{align}
 
 As before, the sum of the values in these commitments will be equal to $v$, but also the sum of the bit blinding factors $s_k$ will also equal $s$.  So
-\begin{eqnarray}
+\begin{align}
   C_k = C
-\end{eqnarray}
+\end{align}
 
 This allows the validator to check that the binary expansion is valid.  And if each $b_k \in {0, 1}$, then one of the following must be a commitment to zero:
-\begin{eqnarray}
+\begin{align}
   \{G^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
-\end{eqnarray}
+\end{align}
 
 So either the first or the second terms will reduce to $g^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don't need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.
 
 The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding ring signatures.  The verifier checks the validity of each bit proof, and then verifies that
-\begin{eqnarray}
+\begin{align}
   C = \prod{C_i}
-\end{eqnarray}
+\end{align}
 
 
 
@@ -313,60 +329,60 @@ Bulletproofs are not just useful as aggregated range proofs; more generally, the
 The heart of a bulletproof is a vector commitment that links a committed value with an inner product.  The prover uses a recursive protocol that at every step cuts the size of the vectors in half and generates a new commitment, until only a single element remains, then sends the final values with the corresponding generators and commitment as the proof.  The verifier checks that the final commitment is valid, then unwinds the stack.
 
 So for some $(\textbf{g}, \textbf{h}) \in \mathbb{G}^n$, $(\textbf{a}, \textbf{b}) \in \mathbb{Z}_p^n$, $(u, P) \in \mathbb{G}$, $c \in \mathbb{Z}_p$, let $P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b}$ and $c = \left<\textbf{a}, \textbf{b}\right>$.  The goal is to find a way to prove knowledge of $\textbf{a}$ and $\textbf{b}$ to someone who knows $P$ and $c$, without revealing them.  To do this, the prover adds the inner product to the commitment itself:
-\begin{eqnarray}
+\begin{align}
   P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}
-\end{eqnarray}
+\end{align}
 
 Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(\textbf{g}_{[n':]}, \textbf{h}_{[n':]})$ and right $(\textbf{g}_{[:n']}, \textbf{h}_{[:n']})$, with the first $n'$ elements in the left vector and the second $n'$ in the right.  Then for some $\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2 \in \mathbb{Z}_p^n$, define the function $H$ to operate on the split vectors. 
-\begin{eqnarray}
+\begin{align}
   H(\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2, c) = \textbf{g}_{[n':]}^{\textbf{a}_1} \textbf{g}_{[n':]}^{\textbf{a}'_2} \textbf{h}_{[:n']}^{\textbf{b}_1} \textbf{h}_{[:n']}^{\textbf{b}'_2} \cdot u^c
-\end{eqnarray}
+\end{align}
 
 We can define $P$ in terms of $H$, splitting the real $(\textbf{a}, \textbf{b})$ as well into left and right:
-\begin{eqnarray}
-  P &=& \textbf{g}^{\textbf{a}} \textbf{h}^{\textbf{b}} \cdot u^{\left<a, \textbf{b}\right>}\\
-  \cr &=& \textbf{g}_{[n':]}^{\textbf{a}_{[n':]}} \textbf{g}_{[:n']}^{\textbf{a}_{[:n']}} \textbf{h}_{[n':]}^{\textbf{b}_{[n':]}} \textbf{h}_{[:n']}^{\textbf{b}_{[:n']}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
-  \cr &=& H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>)
-\end{eqnarray}
+\begin{align}
+  P &= \textbf{g}^{\textbf{a}} \textbf{h}^{\textbf{b}} \cdot u^{\left<a, \textbf{b}\right>}\\
+  \cr &= \textbf{g}_{[n':]}^{\textbf{a}_{[n':]}} \textbf{g}_{[:n']}^{\textbf{a}_{[:n']}} \textbf{h}_{[n':]}^{\textbf{b}_{[n':]}} \textbf{h}_{[:n']}^{\textbf{b}_{[:n']}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
+  \cr &= H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>)
+\end{align}
 
 Note that $H$ is additively homomorphic in its inputs:
-\begin{eqnarray}
+\begin{align}
   H(\textbf{a}_1, \textbf{a}'_1, \textbf{b}_1, \textbf{b}'_1, c_1) \cdot H(\textbf{a}_2, \textbf{a}'_2, \textbf{b}_2, \textbf{b}'_2, c_2) = H(\textbf{a}_1 + \textbf{a}_2, \textbf{a}'_1 + \textbf{a}'_2, \textbf{b}_1 + \textbf{b}_2, \textbf{b}'_1 + \textbf{b}'_2, c_1 + c_2)
-\end{eqnarray}
+\end{align}
 
 Now define $L, R \in \mathbb{G}$:
-\begin{eqnarray}
-  L &=& H(\textbf{0}^{n'}, \textbf{a}_{[n':]}, \textbf{b}_{[:n']}, \textbf{0}^{n'}, \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>)\\
-  R &=& H(\textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, \textbf{b}_{[n':]}, \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
-\end{eqnarray}
+\begin{align}
+  L &= H(\textbf{0}^{n'}, \textbf{a}_{[n':]}, \textbf{b}_{[:n']}, \textbf{0}^{n'}, \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>)\\
+  R &= H(\textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, \textbf{b}_{[n':]}, \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+\end{align}
 
 Prover sends $(L, R)$ to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (\textbf{a}, \textbf{b}) into single vectors using the challenge:
-\begin{eqnarray}
-  \textbf{a}' &=& x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}\\
-  \textbf{b}' &=& x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}
-\end{eqnarray}
+\begin{align}
+  \textbf{a}' &= x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}\\
+  \textbf{b}' &= x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}
+\end{align}
 
 Prover sends $(\textbf{a}', \textbf{b}')$ to verifier, who first computes $P'$ from $(P, L, R, x)$:
-\begin{eqnarray}
+\begin{align}
   P' = L^{(x^2)} \cdot P \cdot R^{(x^{-2})}
-\end{eqnarray}
+\end{align}
 
 Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
-\begin{eqnarray}
+\begin{align}
   Q' = H(x^{-1} \textbf{a}', x \textbf{a}', x \textbf{b}', x^{-1} \textbf{b}', \left<\textbf{a}', \textbf{b}'\right>)
-\end{eqnarray}
+\end{align}
 
 Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
-\begin{eqnarray}
-  Q' &=& H(x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), \left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
-  \cr &=& H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]}, \textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[:n']}, \textbf{b}_{[:n']}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
-\end{eqnarray}
+\begin{align}
+  Q' &= H(x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), \left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
+  \cr &= H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]}, \textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[:n']}, \textbf{b}_{[:n']}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+\end{align}
 
 It's because we get the same thing when we expand $P'$:
-\begin{eqnarray}
-  P' &=& H(\textbf{0}^{n'}, x^2 \textbf{a}_{[n':]}, x^2 \textbf{b}_{[:n']}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>) \cdot H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>) \cdot H(x^{-2} \textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{[n':]}, x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)\\
-  \cr &=& H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[:n']}, \textbf{b}_{[n':]} + x^2 \textbf{b}_{[:n']}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
-\end{eqnarray}
+\begin{align}
+  P' &= H(\textbf{0}^{n'}, x^2 \textbf{a}_{[n':]}, x^2 \textbf{b}_{[:n']}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>) \cdot H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>) \cdot H(x^{-2} \textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{[n':]}, x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)\\
+  \cr &= H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[:n']}, \textbf{b}_{[n':]} + x^2 \textbf{b}_{[:n']}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+\end{align}
 
 So if the prover can construct $(L, R, \textbf{a}', \textbf{b}')$ such that $P' = Q'$, then he must have known $(\textbf{a}, \textbf{b})$.
 
@@ -374,50 +390,50 @@ So if the prover can construct $(L, R, \textbf{a}', \textbf{b}')$ such that $P' 
 \subsection{Range Proof Using Inner Product}
 
 Let $\textbf{a}_L$ be a vector with the $n$ bits of $v$.  Then the following must all be true:
-\begin{eqnarray}
+\begin{align}
   \left<\textbf{a}_L, 2^n\right> = v ; \textbf{a}_L \textbf{a}_R = \textbf{0}^n ; \textbf{a}_R = \textbf{a}_L - \textbf{1}^n
-\end{eqnarray}
+\end{align}
   
 $\textbf{a}_R$ is defined to be the negation of $\textbf{a}_L$: $0$ where $1$, and $-1$ where $0$.  So any pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$.
 
 Given a verifier chosen $y \in \mathbb{G}$, these relations are equivalent to:
-\begin{eqnarray}
+\begin{align}
   \left<\textbf{a}_L, 2^n\right> = v ; \left<\textbf{a}_L,  \textbf{a}_R y^n\right> = 0 ; \left<\textbf{a}_L - \textbf{1}^n - \textbf{a}_R, \textbf{y}^n\right> = 0
-\end{eqnarray}
+\end{align}
 
 As before, pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$, regardless of multiplying by $\textbf{y}^n$, and summing the dot product will likewise be $0$. And solving the third relation for $0$ gives us another dot product of $0$ with our new $\textbf{y}^n$.
 
 Using another verifier chosen $z \in \mathbb{G}$, we can combine these into one relation:
-\begin{eqnarray}
+\begin{align}
   z^2 \left<\textbf{a}_L, 2^n\right> + z \left<\textbf{a}_L - 1^n - \textbf{a}_R, y^n\right> + \left<\textbf{a}_L,  \textbf{a}_R y^n\right> = z^2 v
-\end{eqnarray}
+\end{align}
 
 Multiplying the first relation by $z^2$ gives us the $z^2 v$ term, and since the other two relations were $0$ we can add them for free (swapping order and multiplying one by $z$).
 
 If we expand the inner products, then start isolating prover and verifier terms, we get:
-\begin{eqnarray}
+\begin{align}
   z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{1}^n, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v\\
   z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right>
-\end{eqnarray}
+\end{align}
 
 Since an inner product $\left<\textbf{a}, \textbf{b}\right>$ can be broken into a pairwise/inner product $\left<\textbf{1}^n, \textbf{a} \textbf{b}\right>$:
-\begin{eqnarray}
+\begin{align}
   z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{1}^n, \textbf{a}_R \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right>\\
   \left<\textbf{a}_L, z^2 \textbf{2}^n + z \textbf{y}^n\right> + \left<\textbf{a}_L - z \textbf{1}^n, \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right>
-\end{eqnarray}
+\end{align}
 
 In order to merge the inner products via the first term, add $\left<-z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>$:
-\begin{eqnarray}
+\begin{align}
   \left<\textbf{a}_L - z \textbf{1}n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \textbf{1}^n, z2 \textbf{2}^n + z \textbf{y}^n\right>\\
   \left<\textbf{a}_L - z \textbf{1}n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> - z \left<\textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>\\
   \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> - z3 \left<\textbf{1}^n, \textbf{2}^n\right> - z^2 \left<\textbf{1}^n, \textbf{y}^n\right>\\
   \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + (z - z^2) \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>
-\end{eqnarray}
+\end{align}
   
 Let $d(y,z) = (z - z^2) \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>$, and we get the final form:
-\begin{eqnarray}
+\begin{align}
   \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + d(y,z)
-\end{eqnarray}
+\end{align}
 
 The verifier can calculate the right side (using the commitment $V$ for $v$), and the problem is now reduced to an inner product argument.
 
@@ -427,54 +443,54 @@ The verifier can calculate the right side (using the commitment $V$ for $v$), an
 We have shown how to make a logarithmically efficient inner product argument, and how to reduce a range proof to an inner product.  But the inner product argument is not zero knowledge, so we can't use it directly; we must first blind the parameters.
 
 Let $(s_L, s_R)$ be vectors of integers:
-\begin{eqnarray}
+\begin{align}
   (s_L, s_R) \leftarrow \mathbb{Z}_p^n
-\end{eqnarray}
+\end{align}
 
 Replace $\textbf{a}_L$ with $(\textbf{a}_L + \textbf{s}_L x)$ and $\textbf{a}_R$ with $(\textbf{a}_R + \textbf{s}_R x)$, and the inner product becomes:
-\begin{eqnarray}
+\begin{align}
   \left<(\textbf{a}_L + \textbf{s}_L x) - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x)\textbf{y}^n\right> = z^2 v + d(y,z)
-\end{eqnarray}
+\end{align}
 
 Then construct vector polynomials $l(x)$ and $r(x)$ from the two sides of the inner product:
-\begin{eqnarray}
-  l(x) &=& \textbf{a}_L + \textbf{s}_L x - z \textbf{1}^n\\
-  r(x) &=& z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x) \textbf{y}^n
-\end{eqnarray}
+\begin{align}
+  l(x) &= \textbf{a}_L + \textbf{s}_L x - z \textbf{1}^n\\
+  r(x) &= z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x) \textbf{y}^n
+\end{align}
 
 The zeros of these vector polynomials are just the unblinded inner product terms:
-\begin{eqnarray}
-  l(0) &=& \textbf{a}_L - z \textbf{1}^n\\
-  r(0) &=& z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n
-\end{eqnarray}
+\begin{align}
+  l(0) &= \textbf{a}_L - z \textbf{1}^n\\
+  r(0) &= z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n
+\end{align}
 
 The inner product then becomes
-\begin{eqnarray}
+\begin{align}
   \left<l(0), r(0)\right> = z^2 v + d(y,z)
-\end{eqnarray}
+\end{align}
 
 If we define $t(x)$ as the inner product of the blinded vector polynomials, we get
-\begin{eqnarray}
+\begin{align}
   t(x) = \left<l(x), r(x)\right> 
-\end{eqnarray}
+\end{align}
 
 We can express this in terms of x:
-\begin{eqnarray}
+\begin{align}
   t(x) = t_0 + t_1 x + t_2 x^2
-\end{eqnarray}
+\end{align}
 
 Where
-\begin{eqnarray}
-  t_0 = \left<l(0), r(0)\right> = z^2 v + d(y,z)\\
-  t_2 = \left<l(1), r(1)\right>\\
-  t_0 = \left<l(0) + l(1), r(0) + r(1)\right> - t_0 - t_1
-\end{eqnarray}
+\begin{align}
+  t_0 &= \left<l(0), r(0)\right> = z^2 v + d(y,z)\\
+  t_2 &= \left<l(1), r(1)\right>\\
+  t_0 &= \left<l(0) + l(1), r(0) + r(1)\right> - t_0 - t_1
+\end{align}
 
 Proving the blinded inner product range proof now depends on simply verifying that both 
-\begin{eqnarray}
-  t_0 = z^2 v + d(y,z)\\
-  t(x) = \left<l(x), r(x)\right> = t_0 + t_1 x + t_2 x^2
-\end{eqnarray}
+\begin{align}
+  t_0 &= z^2 v + d(y,z)\\
+  t(x) &= \left<l(x), r(x)\right> = t_0 + t_1 x + t_2 x^2
+\end{align}
 
 
 
@@ -486,24 +502,24 @@ CryptoNote is a privacy focused cryptocurrency system which implements many of t
 \subsection{One time addresses}
 
 A CryptoNote key consists of a pair of public keys $(A, B)$ with their associated private keys $(a, b)$.  To construct a one time address, the creator of a transaction starts with a transaction private key $r$, and an associated transaction public key $R$:
-\begin{eqnarray}
+\begin{align}
   R=g^r
-\end{eqnarray}
+\end{align}
 
 The creator then uses this, with the destination public key $(A, B)$, to construct the one time address $y$.  This address is a public key, with an associated private key $x$:
-\begin{eqnarray}
+\begin{align}
   y = g^x = g^{H(rA)} B
-\end{eqnarray}
+\end{align}
 
 The owner of the destination key $(A, B)$ can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key $(a, b)$ to attempt to recover the one time private key $x$:
-\begin{eqnarray}
+\begin{align}
 	x = H(Ra) + b
-\end{eqnarray}
+\end{align}
 
 Then raise $g$ to this power to reconstruct the public key $y$:
-\begin{eqnarray}
+\begin{align}
   g^x = g^{H(Ra)} g^b
-\end{eqnarray}
+\end{align}
 
 If $y = g^x$, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key $x$, he is able to sign the key $y$ in a ring signature, allowing him to spend it.
 
@@ -513,14 +529,14 @@ If $y = g^x$, then the destination key was the same one used to construct the on
 One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, this can be problematic.  It would be preferable to allow a trusted node to do the scanning for the user, while preventing the node from being able to spend the output.
 
 To do this, the user can pass a tuple of his private key $a$ with his public key $B$:
-\begin{eqnarray}
+\begin{align}
   V = (a, B)
-\end{eqnarray}
+\end{align}
 
 The node can then look at each transaction, and use the view key with the transaction public key $R$ to attempt to reconstruct the one time public key $y$:
-\begin{eqnarray}
+\begin{align}
   Y = g^{H(Ra)} B
-\end{eqnarray}
+\end{align}
 
 If $Y = y$, then the node knows that the one time key belongs to the user, and returns it.
 
@@ -541,26 +557,26 @@ Monero is a privacy focused cryptocurrency.  In its initial implementation, it u
 The Monero implementation of confidential transactions is called RingCT.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recovergz.  Without the MLSAG, any attempt to include the commitments would either be unable to recover gz, or would expose the real input keys.
 
 To accomplish this, the MLSAG signature adds the corresponding commitments to the public key vectors, then passes them in the signature output:
-\begin{eqnarray}
+\begin{align}
   y_i = ((y_{i,0}, C_{i,0}), ..., (y_{i,m-1}, C_{i,m-1}))
-\end{eqnarray}
+\end{align}
 
 When constructing the hashes, the prover signs a final term which is the sum of the input commitments minus the sum of the output commitments:
-\begin{eqnarray}
-  g^z &=& \frac{C_i}{C_o}\\
-  L_{j,m} &=& g^{v_m}\\
-  c_{j+1} &=& H(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
-\end{eqnarray}
+\begin{align}
+  g^z &= \frac{C_i}{C_o}\\
+  L_{j,m} &= g^{v_m}\\
+  c_{j+1} &= H(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
+\end{align}
 
 As before, if this sum is a commitment to zero, then it will take the form of a public key $g^z$, where the user knows the private key $z$.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a $R_{j,m}$ term, or a key image.  It will be necessary to create a new $v_m$ and include an additional $r_{j,m}$ in the signature:
-\begin{eqnarray}
+\begin{align}
   r_{j,m} = v_m - c_j z
-\end{eqnarray}
+\end{align}
 
 The verifier uses this additional $r_{j,m}$ and $c_j$ to build a standard Schnorr term:
-\begin{eqnarray}
+\begin{align}
   c_{j+1} = H(L_{j,0}, L_{j,0}, ... , L_{j,0}, L_{j,0}, g^{r_{j,m}} y^{c_j})
-\end{eqnarray}
+\end{align}
 
 As before, if the sum was a commitment to zero, then this term will be the same in the prover and verifier hashes.
 
@@ -587,50 +603,50 @@ As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/
 \subsection{$\Sigma$-protocol for commitment to $0$ or $1$}
 
 Consider a commitment to a message $m$ with random blinding factor $r$:
-\begin{eqnarray}
+\begin{align}
   c=Com(m, r)
-\end{eqnarray}
+\end{align}
 
 To prove that $c$ opens to $0$ or $1$, pick random $(a,s,t)$ and use them to construct $(c_a, c_b)$:
-\begin{eqnarray}
+\begin{align}
   a,s,t &\in& \mathbb{Z}_p\\
-  c_a &=& Com(a, s)\\
-  c_b &=& Com(am, t)
-\end{eqnarray}
+  c_a &= Com(a, s)\\
+  c_b &= Com(am, t)
+\end{align}
 
 In an interactive protocol, the prover would send $(c_a,c_b)$ to the verifier, who would respond with the challenge $x$.  To make it non-interactive, hash $(c, c_a, c_b)$:
-\begin{eqnarray}
+\begin{align}
   x = H(c, c_a, c_b)
-\end{eqnarray}
+\end{align}
 
 Either way, the prover uses $x$ to construct $(f, z_a, z_b)$ and sends it to the verifier:
-\begin{eqnarray}
-  f &=& mx + a\\
-  z_a &=& rx + s\\
-  z_b &=& r(x-f) + t
-\end{eqnarray}
+\begin{align}
+  f &= mx + a\\
+  z_a &= rx + s\\
+  z_b &= r(x-f) + t
+\end{align}
 
 The verifier now has the full set of $(c, c_a, c_b, x, f, z_a, z_b)$ and accepts the proof if both of the following are true:
-\begin{eqnarray}
-  c^x c_a &=& Com(f, z_a)\\
-  c^{x-f} c_b &=& Com(0, z_b)
-\end{eqnarray}
+\begin{align}
+  c^x c_a &= Com(f, z_a)\\
+  c^{x-f} c_b &= Com(0, z_b)
+\end{align}
 
 This follows as 
-\begin{eqnarray}
-  c^x c_a &=& Com(xm,xr) Com(a,s)\\
-  \cr &=& Com(xm+a, xr+s)\\
-  \cr &=& Com(f, za)\\
-  c^{x-f} c_b &=& Com((x-f)m, (x-f)r) Com(am, t)\\
-  \cr &=& Com(xm - fm + am, (x-f)r + t)\\
-  \cr &=& Com(xm - (mx + a)m + am, z_b)\\
-  \cr &=& Com(xm - m^2 x, z_b)
-\end{eqnarray}
+\begin{align}
+  c^x c_a &= Com(xm,xr) Com(a,s)\\
+  \cr &= Com(xm+a, xr+s)\\
+  \cr &= Com(f, za)\\
+  c^{x-f} c_b &= Com((x-f)m, (x-f)r) Com(am, t)\\
+  \cr &= Com(xm - fm + am, (x-f)r + t)\\
+  \cr &= Com(xm - (mx + a)m + am, z_b)\\
+  \cr &= Com(xm - m^2 x, z_b)
+\end{align}
 
 Since $x$ is not $0$, then $x (m-m^2)$ is only $0$ when $(m-m^2)$ is $0$, or when
-\begin{eqnarray}
+\begin{align}
   m = m^2
-\end{eqnarray}
+\end{align}
 
 This is only true $\forall m \in {0,1}$.  So if $c^{x-f} c_b = Com(0,zb)$, $m \in {0,1}$.
 
@@ -640,97 +656,97 @@ This is only true $\forall m \in {0,1}$.  So if $c^{x-f} c_b = Com(0,zb)$, $m \i
 Ring signatures allow hiding a signature in a set of mixins.  But they grow in size linearly with the mixin set size.  So the mixin set must be limited, and cannot contain every transaction in the ledger.  Merkle proofs offer a logarithmic sized proof for ledger inclusion, but are not zero knowledge.  It would be ideal to be able to demonstrate both ownership and leder inclusion with a single proof.  One out of many proofs do this, in logarithmic size.  So every output in the ledger functions as a mixin, and the proof size scales logarithmically with the ledger size.
 
 Consider a set of $N$ commitments:
-\begin{eqnarray}
+\begin{align}
   c_i = g^{s_i} h^{v_i}
-\end{eqnarray}
+\end{align}
 
 If we know that this set contains a commitment to $0$, then we know an index $l$ such that
-\begin{eqnarray}
+\begin{align}
   c_l = \prod_{i=0}^{N-1} c_i^{\delta_{il}}
-\end{eqnarray}
+\end{align}
 
 is a commitment to zero.  This is true because $\delta_{ll} = 1$, while all other $\delta_{il} = 0$. So this product is simply $c_l$ as the rest of the $c_i$ are canceled by raising to $0$.
 
 Assuming $N = 2^n$, extending as necessary, expand $i$ and $l$ in binary:
-\begin{eqnarray}
+\begin{align}
   i = i_1...i_n\\
   l = l_1...l_n
-\end{eqnarray}
+\end{align}
 
 We can now express $\delta_{il}$ in terms of these bits:
-\begin{eqnarray}
+\begin{align}
   \delta_{il} = \prod_{j=1}^{n} \delta_{i_jl_j}
-\end{eqnarray}
+\end{align}
   
 Combining these two terms, our commitment to $0$ $C$ becomes
-\begin{eqnarray}
+\begin{align}
   C = \prod_{i=0}^{N-1}c_i^{\prod_{j=1}^{n} \delta_{i_jl_j}}
-\end{eqnarray}
+\end{align}
 
 Next we iterate over all $n$ bits, committing to the bits of $l$ and proving they are all zero or one using the previous protocol.  After getting the challenge $x$ we will generate an $f$, but now there is one for each bit of $l$:
-\begin{eqnarray}
+\begin{align}
   f_j = l_j x + a_j
-\end{eqnarray}
+\end{align}
 
 We can further define $f_{j, i_j}$ as a function of $f_j$ that depends on $i_j$:
-\begin{eqnarray}
+\begin{align}
   f_{j,1} = f_j = l_j x + a_j\\
   f_{j,0} = x - f_j = (1 - l_j) x - a_j
-\end{eqnarray}
+\end{align}
 
 For each $i$, we can take the product $p_i(x)$ of the $f_{j, i_j}$ terms:
-\begin{eqnarray}
+\begin{align}
   p_i(x) = \prod_{j=1}^{n} f_{j, i_j}
-\end{eqnarray}
+\end{align}
 
 In all cases, $f_{j, i_j}$ will be a linear function of $x$, so $p_i(x)$ will be a polynomial in $x$ of degree $n$; but the $x$ term will cancel $\forall j$ such that $l_j \ne i_j$.  So $\forall i \ne l$, at least one of the $x$ terms will cancel; thus
-\begin{eqnarray}
+\begin{align}
   p_i(x) = \prod_{j=1}^n f_{j,i_j} = {\prod_{j=1}^{n}\delta_{i_jl_j} x} + \sum_{k=0}^{n-1}{p_{i,k} x^k}
-\end{eqnarray}
+\end{align}
 
 If we have x, then we can calculate this product directly.  But before we have x, we can still evaluate this polynomial algebraically.  If we do so, we can determine the pi,k parameters in terms of aj.  This allows us to use pi,k once we have aj:
 
 For all j=(1, ..., n) with k=j-1:
-\begin{eqnarray}
+\begin{align}
   (rj,aj,sj,tj,j) \mathbb{Z}q\\
   clj=Com(lj;rj)\\
   caj=Com(aj;sj)\\
   cbj=Com(ljaj;tj)\\
   cdk=i=0N-1cipi,k Com(0;k)
-\end{eqnarray}
+\end{align}
 
 The verifier responds with the challenge x, or it is generated via Fiat-Shamir.  Prover then uses x as per the previous protocol to construct, for each j:
-\begin{eqnarray}
+\begin{align}
   fj=ljx+aj\\
   zaj=rjx+sj\\
   zbj=rj(x-fj)+tj
-\end{eqnarray}
+\end{align}
 
 The prover then constructs the final value:
-\begin{eqnarray}
+\begin{align}
   zd=rxn-k=0n-1kxk
-\end{eqnarray}
+\end{align}
 
 The verifier must check the individual bit proofs:
-\begin{eqnarray}
+\begin{align}
   cljx caj=Com(fj;zaj)\\
   cljx-fjcbj=Com(0;zbj)
-\end{eqnarray}
+\end{align}
     
 As before, the first line proves knowledge of lj, and the second proves it was binary.  Finally, the verifier checks zd against cdk using ci and fj,ij:
-\begin{eqnarray}
+\begin{align}
   i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=Com(0;zd)
-\end{eqnarray}
+\end{align}
 
 If we simplify using pi(x) and expand we can see why this is true:
-\begin{eqnarray}
+\begin{align}
   i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=i=0N-1cipi(x)  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk\\
   =i=0N-1cij=1nijljx+ k=0n-1pi,k xk  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk\\
   =clxn i=0N-1cik=0n-1pi,k xk  k=0n-1Com(0;k)-xk k=0n-1(i=0N-1cipi,k)-xk\\
   =Com(0;rxn) k=0n-1Com(0;k)-xk  k=0n-1i=0N-1cipi,k xk  k=0n-1i=0N-1ci-pi,kxk\\
   =Com(0;rxn) k=0n-1Com(0;k)-xk\\
   Com(0;zd)=Com(0;rxn-k=0n-1kxk)=Com(0;rxn) k=0n-1Com(0;k)-xk
-\end{eqnarray}
+\end{align}
 
 
 \subsection{Hiding Transaction Amounts and Origins}
@@ -740,33 +756,33 @@ Confidential Transactions are good at hiding amounts, but it is necessary to rev
 Lelantus accomplishes this via a two step process.  It establishes input ownership via a set of one out of many -proofs, then uses elements of the -proofs to to establish a balance proof.  At no time are the input commitments themselves revealed to the verifier.
 
 To show how the balance proof arises from the elements of the -proofs, consider the following values:
-\begin{eqnarray}
+\begin{align}
   zi=vixn-k=0n-1kixk\\
   Com(0,ki)=g0hki
-\end{eqnarray}
+\end{align}
 
 The verifier can then compute the following:
-\begin{eqnarray}
+\begin{align}
   A=(i=1NnewCoi)xn=(i=1Nnewgsoihvoi)xn=g( so) xnh( vo) xn\\
   B=Com(0,i=1Noldzi) i=1Nold(k=0n-1Com(0,ki)xk)\\
   =g0h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(k=0n-1g0hkixk)\\
   =h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(hk=0n-1kixk)=h( vi) xn
-\end{eqnarray}
+\end{align}
 
 The ratio of A to B is thus:
-\begin{eqnarray}
+\begin{align}
   AB=g( so) xnh( vo) xnh( vi) xn
-\end{eqnarray}
+\end{align}
   
 As before, if the transaction is balanced then 
-\begin{eqnarray}
+\begin{align}
   vi= vo
-\end{eqnarray}
+\end{align}
 
 And thus
-\begin{eqnarray}
+\begin{align}
   AB=g( so) xn
-\end{eqnarray}
+\end{align}
 
 Since the prover knows the output serial numbers, this is a public key to which he knows the private key.  So it suffices to provide a regular Schnorr proof for this ratio to prove that the transaction is balanced, and no input commitments have been revealed.
 
@@ -782,14 +798,14 @@ Some of the most recently released cryptocurrencies use a relatively new system 
 While RingCT uses ring signatures with mixins to obscure the links between inputs and outputs, Mimblewimble rather aggregates all of the transactions in a block.  Thus the individual links between the inputs and outputs of the transactions is lost, and only the block level linking is still present.  This happens naturally as a result of the transaction format.
 
 Consider a transaction with input commitments Ci and output commitments Co.  As with all implementations of confidential transactions, the sum of the input commitments minus the outputs will be the ratio of their products, and this will be a public key to which the owner knows the private key:
-\begin{eqnarray}
+\begin{align}
   Ci Co=g si -  so=gz=CT
-\end{eqnarray}
+\end{align}
 
 The transaction format is thus the set (Ci1,..., CiN,Co1,...,CoM,CT), with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:
-\begin{eqnarray}
+\begin{align}
   (  Ci Co)k= (CT)k
-\end{eqnarray}
+\end{align}
 
 A verifier can check the signatures on the individual CT and the aggregated balance check; if they all succeed, the aggregated transaction set is still valid.
 

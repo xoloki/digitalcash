@@ -21,14 +21,14 @@ There are many papers which outline, define, use, mutate, expand on, or cite the
   Notation
 }
 
-We define a hash function $H_n$ as a function that maps an unbounded list of arbitrarily-sized binary inputs to a set of $n$ bits:
+We define a hash function $H_n$ as a function that maps an unbounded list of arbitrarily-sized binary inputs to an output set $O$ of $n$ bits:
 \begin{align}
-  H_N: \Set{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}}{i_1, i_2, ...} \mapsto \Set{o \in {0, 1}}{o_1, o_2, o_{...}, o_{N-1}}
+  H_n \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{O \in {b_1b_2...b_n}}{b \in \{0,1\}}
 \end{align}
 
-If we do not define $N$, then we assume it is implementation dependent, but that the output set is still bounded at some $N$:
+If we do not define $n$, then we assume it is implementation dependent, but that the output set is still bounded at some $n$ bits:
 \begin{align}
-  H: \Set{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}}{i_1, i_2, ...} \mapsto \Set{o \in {0, 1} o_1, o_2, o_{...}, o_{N-1}}{}  
+  H \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{O \in {b_1b_2...b_n}}{b \in \{0,1\}}  
 \end{align}
 
 

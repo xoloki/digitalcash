@@ -413,7 +413,7 @@ Multiplying the first relation by $z^2$ gives us the $z^2 v$ term, and since the
 If we expand the inner products, then start isolating prover and verifier terms, we get:
 \begin{align}
   z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v\\
-  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>
+  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>
 \end{align}
 
 Since an inner product $\left<\textbf{a}, \textbf{b}\right>$ can be broken into a pairwise/inner product $\left<\textbf{1}^n, \textbf{a} \textbf{b}\right>$:
@@ -424,7 +424,7 @@ Since an inner product $\left<\textbf{a}, \textbf{b}\right>$ can be broken into 
 
 In order to merge the inner products via the first term, add $\left<-z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>$:
 \begin{align}
-  \left<\textbf{a}_L - z \textbf{1}n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \textbf{1}^n, z2 \textbf{2}^n + z \textbf{y}^n\right>\\
+  \left<\textbf{a}_L - z \cdot \textbf{1}n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \cdot \textbf{1}^n, z2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\\
   \left<\textbf{a}_L - z \textbf{1}n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> - z \left<\textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>\\
   \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right> - z3 \left<\textbf{1}^n, \textbf{2}^n\right> - z^2 \left<\textbf{1}^n, \textbf{y}^n\right>\\
   \left<\textbf{a}_L - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n\right> = z^2 v + (z - z^2) \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>

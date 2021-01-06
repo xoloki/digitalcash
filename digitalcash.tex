@@ -23,12 +23,12 @@ There are many papers which outline, define, use, mutate, expand on, or cite the
 
 We define a hash function $H_n$ as a function that maps an unbounded list of arbitrarily-sized binary inputs to an output set $O$ of $n$ bits:
 \begin{align}
-  H_n \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{O \in {b_1b_2...b_n}}{b \in \{0,1\}}
+  H_n \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}
 \end{align}
 
 If we do not define $n$, then we assume it is implementation dependent, but that the output set is still bounded at some $n$ bits:
 \begin{align}
-  H \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{O \in {b_1b_2...b_n}}{b \in \{0,1\}}  
+  H \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}
 \end{align}
 
 
@@ -150,7 +150,7 @@ For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to ze
   L_i &= g^{r_i} y^{c_i}\\
   R_i &= g^{r_i} y^{c_i}\\
   c_{i+1} &= H(L_i,R_i)\\
-  &...& \\
+  &... \\
   c_j &= H(L_{j-1}, R_{j-1})
 \end{align}
 
@@ -233,7 +233,7 @@ Using linkable ring signatures, we can obscure (but not hide) the real inputs to
 
 \subsection{Pedersen Commitments}
 
-We can again use the difficulty of solving discrete logarithms to hide the real amounts behind a commitment.  The naive approach would be to simply raise our group generator $g$ to the value:
+We can again use the difficulty of solving discrete logarithms to hide the real amounts behind a commitment.  The naive approach would be to simply raise our group generator $g$ to the value $v$:
 \begin{align}
   C=g^v
 \end{align}
@@ -391,29 +391,29 @@ So if the prover can construct $(L, R, \textbf{a}', \textbf{b}')$ such that $P' 
 
 Let $\textbf{a}_L$ be a vector with the $n$ bits of $v$.  Then the following must all be true:
 \begin{align}
-  \left<\textbf{a}_L, 2^n\right> = v ; \textbf{a}_L \textbf{a}_R = \textbf{0}^n ; \textbf{a}_R = \textbf{a}_L - \textbf{1}^n
+  \left<\textbf{a}_L, 2^n\right> = v ; \textbf{a}_L \circ  \textbf{a}_R = \textbf{0}^n ; \textbf{a}_R = \textbf{a}_L - \textbf{1}^n
 \end{align}
   
 $\textbf{a}_R$ is defined to be the negation of $\textbf{a}_L$: $0$ where $1$, and $-1$ where $0$.  So any pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$.
 
 Given a verifier chosen $y \in \mathbb{G}$, these relations are equivalent to:
 \begin{align}
-  \left<\textbf{a}_L, 2^n\right> = v ; \left<\textbf{a}_L,  \textbf{a}_R y^n\right> = 0 ; \left<\textbf{a}_L - \textbf{1}^n - \textbf{a}_R, \textbf{y}^n\right> = 0
+  \left<\textbf{a}_L, 2^n\right> = v ; \left<\textbf{a}_L, \textbf{a}_R \circ y^n\right> = 0 ; \left<\textbf{a}_L - \textbf{1}^n - \textbf{a}_R, \textbf{y}^n\right> = 0
 \end{align}
 
 As before, pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$, regardless of multiplying by $\textbf{y}^n$, and summing the dot product will likewise be $0$. And solving the third relation for $0$ gives us another dot product of $0$ with our new $\textbf{y}^n$.
 
 Using another verifier chosen $z \in \mathbb{G}$, we can combine these into one relation:
 \begin{align}
-  z^2 \left<\textbf{a}_L, 2^n\right> + z \left<\textbf{a}_L - 1^n - \textbf{a}_R, y^n\right> + \left<\textbf{a}_L,  \textbf{a}_R y^n\right> = z^2 v
+  z^2 \cdot \left<\textbf{a}_L, 2^n\right> + z \cdot \left<\textbf{a}_L - 1^n - \textbf{a}_R, y^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v
 \end{align}
 
 Multiplying the first relation by $z^2$ gives us the $z^2 v$ term, and since the other two relations were $0$ we can add them for free (swapping order and multiplying one by $z$).
 
 If we expand the inner products, then start isolating prover and verifier terms, we get:
 \begin{align}
-  z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{1}^n, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v\\
-  z^2 \left<\textbf{a}_L, \textbf{2}^n\right> + z \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \textbf{y}^n\right> = z^2 v + z \left<\textbf{1}^n, \textbf{y}^n\right>
+  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v\\
+  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L,  \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>
 \end{align}
 
 Since an inner product $\left<\textbf{a}, \textbf{b}\right>$ can be broken into a pairwise/inner product $\left<\textbf{1}^n, \textbf{a} \textbf{b}\right>$:

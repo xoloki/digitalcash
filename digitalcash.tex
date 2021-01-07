@@ -740,12 +740,13 @@ As before, the first line proves knowledge of $l_j$, and the second proves it wa
 
 If we simplify using $p_i(x)$ and expand we can see why this is true:
 \begin{align}
-  \prod_{i=0}^{N-1}{c_i^{\prod_{j=1}^{n}{f_{j,i_j}}}} \prod_{k=0}^{n-1}{c_{d_k}^{-x^k}} &= \prod_{i=0}^{N-1}{c_i^{p_i(x)}} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k)^{-x^k}}\\
-  \cr &= \prod_{i=0}^{N-1}{c_i^{  \prod_{j=1}^{n}{\delta_{i_jl_j} x} + \sum_{k=0}^{n-1}{p_{i,k} x^k}   }} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k)^{-x^k}}\\
+  \prod_{i=0}^{N-1}{c_i^{\prod_{j=1}^{n}{f_{j,i_j}}}} &  \prod_{k=0}^{n-1}{c_{d_k}^{-x^k}} = \prod_{i=0}^{N-1}{c_i^{p_i(x)}} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k)^{-x^k}}\\
+  \cr &= \prod_{i=0}^{N-1}{c_i^{  \prod_{j=1}^{n}{\delta_{i_jl_j} x} + \sum_{k=0}^{n-1}{p_{i,k} x^k}   }} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k))^{-x^k}}\\
   \cr &= c_l^{x^n} \prod_{i=0}^{N-1}{c_i^{ \sum_{k=0}^{n-1}{p_{i,k} x^k}   }}     \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}         \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}})^{-x^k}}\\
   \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}      \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{p_{i,k}  x^k}}}          \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{-p_{i,k} x^k}}}\\
   \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}\\
-  Com(0; z_d) &= Com(0; rx^n - \sum_{k=0}^{n-1}{\rho_k x^k}) = Com(0; rx^n) \prod_{k=0}^{n-1}{Com(0; \rho_k)^{-x^k}}
+  Com(0; z_d) &= Com(0; rx^n - \sum_{k=0}^{n-1}{\rho_k x^k})\\
+  \cr &= Com(0; rx^n) \prod_{k=0}^{n-1}{Com(0; \rho_k)^{-x^k}}
 \end{align}
 
 

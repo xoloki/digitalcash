@@ -704,48 +704,48 @@ In all cases, $f_{j, i_j}$ will be a linear function of $x$, so $p_i(x)$ will be
   p_i(x) = \prod_{j=1}^n f_{j,i_j} = {\prod_{j=1}^{n}\delta_{i_jl_j} x} + \sum_{k=0}^{n-1}{p_{i,k} x^k}
 \end{align}
 
-If we have x, then we can calculate this product directly.  But before we have x, we can still evaluate this polynomial algebraically.  If we do so, we can determine the pi,k parameters in terms of aj.  This allows us to use pi,k once we have aj:
+If we have $x$, then we can calculate this product directly.  But before we have $x$, we can still evaluate this polynomial algebraically.  If we do so, we can determine the $p_{i,k}$ parameters in terms of $a_j$.  This allows us to use $p_{i,k}$ once we have $a_j$:
 
-For all j=(1, ..., n) with k=j-1:
+For all $j = (1, ..., n)$ with $k = j - 1$:
 \begin{align}
-  (rj,aj,sj,tj,j) \mathbb{Z}q\\
-  clj=Com(lj;rj)\\
-  caj=Com(aj;sj)\\
-  cbj=Com(ljaj;tj)\\
-  cdk=i=0N-1cipi,k Com(0;k)
+  (&r_j, a_j, s_j, t_j, \rho_j) \longleftarrow \mathbb{Z}_q\\
+  &c_{l_j} = Com(l_j; r_j)\\
+  &c_{a_j} = Com(a_j; s_j)\\
+  &c_{b_j} = Com(l_j a_j; t_j)\\
+  &c_{d_k} = \prod_{i=0}^{N-1}{c_i^{p_{i,k}}} \cdot Com(0; \rho_k)
 \end{align}
 
-The verifier responds with the challenge x, or it is generated via Fiat-Shamir.  Prover then uses x as per the previous protocol to construct, for each j:
+The verifier responds with the challenge $x$, or it is generated via Fiat-Shamir.  Prover then uses $x$ as per the previous protocol to construct, $\forall j$:
 \begin{align}
-  fj=ljx+aj\\
-  zaj=rjx+sj\\
-  zbj=rj(x-fj)+tj
+  f_j &= l_j + a_j\\
+  z_{a_j} &= r_j x + s_j\\
+  z_{b_j} &= r_j (x - f_j) + t_j
 \end{align}
 
 The prover then constructs the final value:
 \begin{align}
-  zd=rxn-k=0n-1kxk
+  z_d = r x^n - \sum_{k=0}^{n-1}{\rho_k x^k}
 \end{align}
 
 The verifier must check the individual bit proofs:
 \begin{align}
-  cljx caj=Com(fj;zaj)\\
-  cljx-fjcbj=Com(0;zbj)
+  c_{l_j}^x c_{a_j} &= Com(f_j; z_{a_j})\\
+  c_{l_j}^{x-f_j} c_{b_j} &= Com(0; z_{b_j})
 \end{align}
     
-As before, the first line proves knowledge of lj, and the second proves it was binary.  Finally, the verifier checks zd against cdk using ci and fj,ij:
+As before, the first line proves knowledge of $l_j$, and the second proves it was binary.  Finally, the verifier checks $z_d$ against $c_{d_k}$ using $c_i$ and $f_{j,i_j}$:
 \begin{align}
-  i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=Com(0;zd)
+  \prod_{i=0}^{N-1}{c_i^{\prod_{j=1}^{n}{f_{j,i_j}}}} \prod_{k=0}^{n-1}{c_{d_k}^{-x^k}} = Com(0; z_d)
 \end{align}
 
-If we simplify using pi(x) and expand we can see why this is true:
+If we simplify using $p_i(x)$ and expand we can see why this is true:
 \begin{align}
-  i=0N-1cij=1nfj,ij  k=0n-1cdk-xk=i=0N-1cipi(x)  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk\\
-  =i=0N-1cij=1nijljx+ k=0n-1pi,k xk  k=0n-1 (i=0N-1cipi,k Com(0;k))-xk\\
-  =clxn i=0N-1cik=0n-1pi,k xk  k=0n-1Com(0;k)-xk k=0n-1(i=0N-1cipi,k)-xk\\
-  =Com(0;rxn) k=0n-1Com(0;k)-xk  k=0n-1i=0N-1cipi,k xk  k=0n-1i=0N-1ci-pi,kxk\\
-  =Com(0;rxn) k=0n-1Com(0;k)-xk\\
-  Com(0;zd)=Com(0;rxn-k=0n-1kxk)=Com(0;rxn) k=0n-1Com(0;k)-xk
+  \prod_{i=0}^{N-1}{c_i^{\prod_{j=1}^{n}{f_{j,i_j}}}} \prod_{k=0}^{n-1}{c_{d_k}^{-x^k}} &= \prod_{i=0}^{N-1}{c_i^{p_i(x)}} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k)^{-x^k}}\\
+  \cr &= \prod_{i=0}^{N-1}{c_i^{  \prod_{j=1}^{n}{\delta_{i_jl_j} x} + \sum_{k=0}^{n-1}{p_{i,k} x^k}   }} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k)^{-x^k}}\\
+  \cr &= c_l^{x^n} \prod_{i=0}^{N-1}{c_i^{ \sum_{k=0}^{n-1}{p_{i,k} x^k}   }}     \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}         \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}})^{-x^k}}\\
+  \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}      \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{p_{i,k}  x^k}}}          \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{-p_{i,k} x^k}}}\\
+  \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}\\
+  Com(0; z_d) &= Com(0; rx^n - \sum_{k=0}^{n-1}{\rho_k x^k}) = Com(0; rx^n) \prod_{k=0}^{n-1}{Com(0; \rho_k)^{-x^k}}
 \end{align}
 
 
@@ -797,14 +797,14 @@ Some of the most recently released cryptocurrencies use a relatively new system 
 
 While RingCT uses ring signatures with mixins to obscure the links between inputs and outputs, Mimblewimble rather aggregates all of the transactions in a block.  Thus the individual links between the inputs and outputs of the transactions is lost, and only the block level linking is still present.  This happens naturally as a result of the transaction format.
 
-Consider a transaction with input commitments Ci and output commitments Co.  As with all implementations of confidential transactions, the sum of the input commitments minus the outputs will be the ratio of their products, and this will be a public key to which the owner knows the private key:
+Consider a transaction with input commitments $C_i$ and output commitments $C_o$.  As with all implementations of confidential transactions, the sum of the input commitments minus the outputs will be the ratio of their products, and this will be a public key to which the owner knows the private key:
 \begin{align}
-  Ci Co=g si -  so=gz=CT
+  \frac{\prod C_i}{\prod C_o} = g^{s_i - s_o} = g^z = C_T
 \end{align}
 
-The transaction format is thus the set (Ci1,..., CiN,Co1,...,CoM,CT), with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:
+The transaction format is thus the set $(C_{i_1}, ..., C_{i_N}, C_{o_1}, ..., C_{o_M}, C_T)$, with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:
 \begin{align}
-  (  Ci Co)k= (CT)k
+  \prod (\frac{\prod C_i}{\prod Co})_k= \prod (C_T)_k
 \end{align}
 
 A verifier can check the signatures on the individual CT and the aggregated balance check; if they all succeed, the aggregated transaction set is still valid.
@@ -835,7 +835,7 @@ To address this, MobileCoin currently drops the inputs from transactions before 
 
 \section{Acknowledgements}
 
-\paragraph{The author would like to thank Toby Segaran for initial help on ring signatures.}
+The author would like to thank Toby Segaran for initial help on ring signatures, and Isis Lovecruft for the initial review.
 
 
 

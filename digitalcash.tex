@@ -306,7 +306,7 @@ As before, the sum of the values in these commitments will be equal to $v$, but 
 
 This allows the validator to check that the binary expansion is valid.  And if each $b_k \in {0, 1}$, then one of the following must be a commitment to zero:
 \begin{align}
-  \{G^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
+  \{g^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
 \end{align}
 
 So either the first or the second terms will reduce to $g^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don't need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.
@@ -348,7 +348,8 @@ We can define $P$ in terms of $H$, splitting the real $(\textbf{a}, \textbf{b})$
 
 Note that $H$ is additively homomorphic in its inputs:
 \begin{align}
-  H(\textbf{a}_1, \textbf{a}'_1, \textbf{b}_1, \textbf{b}'_1, c_1) \cdot H(\textbf{a}_2, \textbf{a}'_2, \textbf{b}_2, \textbf{b}'_2, c_2) = H(\textbf{a}_1 + \textbf{a}_2, \textbf{a}'_1 + \textbf{a}'_2, \textbf{b}_1 + \textbf{b}_2, \textbf{b}'_1 + \textbf{b}'_2, c_1 + c_2)
+  H(\textbf{a}_1, & \textbf{a}'_1, \textbf{b}_1, \textbf{b}'_1, c_1) \cdot H(\textbf{a}_2, \textbf{a}'_2, \textbf{b}_2, \textbf{b}'_2, c_2)
+  \cr &= H(\textbf{a}_1 + \textbf{a}_2, \textbf{a}'_1 + \textbf{a}'_2, \textbf{b}_1 + \textbf{b}_2, \textbf{b}'_1 + \textbf{b}'_2, c_1 + c_2)
 \end{align}
 
 Now define $L, R \in \mathbb{G}$:
@@ -375,7 +376,9 @@ Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
 
 Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
 \begin{align}
-  Q' &= H(x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), \left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
+  Q' &= H(x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}),
+  x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}),
+  \left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
   \cr &= H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]}, \textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[:n']}, \textbf{b}_{[:n']}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
 \end{align}
 
@@ -744,7 +747,7 @@ If we simplify using $p_i(x)$ and expand we can see why this is true:
   \prod_{i=0}^{N-1}{c_i^{\prod_{j=1}^{n}{f_{j,i_j}}}} &  \prod_{k=0}^{n-1}{c_{d_k}^{-x^k}} = \prod_{i=0}^{N-1}{c_i^{p_i(x)}} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k)^{-x^k}}\\
   \cr &= \prod_{i=0}^{N-1}{c_i^{  \underoverset{j=1}{n}{\prod}{\delta_{i_jl_j} x} + \underoverset{k=0}{n-1}{\sum}{p_{i,k} x^k}   }} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k))^{-x^k}}\\
   \cr &= c_l^{x^n} \prod_{i=0}^{N-1}{c_i^{ \underoverset{k=0}{n-1}{\sum}{p_{i,k} x^k} }}        \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}         \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}})^{-x^k}}\\
-  \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}      \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{p_{i,k}  x^k}}}          \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{-p_{i,k} x^k}}}\\
+  \cr = Com(0 &; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}      \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{p_{i,k}  x^k}}}          \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{-p_{i,k} x^k}}}\\
   \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}\\
   Com(0; z_d) &= Com(0; rx^n - \sum_{k=0}^{n-1}{\rho_k x^k})\\
   \cr &= Com(0; rx^n) \prod_{k=0}^{n-1}{Com(0; \rho_k)^{-x^k}}
@@ -755,20 +758,20 @@ If we simplify using $p_i(x)$ and expand we can see why this is true:
  
 Confidential Transactions are good at hiding amounts, but it is necessary to reveal the commitments themselves in order to prove that a transaction is balanced, i.e. that the sum of the inputs equals the sum of the outputs.  RingCT obfuscates the actual input commitments in a ring of mixins (with both addresses and commitments), but the data is still present and subject to analysis.  It would be better to be able to prove both input ownership and transaction balance without ever showing the input commitments.
 
-Lelantus accomplishes this via a two step process.  It establishes input ownership via a set of one out of many -proofs, then uses elements of the -proofs to to establish a balance proof.  At no time are the input commitments themselves revealed to the verifier.
+Lelantus accomplishes this via a two step process.  It establishes input ownership via a set of one out of many $\Sigma$-proofs, then uses elements of the $\Sigma$-proofs to to establish a balance proof.  At no time are the input commitments themselves revealed to the verifier.
 
-To show how the balance proof arises from the elements of the -proofs, consider the following values:
+To show how the balance proof arises from the elements of the $\Sigma$-proofs, consider the following values:
 \begin{align}
-  zi=vixn-k=0n-1kixk\\
-  Com(0,ki)=g0hki
+  z_i &= v_i x^n - \sum_{k=0}^{n-1}{\rho_k^i x^k}\\
+  Com(0, \rho_k^i) &= g^0 h^{\rho_k^i}
 \end{align}
 
 The verifier can then compute the following:
 \begin{align}
-  A=(i=1NnewCoi)xn=(i=1Nnewgsoihvoi)xn=g( so) xnh( vo) xn\\
-  B=Com(0,i=1Noldzi) i=1Nold(k=0n-1Com(0,ki)xk)\\
-  =g0h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(k=0n-1g0hkixk)\\
-  =h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(hk=0n-1kixk)=h( vi) xn
+  A &= (\prod_{i=1}^{N_{new}}{C_{o_i}})^{x^n} = (\prod_{i=1}^{N_{new}}{g^{s_{o_i}} h^{v_{o_i}}})^{x^n}  =  g^{(\Sigma s_o) x^n}  h^{(\Sigma v_o) x^n}\\
+  B &= Com(0, \sum_{i=1}^{N_{old}}{z_i}) \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1} Com(0, \rho_k^i)^{x^k})}\\
+  \cr &= g^0 h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}} \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1}{g^0 h^{\rho_k^i x^k}})}\\
+  \cr &= h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(hk=0n-1kixk)=h( vi) xn
 \end{align}
 
 The ratio of A to B is thus:
@@ -806,7 +809,7 @@ Consider a transaction with input commitments $C_i$ and output commitments $C_o$
 
 The transaction format is thus the set $(C_{i_1}, ..., C_{i_N}, C_{o_1}, ..., C_{o_M}, C_T)$, with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:
 \begin{align}
-  \prod (\frac{\prod C_i}{\prod Co})_k= \prod (C_T)_k
+  \prod (\frac{\prod C_i}{\prod C_o})_k= \prod (C_T)_k
 \end{align}
 
 A verifier can check the signatures on the individual CT and the aggregated balance check; if they all succeed, the aggregated transaction set is still valid.

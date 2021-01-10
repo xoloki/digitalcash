@@ -771,22 +771,23 @@ The verifier can then compute the following:
   A &= (\prod_{i=1}^{N_{new}}{C_{o_i}})^{x^n} = (\prod_{i=1}^{N_{new}}{g^{s_{o_i}} h^{v_{o_i}}})^{x^n}  =  g^{(\Sigma s_o) x^n}  h^{(\Sigma v_o) x^n}\\
   B &= Com(0, \sum_{i=1}^{N_{old}}{z_i}) \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1} Com(0, \rho_k^i)^{x^k})}\\
   \cr &= g^0 h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}} \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1}{g^0 h^{\rho_k^i x^k}})}\\
-  \cr &= h( vi) xn i=1Noldh-k=0n-1kixki=1Nold(hk=0n-1kixk)=h( vi) xn
+  \cr &= h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}}  \prod_{i=1}^{N_{old}}{h^{\sum_{k=0}^{n-1}{\rho_k^i x^k}}}
+  \cr &= h^{(\sum{v_i}) x^n}
 \end{align}
 
 The ratio of A to B is thus:
 \begin{align}
-  AB=g( so) xnh( vo) xnh( vi) xn
+  \frac{A}{B} = \frac{g^{(\sum{s_o}) x^n g^{(\sum{v_o}) x^n}}}{g^{(\sum{v_i}) x^n}}
 \end{align}
   
 As before, if the transaction is balanced then 
 \begin{align}
-  vi= vo
+  \sum{v_i} = \sum{v_o}
 \end{align}
 
 And thus
 \begin{align}
-  AB=g( so) xn
+  \frac{A}{B} = g^{(\sum{s_o}) x^n}
 \end{align}
 
 Since the prover knows the output serial numbers, this is a public key to which he knows the private key.  So it suffices to provide a regular Schnorr proof for this ratio to prove that the transaction is balanced, and no input commitments have been revealed.
@@ -812,7 +813,7 @@ The transaction format is thus the set $(C_{i_1}, ..., C_{i_N}, C_{o_1}, ..., C_
   \prod (\frac{\prod C_i}{\prod C_o})_k= \prod (C_T)_k
 \end{align}
 
-A verifier can check the signatures on the individual CT and the aggregated balance check; if they all succeed, the aggregated transaction set is still valid.
+A verifier can check the signatures on the individual $C_T$ and the aggregated balance check; if they all succeed, the aggregated transaction set is still valid.
 
 Using this technique, miners will aggregate all of the transactions in a block into a single set with a single aggregated signature.  After the new block is formed, nodes can again merge the transactions from the new block into the set of all transactions.  Once this is done, any spent outputs will appear in both the output list and the input list.  Such outputs can be safely pruned from both lists, and a balance check over the entire ledger will still be valid.  This is clear, as any such transactions will appear in both the top and bottom of the input/output ratio, and will thus cancel each other out.  
 
@@ -822,7 +823,7 @@ However, any observer who sees the advertised transactions (either a peer or a m
 
 Since spent outputs will be removed, it will no longer be possible to validate a block using normal merkle tree semantics, since this requires having all leaf nodes to construct the root hash.  So every output will need a separate merkle proof, to tie it to the root hash at time of block creation.  Validating a block will require validating each remaining output's merkle proof.
 
-Finally, while there are indeed space savings from removing inputs and spent outputs, it is necessary to store all balance commitments CT and their associated Schnorr proofs forever.  This set grows monotonically with each added transaction.  
+Finally, while there are indeed space savings from removing inputs and spent outputs, it is necessary to store all balance commitments $C_T$ and their associated Schnorr proofs forever.  This set grows monotonically with each added transaction.  
 
 
 
@@ -843,7 +844,7 @@ To address this, MobileCoin currently drops the inputs from transactions before 
 The author would like to thank Toby Segaran for initial help on ring signatures, and Isis Lovecruft for the initial review.
 
 
-
+\newpage
 \section{References}
 
 \paragraph{Nicolas van Saberhagen. CryptoNote v 2.0. October 17, 2013. https://cryptonote.org/whitepaper.pdf}

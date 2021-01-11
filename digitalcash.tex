@@ -94,9 +94,9 @@ Since $g^v = g^r y^c$, the two hashes are identical.  Thus
   c + c_1 = H(g^r y^c, g^{r_1} y_1^{c_1})
 \end{align}
 
-So if $c$ is equal to the hash, then the prover must have known $x$ for some $y$.  And since the prover can put the real $(y,r,c)$ in either position, there is no way for the verifier to know which key was actually signed.
+So if $\sum c$ is equal to the hash, then the prover must have known $x$ for some $y$.  And since the prover can put the real $(y,r,c)$ in either position, there is no way for the verifier to know which key was actually signed.
 
-We can do the same for any number of additional public keys $y_k$: choose a random $(r_k,c_k)$ which is added to the hash in the form of $g^{r_k}y_k^{c_k}$ then subtracting the new $c_k$ from the hash to form the real $c$. Then $c$ will be equal to the hash for both prover and verifier.
+We can do the same for any number of additional public keys $y_k$: choose a random $(r_k,c_k)$ which is added to the hash in the form of $g^{r_k}y_k^{c_k}$ then subtracting the new $c_k$ from the hash to form the real $c$. Then $\sum c$ will be equal to the hash for both prover and verifier.
 
 
 
@@ -127,7 +127,7 @@ We define $c$ as before, then solve for the hash:
   c + c_1 &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
 \end{align}
 
-So as before, $c$ is equal to the hash.  The prover now sends $(I, y, r, c, y_1, r_1, c_1)$ to the verifier, who can check that their hash is still equal to $c$:
+So as before, $\sum c$ is equal to the hash.  The prover now sends $(I, y, r, c, y_1, r_1, c_1)$ to the verifier, who can check that their hash is still equal to $\sum c$:
 \begin{align}
   c + c_1 = H(g^r y^c, H(y)^r I^c, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
 \end{align}

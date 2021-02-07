@@ -322,7 +322,7 @@ The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding
 
 Range proofs allow us to verify that output commitments are not negative, but they use a lot of space; each output range proof consists of $64$ separate ring signatures.  It would be preferable to somehow consolidate them, and there are a variety of techniques to do so.  Bulletproofs are a compact way to represent aggregated range proofs, and result in significant space savings.
 
-Bulletproofs are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.
+Bulletproofs \cite{bulletproofs} are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.
 
 
 \subsection{Improved Inner Product Argument}
@@ -500,7 +500,7 @@ Proving the blinded inner product range proof now depends on simply verifying th
 
 \section{CryptoNote}
 
-CryptoNote is a privacy focused cryptocurrency system which implements many of the techniques explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but I will break with that to maintain consistency with the rest of the document, and use exponentials in this section.
+CryptoNote \cite{cryptonote} is a privacy focused cryptocurrency system which implements many of the techniques explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but I will break with that to maintain consistency with the rest of the document, and use exponentials in this section.
 
 
 \subsection{One time addresses}
@@ -553,12 +553,12 @@ CryptoNote uses linkable ring signatures, with external data.  It defines a tran
 
 \section{Monero}
 
-Monero is a privacy focused cryptocurrency.  In its initial implementation, it used a vanilla implementation of cryptonote.  Later iterations added confidential transactions, with standard range proofs.  Recent work includes upgrading the range proofs with bulletproofs for significant space savings.
+Monero is a privacy focused cryptocurrency.  In its initial implementation, it used a vanilla implementation of cryptonote \cite{cryptonote}.  Later iterations added confidential transactions, with standard range proofs.  Recent work includes upgrading the range proofs with bulletproofs for significant space savings.
 
 
 \subsection{RingCT}
 
-The Monero implementation of confidential transactions is called RingCT.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recovergz.  Without the MLSAG, any attempt to include the commitments would either be unable to recover gz, or would expose the real input keys.
+The Monero implementation of confidential transactions is called RingCT \cite{ringct}.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recovergz.  Without the MLSAG, any attempt to include the commitments would either be unable to recover gz, or would expose the real input keys.
 
 To accomplish this, the MLSAG signature adds the corresponding commitments to the public key vectors, then passes them in the signature output:
 \begin{align}
@@ -599,7 +599,7 @@ A zkSNARK is a zero-knowledge, short, non-interactive argument of knowledge.  It
 
 \section{Lelantus}
 
-There is a new Zerocoin based cryptocurrency system called Lelantus, released 2018-12-22.  It uses confidential transactions, and claims to be able to hide the inputs fully while still being auditable.  
+There is a new Zerocoin based cryptocurrency system called Lelantus \cite{lelantus}, released 2018-12-22.  It uses confidential transactions, and claims to be able to hide the inputs fully while still being auditable.  
 
 As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/outputs themselves, rather than associating the commitments with a one time address as in RingCT.  It is thus necessary to reveal the commitment secret during the spend, similar to the way that CryptoNote reveals the key image.  So it is necessary to make the commitments double blind, or else after secret reveal it would be possible to brute force the values as per the naive approach to Pedersen commitments.  Adapting Lelantus to a more CryptoNote-ish system could obviate this need, and allow single blinded commitments.
 
@@ -796,7 +796,7 @@ Since the prover knows the output serial numbers, this is a public key to which 
 
 \section{Mimblewimble}
 
-Some of the most recently released cryptocurrencies use a relatively new system called Mimblewimble.  The goals are to implement a system with the benefits of RingCT, but with a pruned blockchain that still verifies even after removing spent outputs.  As a downside, the sender and receiver of a transaction must complete an interactive protocol.
+Some of the most recently released cryptocurrencies use a relatively new system called Mimblewimble \cite{mimblewimble}.  The goals are to implement a system with the benefits of RingCT, but with a pruned blockchain that still verifies even after removing spent outputs.  As a downside, the sender and receiver of a transaction must complete an interactive protocol.
 
 
 \subsection{One Way Aggregate Signatures}

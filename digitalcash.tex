@@ -320,9 +320,9 @@ The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding
 
 \section{Bulletproofs}
 
-Range proofs allow us to verify that output commitments are not negative, but they use a lot of space; each output range proof consists of $64$ separate ring signatures.  It would be preferable to somehow consolidate them, and there are a variety of techniques to do so.  Bulletproofs are a compact way to represent aggregated range proofs, and result in significant space savings.
+Range proofs allow us to verify that output commitments are not negative, but they use a lot of space; each output range proof consists of $64$ separate ring signatures.  It would be preferable to somehow consolidate them, and there are a variety of techniques to do so.  Bulletproofs \cite{bulletproofs} are a compact way to represent aggregated range proofs, and result in significant space savings.
 
-Bulletproofs \cite{bulletproofs} are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.
+Bulletproofs are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.
 
 
 \subsection{Improved Inner Product Argument}

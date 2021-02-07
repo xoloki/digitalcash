@@ -801,7 +801,7 @@ Some of the most recently released cryptocurrencies use a relatively new system 
 
 \subsection{One Way Aggregate Signatures}
 
-While RingCT uses ring signatures with mixins to obscure the links between inputs and outputs, Mimblewimble rather aggregates all of the transactions in a block.  Thus the individual links between the inputs and outputs of the transactions is lost, and only the block level linking is still present.  This happens naturally as a result of the transaction format.
+While RingCT uses ring signatures with mixins to obscure the links between inputs and outputs, Mimblewimble rather aggregates all of the transactions in a block via a technique they call One Way Aggregate Signatures \cite{increasingBitcoinAnonymity}.  Thus the individual links between the inputs and outputs of the transactions is lost, and only the block level linking is still present.  This happens naturally as a result of the transaction format.
 
 Consider a transaction with input commitments $C_i$ and output commitments $C_o$.  As with all implementations of confidential transactions, the sum of the input commitments minus the outputs will be the ratio of their products, and this will be a public key to which the owner knows the private key:
 \begin{align}

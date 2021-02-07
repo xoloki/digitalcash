@@ -374,15 +374,18 @@ Prover sends $(\textbf{a}', \textbf{b}')$ to verifier, who first computes $P'$ f
 
 Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
 \begin{align}
-  Q' = H(x^{-1} \textbf{a}', x \textbf{a}', x \textbf{b}', x^{-1} \textbf{b}', \left<\textbf{a}', \textbf{b}'\right>)
+  Q' = H(x^{-1} \textbf{a'}, x \textbf{a'}, x \textbf{b'}, x^{-1} \textbf{b'}, \left<\textbf{a'}, \textbf{b'}\right>)
 \end{align}
 
 Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
 \begin{align}
-  Q' &= H(x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}),
-  x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}),
-  \left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
-  \cr &= H(\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]}, \textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}_{[:n']}, \textbf{b}_{[:n']}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+  Q' = H(&x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}),\nonumber\\
+         &x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}),\nonumber\\
+         &\left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
+  \cr = H(&\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]},\nonumber\\
+          &\textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']},\nonumber\\
+          &\left<\textbf{a}_{[n':]}, \textbf{b}_{[n':]}\right> + x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> +\nonumber\\
+          &x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right> + \left<\textbf{a}_{[:n']}, \textbf{b}_{[:n']}\right>)
 \end{align}
 
 It's because we get the same thing when we expand $P'$:

@@ -40,7 +40,7 @@ If we do not define $n$, then we assume it is implementation dependent, but that
   Schnorr Proofs and the Fiat Shamir Transform
 }
 
-Schnorr proofs allow the owner of a private key to demonstrate that ownership to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform.  This allows the protocol to function as a signature.
+Schnorr proofs \cite{schnorr} allow the owner of a private key to demonstrate that ownership to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform \cite{fiatshamir}.  This allows the protocol to function as a signature.
 
 Let $g$ be a generator in a finite group $G$ of prime order $p \in \mathbb{P}$, with private key $x \in \mathbb{Z}_p$, and public key $y = g^x$. The prover chooses a random $v \in Z_p$, then sets $t = g^v$.
 
@@ -848,7 +848,15 @@ The author would like to thank Toby Segaran for initial help on ring signatures,
 
 
 \newpage
-\begin{thebibliography}{6}
+\begin{thebibliography}{8}
+
+\bibitem{schnorr}
+  \emph{Schnorr signature}.
+  \texttt{https://en.wikipedia.org/wiki/Schnorr\%5Fsignature}
+
+\bibitem{fiatshamir}
+  \emph{Fiat Shamir heuristic}.
+  \texttt{https://en.wikipedia.org/wiki/Fiat\%2DShamir\%5Fheuristic}
 
 \bibitem{cryptonote}
   Nicolas van Saberhagen.

@@ -67,7 +67,7 @@ So if $t = g^r y^c$, then the prover must have known $x$.  Otherwise the prover 
 
 \section{Ring signatures}
 
-A Schnorr proof allows us to sign a public key, proving we know the corresponding private key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct a one out of many signature, to prove that we knew the private key for one out of $N$ public keys.
+A Schnorr proof allows us to sign a public key, proving we know the corresponding private key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct a one out of many signature, to prove that we knew the private key for one out of $N$ public keys.  Such a signature is called a ring signature \cite{cryptonote}.
 
 Start with public key $y$ for which the prover knows the private key $x$, and as before, choose a random $v \in \mathbb{Z}_p$ . To mix in an additional key $y_1$ whose private key $x_1$ is unknown, select a random $r_1$ and $c_1$.  The prover sets $c$ as follows, using the values known to calculate it:
 \begin{align}
@@ -167,7 +167,7 @@ Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $
 
 LSAG signatures allow a compact representation of a linked ring signature, but each real key needs its own signature, and there is no way to associate the real keys with interleaved data.
 
-The MLSAG solves this by using key vectors rather than single keys.  So key $y_i$ is instead a vector of $m$ keys
+The MLSAG solves this by using key vectors rather than single keys \cite{ringct}.  So key $y_i$ is instead a vector of $m$ keys
 \begin{align}
   y_i = (y_{i,0}, ..., y_{i,m-1})
 \end{align}
@@ -249,7 +249,7 @@ Then we can check that the sum of the input values is equal to the sum of the ou
   
 So to check that the transaction is balanced, we check the product of the input commitments against the product of the output commitments: if they are equal, then the transaction is balanced.
 
-This simple approach does not work, however, because the range of values in a cryptocurrency is usually only $[0, 2^{64})$.  So an attacker can brute force any commitment by trying all $2^{64}$ possible values.  To prevent this, we add a random blinding factor $s$ to the commitment:
+This simple approach does not work, however, because the range of values in a cryptocurrency is usually only $[0, 2^{64})$.  So an attacker can brute force any commitment by trying all $2^{64}$ possible values.  To prevent this, we add a random blinding factor $s$ to the commitment \cite{ringct}:
 \begin{align}
   C = g^s h^v
 \end{align}
@@ -282,7 +282,7 @@ We already know how to sign a public key if we know the private key, which means
 
 \subsection{Range Proofs}
 
-Now that the values can be hidden, we have a new problem.  Since we are checking that the sum of the inputs matches the sum of the outputs, what happens if one of the output values is negative?  The transaction will be balanced, but we will end up minting new coins.  How can we prevent this?
+Now that the values can be hidden, we have a new problem.  Since we are checking that the sum of the inputs matches the sum of the outputs, what happens if one of the output values is negative?  The transaction will be balanced, but we will end up minting new coins.  How can we prevent this?  The answer is via the use of range proofs \cite{ringct}.
 
 First, consider a $n$-bit binary expansion of $v$:
 \begin{align}
@@ -553,7 +553,7 @@ CryptoNote uses linkable ring signatures, with external data.  It defines a tran
 
 \section{Monero}
 
-Monero is a privacy focused cryptocurrency.  In its initial implementation, it used a vanilla implementation of cryptonote \cite{cryptonote}.  Later iterations added confidential transactions, with standard range proofs.  Recent work includes upgrading the range proofs with bulletproofs for significant space savings.
+Monero is a privacy focused cryptocurrency.  In its initial implementation, it used a vanilla implementation of cryptonote \cite{cryptonote}.  Later iterations added confidential transactions, with standard range proofs \cite{ringct}.  Recent work includes upgrading the range proofs with bulletproofs for significant space savings.
 
 
 \subsection{RingCT}

@@ -107,7 +107,7 @@ We can do the same for any number of additional public keys $y_k$: choose a rand
 
 Now that we can use ring signatures to hide which public key is being signed, we have a new problem: assuming each public key corresponds to a spendable output, how do we know which output was actually spent?  We need a way to track this to prevent double spends, but in such a way that we preserve the privacy which the ring signature grants.
 
-First we construct a key image, which is a commitment to the public key used but cannot be used to find the public or private keys, and is unique:
+First we construct a key image \cite{cryptonote}, which is a commitment to the public key used but cannot be used to find the public or private keys, and is unique:
 \begin{align}
   I = H(y)^x
 \end{align}

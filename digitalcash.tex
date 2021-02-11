@@ -27,12 +27,12 @@ There are many papers which outline, define, use, mutate, expand on, or cite the
 
 We define a hash function $H_n$ as a function that maps an unbounded list of arbitrarily-sized binary inputs to an output set $O$ of $n$ bits:
 \begin{align}
-  H_n \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}
+  H_n \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}\nonumber
 \end{align}
 
 If we do not define $n$, then we assume it is implementation dependent, but that the output set is still bounded at some $n$ bits:
 \begin{align}
-  H \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}
+  H \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}\nonumber
 \end{align}
 
 
@@ -56,7 +56,7 @@ The prover then defines $r$ as below, and calculates it from $(v, c, x)$:
  
 This is equivalent algebraically to
 \begin{align}
-  v = r + cx
+  v = r + cx \nonumber
 \end{align}
 
 We can use this derived expression for $v$ to expand $t$:
@@ -79,7 +79,7 @@ Start with public key $y$ for which the prover knows the private key $x$, and as
 
 This is equivalent algebraically to:
 \begin{align}
-  c + c_1 = H(g^v, g^{r_1} y^{c_1})
+  c + c_1 = H(g^v, g^{r_1} y^{c_1})\nonumber
 \end{align}
 
 Now that the prover has c, r is as before:
@@ -89,7 +89,7 @@ Now that the prover has c, r is as before:
 
 The prover then sends $(y, r, c, y_1, r_1, c_1)$ to the verifier, who then calculates the hash
 \begin{align}
-  H(g^r y^c, g^{r_1} y_1^{c_1})
+  H(g^r y^c, g^{r_1} y_1^{c_1})\nonumber
 \end{align}
 
 Since $g^v = g^r y^c$, the two hashes are identical.  Thus 
@@ -114,8 +114,8 @@ First we construct a key image \cite{cryptonote}, which is a commitment to the p
 
 We then add a term to the hash for each $y$ that uses the key image.  For the real $y$, we know that
 \begin{align}
-  H(y)^v &= H(y)^r H(y)^{cx}\\
-  \cr &= H(y)^r (H(y)^x)^c\\
+  H(y)^v &= H(y)^r H(y)^{cx}\nonumber\\
+  \cr &= H(y)^r (H(y)^x)^c\nonumber\\
   \cr &= H(y)^r I^c
 \end{align}
 
@@ -126,8 +126,8 @@ Putting the real $y$ first, the prover hash becomes:
 
 We define $c$ as before, then solve for the hash:
 \begin{align}
-  c &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1}) - c_1\\
-  c + c_1 &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
+  c &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y_1)^{r_1} I^{c_1}) - c_1\\
+  c_1 + c &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y_1)^{r_1} I^{c_1})\nonumber
 \end{align}
 
 So as before, $\sum c$ is equal to the hash.  The prover now sends $(I, y, r, c, y_1, r_1, c_1)$ to the verifier, who can check that their hash is still equal to $\sum c$:

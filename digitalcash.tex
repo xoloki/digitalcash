@@ -567,7 +567,7 @@ Monero is a privacy focused cryptocurrency.  In its initial implementation, it u
 
 \subsection{RingCT}
 
-The Monero implementation of confidential transactions is called RingCT \cite{ringct}.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recovergz.  Without the MLSAG, any attempt to include the commitments would either be unable to recover gz, or would expose the real input keys.
+The Monero implementation of confidential transactions is called RingCT \cite{ringct}.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recover $g^z$.  Without the MLSAG, any attempt to include the commitments would either be unable to recover $g^z$, or would expose the real input keys.
 
 To accomplish this, the MLSAG signature adds the corresponding commitments to the public key vectors, then passes them in the signature output:
 \begin{align}

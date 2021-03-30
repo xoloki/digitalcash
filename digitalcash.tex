@@ -142,7 +142,7 @@ Since the key image $I$ is now tied to the signature, any attempt to sign two di
 
 Linkable ring signatures do a good job of proving ownership while obscuring origins, but they get large as the number of mixins rises. LSAG signatures address this by constructing the $c$ terms via an iterative process, so it is only necessary to send one of them.  For a large ring, this results in nearly 33\% space savings.
 
-Consider a set of public keys $y_i, i \in \{0, …, n-1\}$ with a secret index $j$ which denotes the public key to which we know the corresponding private key.  As before, choose random $v$, and $r_i$ $\forall i \ne j$.  Then define
+Consider a set of public keys $y_i, i \in \{0, …, n-1\}$ with a secret index $j$ which denotes the public key to which we know the corresponding private key $x$.  As before, choose random $v$, and $r_i$ $\forall i \ne j$.  As with linkable signatures, define $I = H(y_j)^x$. Then define
 \begin{align}
       L_j &= g^v\\
       R_j &= H(y_j)^v\\
@@ -151,8 +151,8 @@ Consider a set of public keys $y_i, i \in \{0, …, n-1\}$ with a secret index $
 
 For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to zero, then back to $j$)
 \begin{align}
-  L_i &= g^{r_i} y^{c_i}\\
-  R_i &= g^{r_i} y^{c_i}\\
+  L_i &= g^{r_i} {y_i}^{c_i}\\
+  R_i &= H(y_i)^{r_i} I^{c_i}\\
   c_{i+1} &= H(L_i,R_i)\\
   &... \\
   c_j &= H(L_{j-1}, R_{j-1})

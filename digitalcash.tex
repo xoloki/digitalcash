@@ -191,7 +191,7 @@ The prover proceeds as with an LSAG, starting with index $j$.  $v$ is now a vect
 
 As before, the prover calculates the remaining $L_i$ and $R_i$ using the corresponding $c_i$, $r_i$, and $I$, and the hash for $c_{i+1}$ contains the full set of $L_{i,k}$ and $R_{i,k}$:
 \begin{align}
-  L_{i,k} &= g^{r_{i,k}} y^{c_i}\\
+  L_{i,k} &= g^{r_{i,k}} y_{i,k}^{c_i}\\
   R_{i,k} &= H(y_i)^{r_{i,k}} I^{c_i}\\
   c_{i+1} &= H(L_{i,0}, R_{i,0}, ..., L_{i,m-1}, R_{i,m-1}) \\
   &...& \\
@@ -327,6 +327,9 @@ Range proofs allow us to verify that output commitments are not negative, but th
 
 Bulletproofs are not just useful as aggregated range proofs; more generally, they also have the ability to represent arbitrary arithmetic circuits.  They have similar functionality with zkSNARKs, but require no trusted setup.
 
+\subsection{Notation}
+
+The bulletproofs paper uses several notation systems.  Some were innovative, like the use of boldfaced group elements to represent that they were arrays.  Some were just obscure, like using the $\circ$ operator to denote pairwise multiplication of vectors,  But other, like using the python$[:n]$ array slicing operator were verbose and annoying.  So pretty much everyone who implented, or tried to explain bulletproofs, emded up replacing something with their own.  Here I will limit myself to replacing the $[n:]$ operator with $B$ for the bottom half and $T$ for the top.  We can do this because we are only ever dealing with powers of two, so it is never ambiguous.
 
 \subsection{Improved Inner Product Argument}
 

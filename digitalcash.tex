@@ -329,7 +329,7 @@ Bulletproofs are not just useful as aggregated range proofs; more generally, the
 
 \subsection{Notation}
 
-The bulletproofs paper uses several notation systems.  Some were innovative, like the use of boldfaced group elements to represent that they were arrays.  Some were just obscure, like using the $\circ$ operator to denote pairwise multiplication of vectors,  But other, like using the python$[:n]$ array slicing operator were verbose and annoying.  So pretty much everyone who implented, or tried to explain bulletproofs, emded up replacing something with their own.  Here I will limit myself to replacing the $[n:]$ operator with $B$ for the bottom half and $T$ for the top.  We can do this because we are only ever dealing with powers of two, so it is never ambiguous.
+The bulletproofs paper uses several notation systems.  Some were innovative, like the use of boldfaced group elements to represent that they were arrays.  Some were just obscure, like using the $\circ$ operator to denote pairwise multiplication of vectors,  But other, like using the python$[:n]$ array slicing operator were verbose and annoying.  So pretty much everyone who implented, or tried to explain bulletproofs, emded up replacing something with their own.  Here I will limit myself to replacing the $[:n]$ operator with $B$ for the bottom half and $T$ for the top.  We can do this because we are only ever dealing with powers of two, so it is never ambiguous.
 
 \subsection{Improved Inner Product Argument}
 
@@ -340,19 +340,19 @@ So for some $(\textbf{g}, \textbf{h}) \in \mathbb{G}^n$, $(\textbf{a}, \textbf{b
   P = \textbf{g}^\textbf{a} \textbf{h}^\textbf{b} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}
 \end{align}
 
-Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into left $(\textbf{g}_{[n':]}, \textbf{h}_{[n':]})$ and right $(\textbf{g}_{[:n']}, \textbf{h}_{[:n']})$, with the first $n'$ elements in the left vector and the second $n'$ in the right.  Then for some $\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2 \in \mathbb{Z}_p^n$, define the function $H$ to operate on the split vectors. 
+Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textbf{g}, \textbf{h})$ are still size $n$, split each into bottom $(\textbf{g}_{B}, \textbf{h}_{B})$ and top $(\textbf{g}_{T}, \textbf{h}_{T})$, with the first $n'$ elements in the bottom vector and the second $n'$ in the top.  Then for some $\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2 \in \mathbb{Z}_p^n$, define the function $H$ to operate on the split vectors. 
 \begin{align}
-  H(\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2, c) = \textbf{g}_{[n':]}^{\textbf{a}_1} \textbf{g}_{[n':]}^{\textbf{a}'_2} \textbf{h}_{[:n']}^{\textbf{b}_1} \textbf{h}_{[:n']}^{\textbf{b}'_2} \cdot u^c
+  H(\textbf{a}_1, \textbf{a}'_2, \textbf{b}_1, \textbf{b}'_2, c) = \textbf{g}_{B}^{\textbf{a}_1} \textbf{g}_{T}^{\textbf{a}'_2} \textbf{h}_{B}^{\textbf{b}_1} \textbf{h}_{T}^{\textbf{b}'_2} \cdot u^c
 \end{align}
 
-We can define $P$ in terms of $H$, splitting the real $(\textbf{a}, \textbf{b})$ as well into left and right:
+We can define $P$ in terms of $H$, splitting the real $(\textbf{a}, \textbf{b})$ as well into bottom and top:
 \begin{align}
   P &= \textbf{g}^{\textbf{a}} \textbf{h}^{\textbf{b}} \cdot u^{\left<a, \textbf{b}\right>}\\
-  \cr &= \textbf{g}_{[n':]}^{\textbf{a}_{[n':]}} \textbf{g}_{[:n']}^{\textbf{a}_{[:n']}} \textbf{h}_{[n':]}^{\textbf{b}_{[n':]}} \textbf{h}_{[:n']}^{\textbf{b}_{[:n']}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
-  \cr &= H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>)
+  \cr &= \textbf{g}_{B}^{\textbf{a}_{B}} \textbf{g}_{T}^{\textbf{a}_{T}} \textbf{h}_{B}^{\textbf{b}_{B}} \textbf{h}_{T}^{\textbf{b}_{T}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
+  \cr &= H(\textbf{a}_{B}, \textbf{a}_{T}, \textbf{b}_{B}, \textbf{b}_{T}, \left<\textbf{a}, \textbf{b}\right>)
 \end{align}
 
-Note that $H$ is additively homomorphic in its inputs:
+$H$ is additively homomorphic:
 \begin{align}
   H(\textbf{a}_1, & \textbf{a}'_1, \textbf{b}_1, \textbf{b}'_1, c_1) \cdot H(\textbf{a}_2, \textbf{a}'_2, \textbf{b}_2, \textbf{b}'_2, c_2)
   \cr &= H(\textbf{a}_1 + \textbf{a}_2, \textbf{a}'_1 + \textbf{a}'_2, \textbf{b}_1 + \textbf{b}_2, \textbf{b}'_1 + \textbf{b}'_2, c_1 + c_2)
@@ -360,14 +360,14 @@ Note that $H$ is additively homomorphic in its inputs:
 
 Now define $L, R \in \mathbb{G}$:
 \begin{align}
-  L &= H(\textbf{0}^{n'}, \textbf{a}_{[n':]}, \textbf{b}_{[:n']}, \textbf{0}^{n'}, \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>)\\
-  R &= H(\textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, \textbf{b}_{[n':]}, \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+  L &= H(\textbf{0}^{n'}, \textbf{a}_{B}, \textbf{b}_{T}, \textbf{0}^{n'}, \left<\textbf{a}_{B}, \textbf{b}_{T}\right>)\\
+  R &= H(\textbf{a}_{T}, \textbf{0}^{n'}, \textbf{0}^{n'}, \textbf{b}_{B}, \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
 \end{align}
 
 Prover sends $(L, R)$ to the verifier, who responds with the challenge $x \in \mathbb{Z}_p$.  Prover then combines the left and right parts of (\textbf{a}, \textbf{b}) into single vectors using the challenge:
 \begin{align}
-  \textbf{a}' &= x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}\\
-  \textbf{b}' &= x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}
+  \textbf{a}' &= x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}\\
+  \textbf{b}' &= x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}
 \end{align}
 
 Prover sends $(\textbf{a}', \textbf{b}')$ to verifier, who first computes $P'$ from $(P, L, R, x)$:
@@ -382,22 +382,22 @@ Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
 
 Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
 \begin{align}
-  Q' = H(&x^{-1}(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}), x(x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}),\nonumber\\
-         &x(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}), x_{-1}(x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}),\nonumber\\
-         &\left<x \textbf{a}_{[n':]} + x^{-1} \textbf{a}_{[:n']}, x^{-1} \textbf{b}_{[n':]} + x \textbf{b}_{[:n']}\right>)\\
-  \cr = H(&\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[n':]},\nonumber\\
-          &\textbf{b}_{[:n']} + x^2 \textbf{b}_{[n':]}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']},\nonumber\\
-          &x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+  Q' = H(&x^{-1}(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}), x(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}),\nonumber\\
+         &x(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}), x_{-1}(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}),\nonumber\\
+         &\left<x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}, x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}\right>)\\
+  \cr = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{B},\nonumber\\
+          &\textbf{b}_{T} + x^2 \textbf{b}_{B}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T},\nonumber\\
+          &x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
 \end{align}
 
 It's because we get the same thing when we expand $P'$:
 \begin{align}
-  P' = &H(\textbf{0}^{n'}, x^2 \textbf{a}_{[n':]}, x^2 \textbf{b}_{[:n']}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right>) \cdot \nonumber\\
-       &H(\textbf{a}_{[n':]}, \textbf{a}_{[:n']}, \textbf{b}_{[n':]}, \textbf{b}_{[:n']}, \left<\textbf{a}, \textbf{b}\right>) \cdot \nonumber\\
-       &H(x^{-2} \textbf{a}_{[:n']}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{[n':]}, x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)\\
-  \cr = H(&\textbf{a}_{[n':]} + x^{-2} \textbf{a}_{[:n']}, x^2 \textbf{a}_{[n':]} + \textbf{a}_{[:n']}, \nonumber\\
-          &\textbf{b}_{[n':]} + x^2 \textbf{b}_{[:n']}, x^{-2} \textbf{b}_{[n':]} + \textbf{b}_{[:n']}, \nonumber\\
-          &x^2 \left<\textbf{a}_{[n':]}, \textbf{b}_{[:n']}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{[:n']}, \textbf{b}_{[n':]}\right>)
+  P' = &H(\textbf{0}^{n'}, x^2 \textbf{a}_{B}, x^2 \textbf{b}_{T}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right>) \cdot \nonumber\\
+       &H(\textbf{a}_{B}, \textbf{a}_{T}, \textbf{b}_{B}, \textbf{b}_{T}, \left<\textbf{a}, \textbf{b}\right>) \cdot \nonumber\\
+       &H(x^{-2} \textbf{a}_{T}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{B}, x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)\\
+  \cr = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T}, \nonumber\\
+          &\textbf{b}_{B} + x^2 \textbf{b}_{T}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T}, \nonumber\\
+          &x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
 \end{align}
 
 So if the prover can construct $(L, R, \textbf{a'}, \textbf{b'})$ such that $P' = Q'$, then he must have known $(\textbf{a}, \textbf{b})$.
@@ -465,24 +465,38 @@ Let $(\textbf{s}_L, \textbf{s}_R)$ be vectors of integers:
 
 Replace $\textbf{a}_L$ with $(\textbf{a}_L + \textbf{s}_L x)$ and $\textbf{a}_R$ with $(\textbf{a}_R + \textbf{s}_R x)$, and the inner product becomes:
 \begin{align}
-  \left<(\textbf{a}_L + \textbf{s}_L x) - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x)\textbf{y}^n\right> = z^2 v + d(y,z)
+  \left<(\textbf{a}_L + \textbf{s}_L x) - z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R + \textbf{s}_R x)\circ\textbf{y}^n\right> = z^2 v + d(y,z)
 \end{align}
 
 Then construct vector polynomials $l(x)$ and $r(x)$ from the two sides of the inner product:
 \begin{align}
   l(x) &= \textbf{a}_L + \textbf{s}_L x - z \textbf{1}^n\\
-  r(x) &= z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x) \textbf{y}^n
+  r(x) &= z^2 \textbf{2}^n + z \textbf{y}^n + (\textbf{a}_R+ \textbf{s}_R x)\circ\textbf{y}^n
 \end{align}
 
 The zeros of these vector polynomials are just the unblinded inner product terms:
 \begin{align}
   l(0) &= \textbf{a}_L - z \textbf{1}^n\\
-  r(0) &= z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R \textbf{y}^n
+  r(0) &= z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R\circ\textbf{y}^n
 \end{align}
 
 The inner product then becomes
 \begin{align}
   \left<l(0), r(0)\right> = z^2 v + d(y,z)
+\end{align}
+
+We can express $l(x)$ and $r(x)$ as generic degree one polynomials
+\begin{align}
+  l(x) &= l_0 + l_1 x\\
+  r(x) &= r_0 + r_1 x
+\end{align}
+
+Where
+\begin{align}
+  l_0 &= \textbf{a}_L - z \textbf{1}^n\\
+  l_1 &= \textbf{s}_L\\
+  r_0 &= z^2 \textbf{2}^n + z \textbf{y}^n + \textbf{a}_R\circ\textbf{y}^n\\
+  r_1 &= \textbf{s}_R\circ\textbf{y}^n\\
 \end{align}
 
 If we define $t(x)$ as the inner product of the blinded vector polynomials, we get
@@ -497,9 +511,9 @@ We can express this in terms of x:
 
 Where
 \begin{align}
-  t_0 &= \left<l(0), r(0)\right> = z^2 v + d(y,z)\\
-  t_2 &= \left<l(1), r(1)\right>\\
-  t_0 &= \left<l(0) + l(1), r(0) + r(1)\right> - t_0 - t_1
+  t_0 &= \left<l_0, r_0\right> = z^2 v + d(y,z)\\
+  t_2 &= \left<l_1, r_1\right>\\
+  t_1 &= \left<l_0 + l_1, r_0 + r_1\right> - t_0 - t_2
 \end{align}
 
 Proving the blinded inner product range proof now depends on simply verifying that both 

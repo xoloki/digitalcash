@@ -383,7 +383,7 @@ Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
 Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
 \begin{align}
   Q' = H(&x^{-1}(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}), x(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}),\nonumber\\
-         &x(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}), x_{-1}(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}),\nonumber\\
+         &x(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}), x^{-1}(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}),\nonumber\\
          &\left<x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}, x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}\right>)\\
   \cr = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{B},\nonumber\\
           &\textbf{b}_{T} + x^2 \textbf{b}_{B}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T},\nonumber\\

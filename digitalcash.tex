@@ -9,6 +9,13 @@
 %\usepackage{overunderset}
 \newcommand\Set[2]{\{\,#1\mid#2\,\}}
 \newcommand\underoverset[3]{\underset{#1}{\overset{#2}{#3}}}
+\usepackage{geometry}
+ \geometry{
+   a4paper,
+   total={170mm,257mm},
+   left=20mm,
+   top=20mm,
+ }
 \begin{document}
 \begin{figure}
   \includegraphics[width=\linewidth]{digitalcash.png}
@@ -154,7 +161,7 @@ For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to ze
   L_i &= g^{r_i} {y_i}^{c_i}\\
   R_i &= H(y_i)^{r_i} I^{c_i}\\
   c_{i+1} &= H(L_i,R_i)\\
-  &... \\
+  &... \nonumber\\
   c_j &= H(L_{j-1}, R_{j-1})
 \end{align}
 
@@ -194,7 +201,7 @@ As before, the prover calculates the remaining $L_i$ and $R_i$ using the corresp
   L_{i,k} &= g^{r_{i,k}} y_{i,k}^{c_i}\\
   R_{i,k} &= H(y_i)^{r_{i,k}} I^{c_i}\\
   c_{i+1} &= H(L_{i,0}, R_{i,0}, ..., L_{i,m-1}, R_{i,m-1}) \\
-  &...& \\
+  &... \\
   c_j &= H(L_{j-1,0}, R_{j-1,0}, ..., L_{j-1,m-1}, R_{j-1,m-1}) 
 \end{align}
 
@@ -382,22 +389,22 @@ Verifier then uses $(x, \textbf{a}', \textbf{b}')$ to calculate $Q'$:
 
 Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
 \begin{align}
-  Q' = H(&x^{-1}(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}), x(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}),\nonumber\\
-         &x(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}), x^{-1}(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}),\nonumber\\
-         &\left<x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}, x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}\right>)\\
-  \cr = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{B},\nonumber\\
-          &\textbf{b}_{T} + x^2 \textbf{b}_{B}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T},\nonumber\\
-          &x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
+  Q' = H(&x^{-1}(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}), x(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}),
+         x(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}), x^{-1}(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}),\nonumber\\
+         &\left<x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}, x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}\right>)\nonumber\\
+  \cr = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T},
+          \textbf{b}_{B} + x^2 \textbf{b}_{T}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T},
+          x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
 \end{align}
 
 It's because we get the same thing when we expand $P'$:
 \begin{align}
-  P' = &H(\textbf{0}^{n'}, x^2 \textbf{a}_{B}, x^2 \textbf{b}_{T}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right>) \cdot \nonumber\\
-       &H(\textbf{a}_{B}, \textbf{a}_{T}, \textbf{b}_{B}, \textbf{b}_{T}, \left<\textbf{a}, \textbf{b}\right>) \cdot \nonumber\\
-       &H(x^{-2} \textbf{a}_{T}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{B}, x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)\\
-  \cr = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T}, \nonumber\\
-          &\textbf{b}_{B} + x^2 \textbf{b}_{T}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T}, \nonumber\\
-          &x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
+  P' = &H(\textbf{0}^{n'}, x^2 \textbf{a}_{B}, x^2 \textbf{b}_{T}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right>) \cdot 
+       H(\textbf{a}_{B}, \textbf{a}_{T}, \textbf{b}_{B}, \textbf{b}_{T}, \left<\textbf{a}, \textbf{b}\right>) \cdot \nonumber\\
+       &H(x^{-2} \textbf{a}_{T}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{B}, x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)\nonumber\\
+  \cr = &H(\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T},
+          \textbf{b}_{B} + x^2 \textbf{b}_{T}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T},
+          x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
 \end{align}
 
 So if the prover can construct $(L, R, \textbf{a'}, \textbf{b'})$ such that $P' = Q'$, then he must have known $(\textbf{a}, \textbf{b})$.
@@ -639,7 +646,7 @@ Consider a commitment to a message $m$ with random blinding factor $r$:
 
 To prove that $c$ opens to $0$ or $1$, pick random $(a,s,t)$ and use them to construct $(c_a, c_b)$:
 \begin{align}
-  a,s,t &\in& \mathbb{Z}_p\\
+  a,s,t &\in \mathbb{Z}_p\\
   c_a &= Com(a, s)\\
   c_b &= Com(am, t)
 \end{align}

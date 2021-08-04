@@ -435,22 +435,22 @@ Multiplying the first relation by $z^2$ gives us the $z^2 v$ term, and since the
 
 If we expand the inner products, then start isolating prover and verifier terms, we get:
 \begin{align}
-  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v\\
-  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>
+  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v\nonumber\\
+  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{a}_R, \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber
 \end{align}
 
 Since an inner product $\left<\textbf{a}, \textbf{b}\right>$ can be broken into a pairwise/inner product $\left<\textbf{1}^n, \textbf{a} \textbf{b}\right>$:
 \begin{align}
-  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\\
-  \left<\textbf{a}_L, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right> + \left<\textbf{a}_L - z \cdot \textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>
+  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right> + \left<\textbf{a}_L - z \cdot \textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber
 \end{align}
 
 In order to merge the inner products via the first term, add $\left<-z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>$:
 \begin{align}
-  \left<\textbf{a}_L - z \cdot \textbf{1}n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \cdot \textbf{1}^n, z2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\\
-  \left<\textbf{a}_L - z \cdot \textbf{1}n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\\
-  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z3 \cdot \left<\textbf{1}^n, \textbf{2}^n\right> - z^2 \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\\
-  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + (z - z^2) \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>
+  \left<\textbf{a}_L - z \cdot \textbf{1}n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \cdot \textbf{1}^n, z2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L - z \cdot \textbf{1}n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z3 \cdot \left<\textbf{1}^n, \textbf{2}^n\right> - z^2 \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + (z - z^2) \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>\nonumber
 \end{align}
   
 Let $d(y,z) = (z - z^2) \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>$, and we get the final form:
@@ -671,10 +671,10 @@ The verifier now has the full set of $(c, c_a, c_b, x, f, z_a, z_b)$ and accepts
 
 This follows as 
 \begin{align}
-  c^x c_a &= Com(xm,xr) Com(a,s)\\
+  c^x c_a &= Com(xm,xr) \cdot Com(a,s)\\
   \cr &= Com(xm+a, xr+s)\\
   \cr &= Com(f, za)\\
-  c^{x-f} c_b &= Com((x-f)m, (x-f)r) Com(am, t)\\
+  c^{x-f} c_b &= Com((x-f)m, (x-f)r) \cdot Com(am, t)\\
   \cr &= Com(xm - fm + am, (x-f)r + t)\\
   \cr &= Com(xm - (mx + a)m + am, z_b)\\
   \cr &= Com(xm - m^2 x, z_b)
@@ -810,7 +810,7 @@ The verifier can then compute the following:
 
 The ratio of A to B is thus:
 \begin{align}
-  \frac{A}{B} = \frac{g^{(\sum{s_o}) x^n g^{(\sum{v_o}) x^n}}}{g^{(\sum{v_i}) x^n}}
+  \frac{A}{B} = \frac{g^{(\sum{s_o}) x^n} g^{(\sum{v_o}) x^n}}{g^{(\sum{v_i}) x^n}}
 \end{align}
   
 As before, if the transaction is balanced then 

@@ -122,8 +122,8 @@ First we construct a key image \cite{cryptonote}, which is a commitment to the p
 We then add a term to the hash for each $y$ that uses the key image.  For the real $y$, we know that
 \begin{align}
   H(y)^v &= H(y)^r H(y)^{cx}\nonumber\\
-  \cr &= H(y)^r (H(y)^x)^c\nonumber\\
-  \cr &= H(y)^r I^c
+         &= H(y)^r (H(y)^x)^c\nonumber\\
+         &= H(y)^r I^c
 \end{align}
 
 Putting the real $y$ first, the prover hash becomes:
@@ -268,8 +268,8 @@ This requires another generator $h$, which is usually defined as a hash-to-group
 
 Now when we check the transaction balance, we end up with
 \begin{align}
-  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} &= \frac{g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}}}{g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}}
-  \cr &= g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} h^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} &= \frac{g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}}}{g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}}\\
+                                          &= g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} h^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
 \end{align}
 
 But if the transaction is balanced, then $v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2} = 0$, so
@@ -355,8 +355,8 @@ Since the goal is to shrink the problem in half, let $n' = n/2$.  Since $(\textb
 We can define $P$ in terms of $H$, splitting the real $(\textbf{a}, \textbf{b})$ as well into bottom and top:
 \begin{align}
   P &= \textbf{g}^{\textbf{a}} \textbf{h}^{\textbf{b}} \cdot u^{\left<a, \textbf{b}\right>}\\
-  \cr &= \textbf{g}_{B}^{\textbf{a}_{B}} \textbf{g}_{T}^{\textbf{a}_{T}} \textbf{h}_{B}^{\textbf{b}_{B}} \textbf{h}_{T}^{\textbf{b}_{T}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
-  \cr &= H(\textbf{a}_{B}, \textbf{a}_{T}, \textbf{b}_{B}, \textbf{b}_{T}, \left<\textbf{a}, \textbf{b}\right>)
+    &= \textbf{g}_{B}^{\textbf{a}_{B}} \textbf{g}_{T}^{\textbf{a}_{T}} \textbf{h}_{B}^{\textbf{b}_{B}} \textbf{h}_{T}^{\textbf{b}_{T}} \cdot u^{\left<\textbf{a}, \textbf{b}\right>}\\
+    &= H(\textbf{a}_{B}, \textbf{a}_{T}, \textbf{b}_{B}, \textbf{b}_{T}, \left<\textbf{a}, \textbf{b}\right>)
 \end{align}
 
 $H$ is additively homomorphic:
@@ -391,17 +391,17 @@ Verifier validates if $P' = Q'$.  If we expand $Q'$ we can see why:
   Q' = H(&x^{-1}(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}), x(x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}),
          x(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}), x^{-1}(x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}),\nonumber\\
          &\left<x \textbf{a}_{B} + x^{-1} \textbf{a}_{T}, x^{-1} \textbf{b}_{B} + x \textbf{b}_{T}\right>)\nonumber\\
-  \cr = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T},
+     = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T},
           \textbf{b}_{B} + x^2 \textbf{b}_{T}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T},
           x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
 \end{align}
 
 It's because we get the same thing when we expand $P'$:
 \begin{align}
-  P' = &H(\textbf{0}^{n'}, x^2 \textbf{a}_{B}, x^2 \textbf{b}_{T}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right>) \cdot 
+  P' = H(&\textbf{0}^{n'}, x^2 \textbf{a}_{B}, x^2 \textbf{b}_{T}, \textbf{0}^{n'}, x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right>) \cdot 
        H(\textbf{a}_{B}, \textbf{a}_{T}, \textbf{b}_{B}, \textbf{b}_{T}, \left<\textbf{a}, \textbf{b}\right>) \cdot \nonumber\\
-       &H(x^{-2} \textbf{a}_{T}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{B}, x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)\nonumber\\
-  \cr = &H(\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T},
+       H(&x^{-2} \textbf{a}_{T}, \textbf{0}^{n'}, \textbf{0}^{n'}, x^{-2} \textbf{b}_{B}, x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)\nonumber\\
+     = H(&\textbf{a}_{B} + x^{-2} \textbf{a}_{T}, x^2 \textbf{a}_{B} + \textbf{a}_{T},
           \textbf{b}_{B} + x^2 \textbf{b}_{T}, x^{-2} \textbf{b}_{B} + \textbf{b}_{T},
           x^2 \left<\textbf{a}_{B}, \textbf{b}_{T}\right> + \left<\textbf{a}, \textbf{b}\right> + x^{-2} \left<\textbf{a}_{T}, \textbf{b}_{B}\right>)
 \end{align}
@@ -671,12 +671,12 @@ The verifier now has the full set of $(c, c_a, c_b, x, f, z_a, z_b)$ and accepts
 This follows as 
 \begin{align}
   c^x c_a &= Com(xm,xr) \cdot Com(a,s)\\
-  \cr &= Com(xm+a, xr+s)\\
-  \cr &= Com(f, za)\\
+          &= Com(xm+a, xr+s)\\
+          &= Com(f, za)\\
   c^{x-f} c_b &= Com((x-f)m, (x-f)r) \cdot Com(am, t)\\
-  \cr &= Com(xm - fm + am, (x-f)r + t)\\
-  \cr &= Com(xm - (mx + a)m + am, z_b)\\
-  \cr &= Com(xm - m^2 x, z_b)
+              &= Com(xm - fm + am, (x-f)r + t)\\
+              &= Com(xm - (mx + a)m + am, z_b)\\
+              &= Com(xm - m^2 x, z_b)
 \end{align}
 
 Since $x$ is not $0$, then $x (m-m^2)$ is only $0$ when $(m-m^2)$ is $0$, or when
@@ -777,12 +777,12 @@ As before, the first line proves knowledge of $l_j$, and the second proves it wa
 If we simplify using $p_i(x)$ and expand we can see why this is true:
 \begin{align}
   \prod_{i=0}^{N-1}{c_i^{\prod_{j=1}^{n}{f_{j,i_j}}}} &  \prod_{k=0}^{n-1}{c_{d_k}^{-x^k}} = \prod_{i=0}^{N-1}{c_i^{p_i(x)}} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k))^{-x^k}}\\
-  \cr &= \prod_{i=0}^{N-1}{c_i^{  \underoverset{j=1}{n}{\prod}{\delta_{i_jl_j} x} + \underoverset{k=0}{n-1}{\sum}{p_{i,k} x^k}   }} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k))^{-x^k}}\\
-  \cr &= c_l^{x^n} \prod_{i=0}^{N-1}{c_i^{ \underoverset{k=0}{n-1}{\sum}{p_{i,k} x^k} }}        \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}         \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}})^{-x^k}}\\
-  \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}      \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{p_{i,k}  x^k}}}          \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{-p_{i,k} x^k}}}\\
-  \cr &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}\\
+      &= \prod_{i=0}^{N-1}{c_i^{  \underoverset{j=1}{n}{\prod}{\delta_{i_jl_j} x} + \underoverset{k=0}{n-1}{\sum}{p_{i,k} x^k}   }} \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}} Com(0; \rho_k))^{-x^k}}\\
+      &= c_l^{x^n} \prod_{i=0}^{N-1}{c_i^{ \underoverset{k=0}{n-1}{\sum}{p_{i,k} x^k} }}        \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}         \prod_{k=0}^{n-1}{(\prod_{i=0}^{N-1}{c_i^{p_{i,k}}})^{-x^k}}\\
+      &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}      \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{p_{i,k}  x^k}}}          \prod_{k=0}^{n-1}{\prod_{i=0}^{N-1}{c_i^{-p_{i,k} x^k}}}\\
+      &= Com(0; r x^n) \prod_{k=0}^{n-1}{ Com(0; \rho_k)^{-x^k}}\\
   Com(0; z_d) &= Com(0; rx^n - \sum_{k=0}^{n-1}{\rho_k x^k})\\
-  \cr &= Com(0; rx^n) \prod_{k=0}^{n-1}{Com(0; \rho_k)^{-x^k}}
+      &= Com(0; rx^n) \prod_{k=0}^{n-1}{Com(0; \rho_k)^{-x^k}}
 \end{align}
 
 
@@ -802,9 +802,9 @@ The verifier can then compute the following:
 \begin{align}
   A &= (\prod_{i=1}^{N_{new}}{C_{o_i}})^{x^n} = (\prod_{i=1}^{N_{new}}{g^{s_{o_i}} h^{v_{o_i}}})^{x^n}  =  g^{(\Sigma s_o) x^n}  h^{(\Sigma v_o) x^n}\\
   B &= Com(0, \sum_{i=1}^{N_{old}}{z_i}) \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1} Com(0, \rho_k^i)^{x^k})}\\
-  \cr &= g^0 h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}} \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1}{g^0 h^{\rho_k^i x^k}})}\\
-  \cr &= h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}}  \prod_{i=1}^{N_{old}}{h^{\sum_{k=0}^{n-1}{\rho_k^i x^k}}}
-  \cr &= h^{(\sum{v_i}) x^n}
+    &= g^0 h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}} \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1}{g^0 h^{\rho_k^i x^k}})}\\
+    &= h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}}  \prod_{i=1}^{N_{old}}{h^{\sum_{k=0}^{n-1}{\rho_k^i x^k}}}
+    &= h^{(\sum{v_i}) x^n}
 \end{align}
 
 The ratio of A to B is thus:
@@ -909,12 +909,12 @@ The author would like to thank Toby Segaran for initial help on ring signatures,
 
 \bibitem{increasingBitcoinAnonymity}
   Dr. Yuan Horas Mouton.
-  \emph{Increasing Anonymity in Bitcoin}.
+  \emph{Increasing Anonymity in Bitcoin}.\\
   \texttt{https://download.wpsoftware.net/bitcoin/wizardry/horasyuanmouton-owas.pdf}
 
 \bibitem{mimblewimble}
   Tom Elvis Jedusor.
-  \emph{MIMBLEWIMBLE} 19 July, 2016.
+  \emph{MIMBLEWIMBLE} 19 July, 2016.\\
   \texttt{https://download.wpsoftware.net/bitcoin/wizardry/mimblewimble.txt}
 
 \end{thebibliography}

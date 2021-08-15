@@ -336,7 +336,7 @@ Bulletproofs are not just useful as aggregated range proofs; more generally, the
 
 \subsection{Notation}
 
-The bulletproofs paper uses several notation systems.  Some were innovative, like the use of boldfaced group elements to represent that they were arrays.  Some were just obscure, like using the $\circ$ operator to denote pairwise multiplication of vectors,  But other, like using the python$[:n]$ array slicing operator were verbose and annoying.  So pretty much everyone who implented, or tried to explain bulletproofs, emded up replacing something with their own.  Here I will limit myself to replacing the $[:n]$ operator with $B$ for the bottom half and $T$ for the top.  We can do this because we are only ever dealing with powers of two, so it is never ambiguous.
+The bulletproofs paper uses several notation systems.  Some were innovative, like the use of boldfaced group elements to represent that they were arrays.  Some were just obscure, like using the $\circ$ operator to denote pairwise multiplication of vectors,  But other, like using the python$[:n]$ array slicing operator were verbose and annoying.  So pretty much everyone who implented, or tried to explain bulletproofs, ended up replacing something with their own.  Here I will limit myself to replacing the $[:n]$ operator with $B$ for the bottom half and $T$ for the top.  We can do this because we are only ever dealing with powers of two, so it is never ambiguous.
 
 \subsection{Improved Inner Product Argument}
 
@@ -803,7 +803,7 @@ The verifier can then compute the following:
   A &= (\prod_{i=1}^{N_{new}}{C_{o_i}})^{x^n} = (\prod_{i=1}^{N_{new}}{g^{s_{o_i}} h^{v_{o_i}}})^{x^n}  =  g^{(\Sigma s_o) x^n}  h^{(\Sigma v_o) x^n}\\
   B &= Com(0, \sum_{i=1}^{N_{old}}{z_i}) \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1} Com(0, \rho_k^i)^{x^k})}\\
     &= g^0 h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}} \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1}{g^0 h^{\rho_k^i x^k}})}\\
-    &= h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}}  \prod_{i=1}^{N_{old}}{h^{\sum_{k=0}^{n-1}{\rho_k^i x^k}}}
+    &= h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}}  \prod_{i=1}^{N_{old}}{h^{\sum_{k=0}^{n-1}{\rho_k^i x^k}}}\\
     &= h^{(\sum{v_i}) x^n}
 \end{align}
 

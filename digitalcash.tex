@@ -25,6 +25,11 @@
 While traditional cryptocurrencies were groundbreaking in many ways, they lacked the privacy protections that cash inherently provides.  This document will explore the math which can provide some of those protections.  The goal is to build a cryptocurrency which deserves the name Digital Cash.
 
 There are many papers which outline, define, use, mutate, expand on, or cite the following techniques.  But these papers invariably use different terminology, swapping variable names and using various subsets as needed.  In this document, I will endeavor to be both thorough and strongly consistent, which should not only make the math easier to understand, but also expose the deep connections and demonstrate how each piece builds on the previous.
+
+The target audience here is not mathematicians or cryptographers, but rather engineers with a reasonable mathematical background who want to understand the constructs that underpin modern cryptocurrencies.  This will allow them to become much more effective engineers in this problem domain, and perhaps some will be inspired to learn even more.
+
+For this reason, I do not include rigorous security proofs of any of these constructs.  Instead I just show correctness of the verification, which is analogous to a completeness security proof: this shows that a prover $with$ a valid witness can demonsrate that to a verifier.  I do not attempt to show soundness, which is that a prover $without$ a valid witness cannot so convince the verifier; nor do show $zero knowledge$, which is that the proof transcript does not leak any information $about$ the witness.  These proofs are difficult and non-intuitive, and would not help the target audience at this stage of their learning.
+
 \newpage
 
 \section{Background}
@@ -118,27 +123,27 @@ We can use this derived expression for $r$ to expand $R$:
 So if $R = G^s X^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $s$, allowing the equation to balance.  The tuple $(R,s)$ thus forms the proof of ownership of $X$.
 
 \section{Digital Signatures}
-A Schnorr proof allows us to prove ownership of the private key $x$ for a public key $X = G^x$, but what if we want to use that key as a signature on some message $M$?  This message could be anything, such as an email, or a cryptocurrency transaction, or more generally a hash of some data $D$.  We must tie the message to the proof in order to form a signagure.
+A Schnorr proof allows us to prove ownership of the private key $x$ for a public key $X = G^x$, but what if we want to use that key to sign some message $M$?  This message could be anything, such as an email or a cryptocurrency transaction, but generally will be hash of some data $D$.  We must tie the message to the proof in order to form a signagure.
 
 To do this, we simply add the message $M$ when constructing the hash $c$:
 \begin{align}
   c = H_s(G, X, R, M)
 \end{align}
 
-Since the hash will depend on the message, attempting to verify the proof with a different message $m_k$ will fail.  This allows us to use a Schorr proof to sign messages.
+Since the hash will depend on the message, attempting to verify the proof with a different message $M_k$ will fail.  This allows us to use a Schorr proof to sign messages.
 
 \subsection{Ring signatures}
 
-A digital signature allows us to sign a message for a public key, proving we know the corresponding private key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct a one out of many signature, to prove that we knew the private key $x$ for one out of $N$ public keys $(X_1, ..., X_N)$.  Such a signature is called a ring signature \cite{cryptonote}.
+A digital signature allows us to sign a message with a key, and the signature can be verified with the corresponding public key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct signature that can be verified by a set of public keys $(X_1, ..., X_N)$, proving that we knew the private key $x$ for one of the them. Such a signature is called a ring signature \cite{cryptonote}.
 
-Start with a message $m$ and public key $X_1$ for which the prover knows the private key $x$, and as before, choose a random $r \in \mathbb{Z}_p$. To mix in an additional key $X_2$ whose private key $x_2$ is unknown, select a random $s_2$ and $c_2$.  The prover sets $c_1$ as follows, using the values known to calculate it:
+Start with a message $M$ and public key $X_1$ for which the prover knows the private key $x$, and as before, choose a random $r \in \mathbb{Z}_p$. To mix in an additional key $X_2$ whose private key $x_2$ is unknown, select a random $s_2$ and $c_2$.  The prover sets $c_1$ as follows, using the values known to calculate it:
 \begin{align}
-  c_1 = H_s(G^r, G^{s_2} X_1^{c_2}, M) - c_2
+  c_1 = H_s(G^r, G^{s_2} X_2^{c_2}, M) - c_2
 \end{align}
 
 This is equivalent algebraically to:
 \begin{align}
-  c_1 + c_2 = H_s(G^r, G^{s_2} X_1^{c_2}, M)\nonumber
+  c_1 + c_2 = H_s(G^r, G^{s_2} X_2^{c_2}, M)\nonumber
 \end{align}
 
 Now that the prover has $c_1$, $s_1$ is as before:
@@ -151,9 +156,9 @@ The prover then sends $(X_1, s_1, c_1, X_2, s_2, c_2)$ to the verifier, who then
   H_s(G^{s_1}  X_1^{c_1}, G^{s_2} X_2^{c_2}, M)\nonumber
 \end{align}
 
-Since $G^r = G^{s_1} X^{c_1}$, the two hashes are identical.  Thus 
+Since $G^r = G^{s_1} X_1^{c_1}$, the two hashes are identical.  Thus 
 \begin{align}
-  c_1 + c_2 = H_s(G^{s_1} X^{c_1}, G^{s_2} X_1^{c_2}, M)
+  c_1 + c_2 = H_s(G^{s_1} X_1^{c_1}, G^{s_2} X_2^{c_2}, M)
 \end{align}
 
 So if $\sum c_i$ is equal to the hash, then the prover must have known $x_i$ for some $X_i$.  And since the prover can put the real $(X,s,c)$ in either position, there is no way for the verifier to know which key was actually signed.

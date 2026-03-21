@@ -27,9 +27,48 @@ While traditional cryptocurrencies were groundbreaking in many ways, they lacked
 There are many papers which outline, define, use, mutate, expand on, or cite the following techniques.  But these papers invariably use different terminology, swapping variable names and using various subsets as needed.  In this document, I will endeavor to be both thorough and strongly consistent, which should not only make the math easier to understand, but also expose the deep connections and demonstrate how each piece builds on the previous.
 \newpage
 
+\section{Background}
+
+\subsection{Discrete Math}
+
+Much of mathematics deals with quantities that vary smoothly and fractionally between values, such as temperature or position; these are called $continuous$.  But another branch of mathematics deals with values which represent whole quantities; these are called $discrete$, such as the number of eggs in a crate, or people on a boat.  Cryptography uses discrete math almost exclusively.
+
+\subsubsection{Modular Arithmetic}
+
+Consider a crate of eggs that holds a dozen eggs.  Using discrete math, we could ask the question of how many dozens can be filled by a particular number of eggs, and how many were left over once we had fully filled as many as possible.
+
+Because the crates are filled one at a time, and the remainder cycles between zero and one less than the size of the crate, we call this kind of math modular arithmetic.  The crates are the modules; we in fact seldom care much about the number of crates filled, but rather the remainders.  We refer to the size of the crate as the modulus, and it determines how many remainders are possible.
+
+\subsubsection{Finite Fields}
+
+Keeping with our egg crate example, as noted above the remainders cycle between zero and one less than the size of the crate, aka the modulus.  We name these sets of remainders finite fields.
+
+This means that there is a fixed number of remainders for any field, and that we can do many typical mathematical operations on them: addition, subtraction, and multiplication are easily possible. Division is also possible on some fields; it often takes the form of finding a multiplicitive inverse, then multiplying with it rather than doing division per se.
+
+If we take a member of a finite field, and multiply it by itself repeatedly, this is what is called exponentiation.  Exponentiation can be reversed; rather than finding the result of repeated multiplication, we deciper how many times multiplication would need to be done to get a particular result.  This number is called a logarithm, and is the reverse of exponentiation.
+
+But while it is trivial to find logarithms in non-discrete math, it is not generally possible to find discrete logarithms without resorting to brute force.  The difficults of this problem, called the Discrete Logarithm Problem, or DLP, is what makes public key cryptography work.
+
+\subsubsection{Group Theory}
+
+Finite fields are usually represented by the remainders of numbers divides by some fixed modulus.  But this is not the only way to do such operations.
+
+Group theory is an abstraction of this idea, and can be applied to many contexts where we do not have numbers modulo some fixed modulus.  A group consists of a set, and a binary operation on pairs of members of that set that returns another member of the set.  You can think of this operation as an abstract version of multiplication.  
+
+Numbers modulo some fixed modulus form a group; you can multiply two of those numbers, take the remainder modulo the modulus, and you will get another member of the same set.  But you can also use elliptic curves, polynomials, or even more exotic sets.
+
+We can do the group operation repeatedly some number of times on a single member of the set.  This is an abstraction of the idea of exponentiation, raising some number to a power.  And we can also try to reverse exponentiation; as with finite fields, this requires brute force, and makes public key cryptography safe.  But unlike with finite fields, we can do this with any group.  For a variety of technical reasons, we normally use elliptic curves as our group set, and elliptic curve addition as our group operation.
+
+Some members of a group, when exponentiated, will produce every member of the set exactly once.  These members are called generators.  The number of times you can do this exponentiation before returning to the same value is called the $order$ of a group.
 
 \section{
   Notation
+}
+
+We will use lowercase variable names for group scalars ($x$), and uppercase for group elements ($X$).  Groups themselves will be denoted as $\mathbb{G}$, which we will also use for sets as in $\mathbb{S}$.  Though we will be expressing all of the math here in terms of exponentials, we borrow naming conventions from elliptic curves to make things explcit.  A public key $X$ is defined as $G^x$ for some generator $G$.
+
+\section{
+  Hashing
 }
 
 We define a hash function $H_n$ as a function that maps an unbounded list of arbitrarily-sized binary inputs to an output set $O$ of $n$ bits:
@@ -37,11 +76,16 @@ We define a hash function $H_n$ as a function that maps an unbounded list of arb
   H_n \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}\nonumber
 \end{align}
 
-If we do not define $n$, then we assume it is implementation dependent, but that the output set is still bounded at some $n$ bits:
+When dealing with groups, we often want to hash some data, then convert the ouput bits to a group element or scalar.  This is trivial in the case of a scalar; simly hash to the same number of bits as the scalar, then reduce modulo the group order.  We denote this function as $H_s$.
+
+And for some groups, like numbers modulo a prime, this works for the group elements as well.  But for other groups, like elliptic curve points, there is no direct way to convert the output bits to a group element.  So algorithms had to be developed for every useful group which take the hash output and convert it to a group element.  We denote this function $H_g$.
+
+One trivial way of defining $H_g$ over some binary data $d$ would be to use a generator $G$:
 \begin{align}
-  H \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}\nonumber
+  H_g(d) = G^{H_s(d)}
 \end{align}
 
+This is problematic, though, because now there is a well known discrete logarith for $H_g(d)$, namely $H_s(d)$.  The existence of this discrete logarithm breaks the assumptions needed to prove the security of algorithms that require $H_g$.  So we must use more complex algorithms; the details are out of scope for this document, but are well known and easily found.
 
 \section{
   Schnorr Proofs and the Fiat Shamir Transform
@@ -49,65 +93,72 @@ If we do not define $n$, then we assume it is implementation dependent, but that
 
 Schnorr proofs \cite{schnorr} allow the owner of a private key to demonstrate that ownership to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform \cite{fiatshamir}.  This allows the protocol to function as a signature.
 
-Let $g$ be a generator in a finite group $G$ of prime order $p \in \mathbb{P}$, with private key $x \in \mathbb{Z}_p$, and public key $y = g^x$. The prover chooses a random $v \in Z_p$, then sets $t = g^v$.
+Let $G$ be a generator in a finite group $\mathbb{G}$ of prime order $p \in \mathbb{P}$, with private key $x \in \mathbb{Z}_p$, and public key $X = G^x$. The prover chooses a random $r \in Z_p$, then sets $R = G^r$.
 
-In the interactive version of the protocol, the prover sends $t$ to the verifier, who responds with the challenge $c$.  This way the prover cannot choose $t$ after seeing $c$, which would allow the prover to cheat.  To make this non-interactive, Fiat and Shamir proposed to choose $c$ based on a hash including $t$, which prevents the prover from cheating, since $c$ depends on $t$:
+In the interactive version of the protocol, the prover sends $R$ to the verifier, who responds with the challenge $c$.  This way the prover cannot choose $r$ after seeing $c$, which would allow the prover to cheat.  To make this non-interactive, Fiat and Shamir proposed to choose $c$ based on a hash including $R$, which prevents the prover from cheating, since $c$ depends on $R$:
 \begin{align}
-  c = H(g,y,t)
+  c = H_s(G,X,R)
 \end{align}
 
-The prover then defines $r$ as below, and calculates it from $(v, c, x)$:
+The prover then defines the response $s$ as below, and calculates it from $(r, c, x)$:
 \begin{align}
-  r = v - cx
+  s = r - cx
 \end{align}
  
 This is equivalent algebraically to
 \begin{align}
-  v = r + cx \nonumber
+  r = s + cx \nonumber
 \end{align}
 
-We can use this derived expression for $v$ to expand $t$:
+We can use this derived expression for $r$ to expand $R$:
 \begin{align}
-  t = g^v= g^{r + c x} = g^r g^{cx} = g^r g^{xc} = g^r (g^x)^c = g^r y^c
+  R = G^r= G^{s + c x} = G^s G^{cx} = G^s G^{xc} = G^s (G^x)^c = G^s X^c
 \end{align}
 
-So if $t = g^r y^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $r$, allowing the equation to balance.  The set $(r,c,t)$ thus forms the proof of ownership of $y$.
+So if $R = G^s X^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $s$, allowing the equation to balance.  The tuple $(R,s)$ thus forms the proof of ownership of $X$.
 
+\section{Digital Signatures}
+A Schnorr proof allows us to prove ownership of the private key $x$ for a public key $X = G^x$, but what if we want to use that key as a signature on some message $m$?  This message could be anything, such as an email, or a cryptocurrency transaction, or more generally a hash of some data $d$.  We must tie the message to the proof in order to form a signagure.
 
-
-\section{Ring signatures}
-
-A Schnorr proof allows us to sign a public key, proving we know the corresponding private key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct a one out of many signature, to prove that we knew the private key for one out of $N$ public keys.  Such a signature is called a ring signature \cite{cryptonote}.
-
-Start with public key $y$ for which the prover knows the private key $x$, and as before, choose a random $v \in \mathbb{Z}_p$ . To mix in an additional key $y_1$ whose private key $x_1$ is unknown, select a random $r_1$ and $c_1$.  The prover sets $c$ as follows, using the values known to calculate it:
+To do this, we simply add the message $m$ when constructing the hash $c$:
 \begin{align}
-  c = H(g^v, g^{r_1} y^{c_1}) - c_1
+  c = H_s(G, X, R, m)
+\end{align}
+
+Since the hash will depend on the message, attempting to verify the proof with a different message $m_k$ will fail.  This allows us to use a Schorr proof to sign messages.
+
+\subsection{Ring signatures}
+
+A digital signature allows us to sign a message for a public key, proving we know the corresponding private key.  But the signature is tied to a single key, which is bad for privacy.  It would be better to construct a one out of many signature, to prove that we knew the private key $x$ for one out of $N$ public keys $(X_1, ..., X_N)$.  Such a signature is called a ring signature \cite{cryptonote}.
+
+Start with a message $m$ and public key $X_1$ for which the prover knows the private key $x$, and as before, choose a random $r \in \mathbb{Z}_p$. To mix in an additional key $X_2$ whose private key $x_2$ is unknown, select a random $s_2$ and $c_2$.  The prover sets $c_1$ as follows, using the values known to calculate it:
+\begin{align}
+  c_1 = H_s(G^r, G^{s_2} X_1^{c_2}, m) - c_2
 \end{align}
 
 This is equivalent algebraically to:
 \begin{align}
-  c + c_1 = H(g^v, g^{r_1} y^{c_1})\nonumber
+  c_1 + c_2 = H_s(G^r, G^{s_2} X_1^{c_2}, m)\nonumber
 \end{align}
 
-Now that the prover has c, r is as before:
+Now that the prover has $c_1$, $s_1$ is as before:
 \begin{align}
-  r = v - cx
+  s_1 = r - c_1 x
 \end{align}
 
-The prover then sends $(y, r, c, y_1, r_1, c_1)$ to the verifier, who then calculates the hash
+The prover then sends $(X_1, s_1, c_1, X_2, s_2, c_2)$ to the verifier, who then calculates the hash
 \begin{align}
-  H(g^r y^c, g^{r_1} y_1^{c_1})\nonumber
+  H_s(G^{s_1}  X_1^{c_1}, G^{s_2} X_2^{c_2}, m)\nonumber
 \end{align}
 
-Since $g^v = g^r y^c$, the two hashes are identical.  Thus 
+Since $G^r = G^{s_1} X^{c_1}$, the two hashes are identical.  Thus 
 \begin{align}
-  c + c_1 = H(g^r y^c, g^{r_1} y_1^{c_1})
+  c_1 + c_2 = H_s(G^{s_1} X^{c_1}, G^{s_2} X_1^{c_2}, m)
 \end{align}
 
-So if $\sum c$ is equal to the hash, then the prover must have known $x$ for some $y$.  And since the prover can put the real $(y,r,c)$ in either position, there is no way for the verifier to know which key was actually signed.
+So if $\sum c_i$ is equal to the hash, then the prover must have known $x_i$ for some $X_i$.  And since the prover can put the real $(X,s,c)$ in either position, there is no way for the verifier to know which key was actually signed.
 
-We can do the same for any number of additional public keys $y_k$: choose a random $(r_k,c_k)$ which is added to the hash in the form of $g^{r_k}y_k^{c_k}$ then subtracting the new $c_k$ from the hash to form the real $c$. Then $\sum c$ will be equal to the hash for both prover and verifier.
-
+We can do the same for any number of additional public keys $X_k$: choose a random $(s_k,c_k)$ which is added to the hash in the form of $G^{s_k} X_k^{c_k}$ then subtracting the new $c_k$ from the hash to form the real $c_1$. Then $\sum c_i$ will be equal to the hash for both prover and verifier.  Again, the real $(X, s, c)$ can be in any position, so the proof leaks no information about which key was used to sign.
 
 
 \subsection{Linkable Ring Signatures}
@@ -116,61 +167,62 @@ Now that we can use ring signatures to hide which public key is being signed, we
 
 First we construct a key image \cite{cryptonote}, which is a commitment to the public key used but cannot be used to find the public or private keys, and is unique:
 \begin{align}
-  I = H(y)^x
+  I = H_g(X)^x
 \end{align}
 
-We then add a term to the hash for each $y$ that uses the key image.  For the real $y$, we know that
+We then add a term to the hash for each $X$ that uses the key image $I$.  For the real $X$, we know that
 \begin{align}
-  H(y)^v &= H(y)^r H(y)^{cx}\nonumber\\
-         &= H(y)^r (H(y)^x)^c\nonumber\\
-         &= H(y)^r I^c
+  H_g(X)^r &= H_g(X)^{s + cx}\nonumber\\
+         &= H_g(X)^s (H_g(X)^{xc}\nonumber\\
+         &= H_g(X)^s (H_g(X)^x)^c\nonumber\\
+         &= H_g(X)^s I^c
 \end{align}
 
-Putting the real $y$ first, the prover hash becomes:
+Putting the real $X_1$ first, the prover hash becomes:
 \begin{align}
-  H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y_1)^{r_1} I^{c_1})
+  H_s(G^r, H_g(X_1)^r, G^{s_2} X_2^{c_2}, H_g(X_2)^{S_2} I^{c_2}, m)
 \end{align}
 
 We define $c$ as before, then solve for the hash:
 \begin{align}
-  c &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y_1)^{r_1} I^{c_1}) - c_1\\
-  c_1 + c &= H(g^v, H(y)^v, g^{r_1} y^{c_1}, H(y_1)^{r_1} I^{c_1})\nonumber
+  c_1 &= H_s(G^r, H_g(X_1)^r, G^{s_2} X_2^{c_2}, H_g(X_2)^{s_2} I^{c_2}, m) - c_2 \nonumber \\
+  c_1 + c_2 &= H_s(G^r, H_g(X_1)^r, G^{s_2} X_2^{c_2}, H_g(X_2)^{s_2} I^{c_2}, m)
 \end{align}
 
-So as before, $\sum c$ is equal to the hash.  The prover now sends $(I, y, r, c, y_1, r_1, c_1)$ to the verifier, who can check that their hash is still equal to $\sum c$:
+So as before, $\sum c$ is equal to the hash.  The prover now sends $(I, X_1, s_1, c_1, X_2, s_2, c_2)$ to the verifier, who can check that their hash is still equal to $\sum c$:
 \begin{align}
-  c + c_1 = H(g^r y^c, H(y)^r I^c, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
+  c_1 + c_2 = H_s(G^{s_1} X_1^{c_1}, H_g(X_1)^{s_1} I^{c_1}, G^{s_2} X_2^{c_2}, H_g(X_2)^{s_2} I^{c_2}, m)
 \end{align}
 
-Since the key image $I$ is now tied to the signature, any attempt to sign two different ring signatures with the same y will result in the same $I$, so preventing double spends is easy.  You just keep track of which key images have previously been used, and reject any new signatures with a previously used $I$.
+Since the key image $I$ is now tied to the signature, any attempt to sign two different ring signatures with the same $X$ will result in the same $I$, so preventing double spends is easy.  You just keep track of which key images have previously been used, and reject any new signatures with a previously used $I$.
 
 
 \subsection{Linkable Spontaneous Anonymous Group Signatures}
 
 Linkable ring signatures do a good job of proving ownership while obscuring origins, but they get large as the number of mixins rises. LSAG signatures address this by constructing the $c$ terms via an iterative process, so it is only necessary to send one of them.  For a large ring, this results in nearly 33\% space savings.
 
-Consider a set of public keys $y_i, i \in \{0, …, n-1\}$ with a secret index $j$ which denotes the public key to which we know the corresponding private key $x$.  As before, choose random $v$, and $r_i$ $\forall i \ne j$.  As with linkable signatures, define $I = H(y_j)^x$. Then define
+Consider a set of public keys $X_i, i \in \{0, …, n-1\}$ with a secret index $j$ which denotes the public key to which we know the corresponding private key $x$.  As before, choose random $r$, and $s_i$ $\forall i \ne j$.  As with linkable signatures, define $I = H_g(X_j)^x$. Then define
 \begin{align}
-      L_j &= g^v\\
-      R_j &= H(y_j)^v\\
-  c_{j+1} &= H(L_j,R_j)
+      L_j &= G^r\\
+      R_j &= H_g(X_j)^r\\
+  c_{j+1} &= H_s(L_j,R_j)
 \end{align}
 
 For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to zero, then back to $j$)
 \begin{align}
-  L_i &= g^{r_i} {y_i}^{c_i}\\
-  R_i &= H(y_i)^{r_i} I^{c_i}\\
-  c_{i+1} &= H(L_i,R_i)\\
+  L_i &= G^{s_i} {X_i}^{c_i}\\
+  R_i &= H_g(X_i)^{s_i} I^{c_i}\\
+  c_{i+1} &= H_s(L_i,R_i)\\
   &... \nonumber\\
-  c_j &= H(L_{j-1}, R_{j-1})
+  c_j &= H_s(L_{j-1}, R_{j-1})
 \end{align}
 
 Now that we have $c_j$, we can define
 \begin{align}
-  r_j = v - c_j x
+  s_j = r - c_j x
 \end{align}
 
-Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $r_j$ and $c_j$, and the values should be equal to the original $L_j$ and $R_j$ calculated using $v$. The prover now sends $(I, y_0, r_0, …, y_{n-1}, r_{n-1}, c_0)$ to the verifier.  The verifier can reconstruct all $(c_i, L_i, R_i)$ and then check that $c_0 = c_n$.
+Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $r_j$ and $c_j$, and the values should be equal to the original $L_j$ and $R_j$ calculated using $v$. The prover now sends $(I, X_0, s_0, …, X_{n-1}, s_{n-1}, c_0)$ to the verifier.  The verifier can reconstruct all $(c_i, L_i, R_i)$ and then check that $c_0 = c_n$.
 
 
 \subsection{Multilayered LSAG Signatures}
@@ -211,30 +263,6 @@ Now that we have $c_j$, we can calculate the $r_{j,k}$ as before:
 \end{align}
 
 The prover sends the same set of $(I, y_0, r_0, ..., y_{m-1}, r_{m-1}, c_0)$ as for LSAG, but each $y_i$ and $r_i$ is now a vector.  The verifier again calculates the full set of $c_i$, with corresponding $L_i$ and $R_i$, and checks that $c_0 = c_n$.
-
-
-\subsection{Signing external data}
-
-Schnorr proofs and ring signatures do a good job of signing public keys, with a variety of options for obfuscating mixins and consolidating space.  But it is often desirable to sign external data, such as a transaction body.  This way the signature validates not only ownership of the inputs, but also locks the signature to the spent outputs, amounts, or any other metadata which is necessary to prevent transaction malleability.
-
-To sign external data $d$, take a hash of it then prepend it to the signature hash.  But hashing the external data directly can lead to collisions, which obviates the point of hashing.  So it is common to use domain separators in the hash:
-\begin{align}
-  m = H(\textsf{"transaction body"}, d)
-\end{align}
-
-For a standard linkable ring signature, the prover would do the following:
-\begin{align}
-  c + c1 = H(m, g^v, H(y)^v, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
-\end{align}
-
-The verifier also has access to the external data, and does the same calculation:
-\begin{align}
-  m &= H(\textsf{"transaction body"}, d)\\
-  c+c1 &= H(m, g^r y^c, H(y)^r I^c, g^{r_1} y^{c_1}, H(y)^{r_1} I^{c_1})
-\end{align}
-
-This links the signature to the external data, and if the data is altered the verifier signature will fail validation.
-
 
 
 \section{Confidential Transactions}

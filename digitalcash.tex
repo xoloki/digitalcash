@@ -62,14 +62,15 @@ But while it is trivial to find logarithms in non-discrete math, it is not gener
 
 Finite fields are usually represented by the remainders of numbers divides by some fixed modulus.  But this is not the only way to do such operations.
 
-Group theory is an abstraction of this idea, and can be applied to many contexts where we do not have numbers modulo some fixed modulus.  A group consists of a set, and a binary operation on pairs of members of that set that returns another member of the set.  You can think of this operation as an abstract version of multiplication.  
+Group theory is an abstraction of this idea, and can be applied to many contexts where we do not have numbers modulo some fixed modulus.  A group consists of a set, and a binary operation on pairs of elements of that set that returns another element of the set.  You can think of this operation as an abstract version of multiplication.  
 
-Numbers modulo some fixed modulus form a group; you can multiply two of those numbers, take the remainder modulo the modulus, and you will get another member of the same set.  But you can also use elliptic curves, polynomials, or even more exotic sets.
+Numbers modulo some fixed modulus form a group; you can multiply two of those numbers, take the remainder modulo the modulus, and you will get another element of the same set.  But you can also use elliptic curves, polynomials, or even more exotic sets.
 
-We can do the group operation repeatedly some number of times on a single member of the set.  This is an abstraction of the idea of exponentiation, raising some number to a power.  And we can also try to reverse exponentiation; as with finite fields, this requires brute force, and makes public key cryptography safe.  But unlike with finite fields, we can do this with any group.  For a variety of technical reasons, we normally use elliptic curves as our group set, and elliptic curve addition as our group operation.
+We can do the group operation repeatedly some number of times on a single element of the set.  This is an abstraction of the idea of exponentiation, raising some number to a power.  And we can also try to reverse exponentiation; as with finite fields, this requires brute force, and makes public key cryptography safe.  But unlike with finite fields, we can do this with any group.  For a variety of technical reasons, we normally use elliptic curves as our group set, and elliptic curve addition as our group operation.
 
-Some members of a group, when exponentiated, will produce every member of the set exactly once.  These members are called generators.  The number of times you can do this exponentiation before returning to the same value is called the $order$ of a group.
+Some elementss of a group, when exponentiated, will produce every element of the set exactly once.  These element are called generators.  The number of times you can do this exponentiation before returning to the same value is called the $order$ of a group.  Since exponentiation more times than the order of a group is cyclic, we use numbers modulo the group order for this operation as well.  These number are referred to as group scalars, to reflect this fact.
 
+\newpage
 \section{
   Notation
 }
@@ -126,6 +127,7 @@ We can use this derived expression for $r$ to expand $R$:
 
 So if $R = G^s X^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $s$, allowing the equation to balance.  The tuple $(R,s)$ thus forms the proof of ownership of $X$.
 
+\newpage
 \section{Digital Signatures}
 A Schnorr proof allows us to prove ownership of the private key $x$ for a public key $X = G^x$, but what if we want to use that key to sign some message $M$?  This message could be anything, such as an email or a cryptocurrency transaction, but generally will be hash of some data $D$.  We must tie the message to the proof in order to form a signagure.
 
@@ -894,8 +896,7 @@ Since spent outputs will be removed, it will no longer be possible to validate a
 
 Finally, while there are indeed space savings from removing inputs and spent outputs, it is necessary to store all balance commitments $C_T$ and their associated Schnorr proofs forever.  This set grows monotonically with each added transaction.  
 
-
-
+\newpage
 \section{MobileCoin}
 
 MobileCoin is a new cryptocurrency, whose goals are privacy, convenience, and provable correctness.  The proof of concept implementation uses CryptoNote as a transaction format, with the Stellar Consensus Protocol to achieve blockchain consensus, rather than a wasteful proof of work.  All computation on the nodes uses a secure enclave, to prevent even node operators from having access to view keys or rings.  
@@ -913,7 +914,6 @@ To address this, MobileCoin currently drops the inputs from transactions before 
 The author would like to thank Toby Segaran for initial help on ring signatures, and Isis Lovecruft for the initial review.
 
 
-\newpage
 \begin{thebibliography}{8}
 
 \bibitem{schnorr}

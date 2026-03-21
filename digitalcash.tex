@@ -272,16 +272,16 @@ Using linkable ring signatures, we can obscure (but not hide) the real inputs to
 
 \subsection{Pedersen Commitments}
 
-We can again use the difficulty of solving discrete logarithms to hide the real amounts behind a commitment.  The naive approach would be to simply raise our group generator $g$ to the value $v$:
+We can again use the difficulty of solving discrete logarithms to hide the real amounts behind a commitment.  The naive approach would be to simply raise our group generator $G$ to the value $v$:
 \begin{align}
-  C=g^v
+  C=G^v
 \end{align}
 
 Then we can check that the sum of the input values is equal to the sum of the outputs:
 \begin{align}
   v_{i_1} + v_{i_2} &= v_{o_1} + v_{o_2}\\
-  g^{v_{i_1} + v_{i_2}} &= g^{v_{o_1} + v_{o_2}}\\
-  g^{v_{i_1}} g^{v_{i_2}} &= g^{v_{o_1}} g^{v_{o_2}}\\
+  G^{v_{i_1} + v_{i_2}} &= G^{v_{o_1} + v_{o_2}}\\
+  G^{v_{i_1}} G^{v_{i_2}} &= G^{v_{o_1}} G^{v_{o_2}}\\
   C_{i_1} C_{i_2} &= C_{o_1} C_{o_2}
 \end{align}
   
@@ -289,20 +289,20 @@ So to check that the transaction is balanced, we check the product of the input 
 
 This simple approach does not work, however, because the range of values in a cryptocurrency is usually only $[0, 2^{64})$.  So an attacker can brute force any commitment by trying all $2^{64}$ possible values.  To prevent this, we add a random blinding factor $s$ to the commitment \cite{ringct}:
 \begin{align}
-  C = g^s h^v
+  C = G^s H^v
 \end{align}
   
-This requires another generator $h$, which is usually defined as a hash-to-group of the generator $g$.  If the group is a prime order group, then any element of the group is a generator, and so a simple hash will suffice.  Otherwise, care must be made to assure that $h$ is orthogonal to $g$.
+This requires another generator $H$, which is usually defined as a hash-to-group of the generator $G$.  If the group is a prime order group, then any element of the group is a generator, and so a simple hash will suffice.  Otherwise, care must be made to assure that $H$ is orthogonal to $G$.
 
 Now when we check the transaction balance, we end up with
 \begin{align}
-  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} &= \frac{g^{s_{i_1}} h^{v_{i_1}} g^{s_{i_2}} h^{v_{i_2}}}{g^{s_{o_1}} h^{v_{o_1}} g^{s_{o_2}} h^{v_{o_2}}}\\
-                                          &= g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} h^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} &= \frac{G^{s_{i_1}} H^{v_{i_1}} G^{s_{i_2}} H^{v_{i_2}}}{G^{s_{o_1}} H^{v_{o_1}} G^{s_{o_2}} H^{v_{o_2}}}\\
+                                          &= G^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}} H^{v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2}}
 \end{align}
 
 But if the transaction is balanced, then $v_{i_1} + v_{i_2} - v_{o_1} - v_{o_2} = 0$, so
 \begin{align}
-  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = g^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}}
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = G^{s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}}
 \end{align}
 
 We define the sum of the input blinding factors minus the output blinding factors to be
@@ -310,9 +310,9 @@ We define the sum of the input blinding factors minus the output blinding factor
   z = s_{i_1} + s_{i_2} - s_{o_1} - s_{o_2}
 \end{align}
 
-Which means that the ratio of the product of the commitments is now just $g^z$, and thus we know the private key $z$ which corresponds to the public key generated from the commitments:
+Which means that the ratio of the product of the commitments is now just $G^z$, and thus we know the private key $z$ which corresponds to the public key generated from the commitments:
 \begin{align}
-  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = g^z
+  \frac{C_{i_1} C_{i_2}}{C_{o_1} C_{o_2}} = G^z
 \end{align}
 
 We already know how to sign a public key if we know the private key, which means we can sign this commitment to zero, and a verifier can check it.  This allows a verifier to validate the transaction is balanced.
@@ -327,27 +327,27 @@ First, consider a $n$-bit binary expansion of $v$:
   v = b_0 2^0 + b_1 2^1 + ... + b_{n-1} 2^{n-1}
 \end{align}
 
-If $v$ is in the range $[0, 2^{64})$ then we know that each $b_k \in {0, 1}$.  Remember that we committed to $v$ with $C = g^s h^v$.  Choose a series of $s_k$ such that
+If $v$ is in the range $[0, 2^{64})$ then we know that each $b_k \in {0, 1}$.  Remember that we committed to $v$ with $C = G^s H^v$.  Choose a series of $s_k$ such that
 \begin{align}
   \sum_0^{n-1} s_k = s 
 \end{align}
 
 Then write commitments for each bit in the binary expansion thus
 \begin{align}
-  C_k = g^{s_k} h^{b_k 2^k}
+  C_k = G^{s_k} H^{b_k 2^k}
 \end{align}
 
 As before, the sum of the values in these commitments will be equal to $v$, but also the sum of the bit blinding factors $s_k$ will also equal $s$.  So
 \begin{align}
-  C_k = C
+  \prod{C_k} = C
 \end{align}
 
 This allows the validator to check that the binary expansion is valid.  And if each $b_k \in {0, 1}$, then one of the following must be a commitment to zero:
 \begin{align}
-  \{g^{s_k} h^{b_k 2^k}, g^{s_k} h^{b_k 2^k - 2^k}\}
+  \{G^{s_k} H^{b_k 2^k}, G^{s_k} H^{b_k 2^k - 2^k}\}
 \end{align}
 
-So either the first or the second terms will reduce to $g^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don't need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.
+So either the first or the second terms will reduce to $G^{s_k}$, and since the prover know $s_k$ he can sign the ring.  We don't need linkability, so we can use basic ring signatures of size $2$. The prover of course knows which term is actually a commitment to zero, and can sign accordingly.
 
 The range proof thus consists of the $n$ bit commitments $C_i$ and corresponding ring signatures.  The verifier checks the validity of each bit proof, and then verifies that
 \begin{align}
@@ -567,25 +567,25 @@ CryptoNote \cite{cryptonote} is a privacy focused cryptocurrency system which im
 
 A CryptoNote key consists of a pair of public keys $(A, B)$ with their associated private keys $(a, b)$.  To construct a one time address, the creator of a transaction starts with a transaction private key $r$, and an associated transaction public key $R$:
 \begin{align}
-  R=g^r
+  R=G^r
 \end{align}
 
-The creator then uses this, with the destination public key $(A, B)$, to construct the one time address $y$.  This address is a public key, with an associated private key $x$:
+The creator then uses this, with the destination public key $(A, B)$, to construct the one time address $X$.  This address is a public key, with an associated private key $x$:
 \begin{align}
-  y = g^x = g^{H(rA)} B
+  X = G^x = G^{H_s(rA)} B
 \end{align}
 
 The owner of the destination key $(A, B)$ can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key $(a, b)$ to attempt to recover the one time private key $x$:
 \begin{align}
-	x = H(Ra) + b
+	x = H_s(Ra) + b
 \end{align}
 
 Then raise $g$ to this power to reconstruct the public key $y$:
 \begin{align}
-  g^x = g^{H(Ra)} g^b
+  G^x = G^{H_s(Ra)} G^b
 \end{align}
 
-If $y = g^x$, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key $x$, he is able to sign the key $y$ in a ring signature, allowing him to spend it.
+If $y = G^x$, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key $x$, he is able to sign the key $y$ in a ring signature, allowing him to spend it.
 
 
 \subsection{View keys}
@@ -597,12 +597,12 @@ To do this, the user can pass a tuple of his private key $a$ with his public key
   V = (a, B)
 \end{align}
 
-The node can then look at each transaction, and use the view key with the transaction public key $R$ to attempt to reconstruct the one time public key $y$:
+The node can then look at each transaction, and use the view key with the transaction public key $R$ to attempt to reconstruct the one time public key $Y$:
 \begin{align}
-  Y = g^{H(Ra)} B
+  Y = G^{H_s(Ra)} B
 \end{align}
 
-If $Y = y$, then the node knows that the one time key belongs to the user, and returns it.
+If $Y = X$, then the node knows that the one time key belongs to the user, and returns it.
 
 
 \subsection{Ring signatures}
@@ -618,7 +618,7 @@ Monero is a privacy focused cryptocurrency.  In its initial implementation, it u
 
 \subsection{RingCT}
 
-The Monero implementation of confidential transactions is called RingCT \cite{ringct}.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recover $g^z$.  Without the MLSAG, any attempt to include the commitments would either be unable to recover $g^z$, or would expose the real input keys.
+The Monero implementation of confidential transactions is called RingCT \cite{ringct}.  It uses MLSAG signatures that tie a set of Pedersen Commitments to a set of input keys.  This is necessary because to verify a confidential transaction, it is required to have a full set of the commitments used in order to recover $G^z$.  Without the MLSAG, any attempt to include the commitments would either be unable to recover $G^z$, or would expose the real input keys.
 
 To accomplish this, the MLSAG signature adds the corresponding commitments to the public key vectors, then passes them in the signature output:
 \begin{align}
@@ -627,19 +627,19 @@ To accomplish this, the MLSAG signature adds the corresponding commitments to th
 
 When constructing the hashes, the prover signs a final term which is the sum of the input commitments minus the sum of the output commitments:
 \begin{align}
-  g^z &= \frac{C_i}{C_o}\\
-  L_{j,m} &= g^{v_m}\\
-  c_{j+1} &= H(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
+  G^z &= \frac{C_i}{C_o}\\
+  L_{j,m} &= G^{v_m}\\
+  c_{j+1} &= H_s(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
 \end{align}
 
-As before, if this sum is a commitment to zero, then it will take the form of a public key $g^z$, where the user knows the private key $z$.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a $R_{j,m}$ term, or a key image.  It will be necessary to create a new $v_m$ and include an additional $r_{j,m}$ in the signature:
+As before, if this sum is a commitment to zero, then it will take the form of a public key $G^z$, where the user knows the private key $z$.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a $R_{j,m}$ term, or a key image.  It will be necessary to create a new $v_m$ and include an additional $r_{j,m}$ in the signature:
 \begin{align}
   r_{j,m} = v_m - c_j z
 \end{align}
 
 The verifier uses this additional $r_{j,m}$ and $c_j$ to build a standard Schnorr term:
 \begin{align}
-  c_{j+1} = H(L_{j,0}, L_{j,0}, ... , L_{j,0}, L_{j,0}, g^{r_{j,m}} y^{c_j})
+  c_{j+1} = H_s(L_{j,0}, L_{j,0}, ... , L_{j,0}, L_{j,0}, G^{r_{j,m}} y^{c_j})
 \end{align}
 
 As before, if the sum was a commitment to zero, then this term will be the same in the prover and verifier hashes.
@@ -659,9 +659,9 @@ A zkSNARK is a zero-knowledge, short, non-interactive argument of knowledge.  It
 
 \section{Lelantus}
 
-There is a new Zerocoin based cryptocurrency system called Lelantus \cite{lelantus}, released 2018-12-22.  It uses confidential transactions, and claims to be able to hide the inputs fully while still being auditable.  
+There is a new Zerocoin based cryptocurrency system called Lelantus \cite{lelantus}, released 2018-12-22.  It uses confidential transactions, and due to the logarithmically scaling nature of the proofs, can mixin a very large number of inputs while keeping the proof size small.  It is still necessary to have input commitments in order to verify, but these can be entire blocks, which make network analysis sufficiently difficult that it becomes thermodynamically impossible.
 
-As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/outputs themselves, rather than associating the commitments with a one time address as in RingCT.  It is thus necessary to reveal the commitment secret during the spend, similar to the way that CryptoNote reveals the key image.  So it is necessary to make the commitments double blind, or else after secret reveal it would be possible to brute force the values as per the naive approach to Pedersen commitments.  Adapting Lelantus to a more CryptoNote-ish system could obviate this need, and allow single blinded commitments.
+As per Zerocoin, Lelantus uses the output commitments as the transaction inputs/outputs themselves, rather than associating the commitments with a one time address as in RingCT.  It is thus necessary to reveal the commitment secret during the spend, similar to the way that CryptoNote reveals the key image.  So it is necessary to make the commitments double blind, or else after secret reveal it would be possible to brute force the values as per the naive approach to Pedersen commitments.
 
 
 \subsection{$\Sigma$-protocol for commitment to $0$ or $1$}
@@ -680,7 +680,7 @@ To prove that $c$ opens to $0$ or $1$, pick random $(a,s,t)$ and use them to con
 
 In an interactive protocol, the prover would send $(c_a,c_b)$ to the verifier, who would respond with the challenge $x$.  To make it non-interactive, hash $(c, c_a, c_b)$:
 \begin{align}
-  x = H(c, c_a, c_b)
+  x = H_s(c, c_a, c_b)
 \end{align}
 
 Either way, the prover uses $x$ to construct $(f, z_a, z_b)$ and sends it to the verifier:
@@ -721,7 +721,7 @@ Ring signatures allow hiding a signature in a set of mixins.  But they grow in s
 
 Consider a set of $N$ commitments:
 \begin{align}
-  c_i = g^{s_i} h^{v_i}
+  c_i = G^{s_i} H^{v_i}
 \end{align}
 
 If we know that this set contains a commitment to $0$, then we know an index $l$ such that
@@ -823,21 +823,21 @@ Lelantus accomplishes this via a two step process.  It establishes input ownersh
 To show how the balance proof arises from the elements of the $\Sigma$-proofs, consider the following values:
 \begin{align}
   z_i &= v_i x^n - \sum_{k=0}^{n-1}{\rho_k^i x^k}\\
-  Com(0, \rho_k^i) &= g^0 h^{\rho_k^i}
+  Com(0, \rho_k^i) &= G^0 H^{\rho_k^i}
 \end{align}
 
 The verifier can then compute the following:
 \begin{align}
-  A &= (\prod_{i=1}^{N_{new}}{C_{o_i}})^{x^n} = (\prod_{i=1}^{N_{new}}{g^{s_{o_i}} h^{v_{o_i}}})^{x^n}  =  g^{(\Sigma s_o) x^n}  h^{(\Sigma v_o) x^n}\\
+  A &= (\prod_{i=1}^{N_{new}}{C_{o_i}})^{x^n} = (\prod_{i=1}^{N_{new}}{G^{s_{o_i}} H^{v_{o_i}}})^{x^n}  =  G^{(\Sigma s_o) x^n}  H^{(\Sigma v_o) x^n}\\
   B &= Com(0, \sum_{i=1}^{N_{old}}{z_i}) \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1} Com(0, \rho_k^i)^{x^k})}\\
-    &= g^0 h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}} \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1}{g^0 h^{\rho_k^i x^k}})}\\
-    &= h^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{h^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}}  \prod_{i=1}^{N_{old}}{h^{\sum_{k=0}^{n-1}{\rho_k^i x^k}}}\\
-    &= h^{(\sum{v_i}) x^n}
+    &= G^0 H^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{H^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}} \prod_{i=1}^{N_{old}}{(\prod_{k=0}^{n-1}{G^0 H^{\rho_k^i x^k}})}\\
+    &= H^{(\sum{v_i}) x^n} \prod_{i=1}^{N_{old}}{H^{-\sum_{k=0}^{n-1}{\rho_k^i x^k}}}  \prod_{i=1}^{N_{old}}{H^{\sum_{k=0}^{n-1}{\rho_k^i x^k}}}\\
+    &= H^{(\sum{v_i}) x^n}
 \end{align}
 
 The ratio of A to B is thus:
 \begin{align}
-  \frac{A}{B} = \frac{g^{(\sum{s_o}) x^n} g^{(\sum{v_o}) x^n}}{g^{(\sum{v_i}) x^n}}
+  \frac{A}{B} = \frac{G^{(\sum{s_o}) x^n} G^{(\sum{v_o}) x^n}}{G^{(\sum{v_i}) x^n}}
 \end{align}
   
 As before, if the transaction is balanced then 
@@ -847,7 +847,7 @@ As before, if the transaction is balanced then
 
 And thus
 \begin{align}
-  \frac{A}{B} = g^{(\sum{s_o}) x^n}
+  \frac{A}{B} = G^{(\sum{s_o}) x^n}
 \end{align}
 
 Since the prover knows the output serial numbers, this is a public key to which he knows the private key.  So it suffices to provide a regular Schnorr proof for this ratio to prove that the transaction is balanced, and no input commitments have been revealed.
@@ -865,7 +865,7 @@ While RingCT uses ring signatures with mixins to obscure the links between input
 
 Consider a transaction with input commitments $C_i$ and output commitments $C_o$.  As with all implementations of confidential transactions, the sum of the input commitments minus the outputs will be the ratio of their products, and this will be a public key to which the owner knows the private key:
 \begin{align}
-  \frac{\prod C_i}{\prod C_o} = g^{s_i - s_o} = g^z = C_T
+  \frac{\prod C_i}{\prod C_o} = G^{s_i - s_o} = G^z = C_T
 \end{align}
 
 The transaction format is thus the set $(C_{i_1}, ..., C_{i_N}, C_{o_1}, ..., C_{o_M}, C_T)$, with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:

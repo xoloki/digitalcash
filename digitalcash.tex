@@ -28,7 +28,7 @@ There are many papers which outline, define, use, mutate, expand on, or cite the
 
 The target audience here is not mathematicians or cryptographers, but rather engineers with a reasonable mathematical background who want to understand the constructs that underpin modern cryptocurrencies.  This will allow them to become much more effective engineers in this problem domain, and perhaps some will be inspired to learn even more.
 
-For this reason, we do not include rigorous security proofs of any of these constructs.  Instead we show only $correctness$ of the verification, which is analogous to a completeness security proof: this shows that a prover $with$ a valid witness can demonsrate that to a verifier.  We do not attempt to show $soundness$, which is that a prover $without$ a valid witness cannot so convince the verifier; nor do we show $zero$ $knowledge$, which is that the proof transcript does not leak any information $about$ the witness.  These proofs are difficult and non-intuitive, and would not help the target audience at this stage of their learning.
+For this reason, we do not include rigorous security proofs for any of these constructs.  Instead we show only correctness of the verification, which is analogous to a $completeness$ security proof: this shows that a prover $with$ a valid witness $can$ demonstrate that to a verifier.  We do not attempt to show $soundness$, which is that a prover $without$ a valid witness $cannot$ so convince the verifier; nor do we show $zero$ $knowledge$, which is that the proof transcript does not leak any information $about$ the witness.  These proofs are difficult and non-intuitive, and would not help the target audience at this stage of their learning.
 
 \begin{figure}[H]
   \centering
@@ -50,13 +50,13 @@ Because the crates are filled one at a time, and the remainder cycles between ze
 
 \subsubsection{Finite Fields}
 
-Keeping with our egg crate example, as noted above the remainders cycle between zero and one less than the size of the crate, aka the modulus.  We name these sets of remainders finite fields.
+Keeping with our egg crate example, as noted above the remainders cycle between zero and one less than the size of the crate, aka the modulus.  If the modulus is prime, we name these sets of remainders finite fields.
 
-This means that there is a fixed number of remainders for any field, and that we can do many typical mathematical operations on them: addition, subtraction, and multiplication are easily possible. Division is also possible on some fields; it often takes the form of finding a multiplicitive inverse, then multiplying with it rather than doing division per se.
+This means that there is a fixed number of remainders for any field, and that we can do the basic mathematical operations of addition and multiplication on them. We can also take inverses, both additively and multiplicatively.  Subtraction and division are thus also possible, by taking inverses then applying the operation.
 
-If we take a member of a finite field, and multiply it by itself repeatedly, this is what is called exponentiation.  Exponentiation can be reversed; rather than finding the result of repeated multiplication, we deciper how many times multiplication would need to be done to get a particular result.  This number is called a logarithm, and is the reverse of exponentiation.
+If we take a member of a finite field, and multiply it by itself repeatedly, this is what is called exponentiation.  Exponentiation can be reversed; rather than finding the result of repeated multiplication, we decipher how many times multiplication would need to be done to get a particular result.  This number is called a logarithm, and is the reverse of exponentiation.
 
-But while it is trivial to find logarithms in non-discrete math, it is not generally possible to find discrete logarithms without resorting to brute force.  The difficults of this problem, called the Discrete Logarithm Problem, or DLP, is what makes public key cryptography work.
+But while it is trivial to find logarithms in non-discrete math, it is not generally possible to find discrete logarithms without resorting to brute force.  The difficulty of this problem, called the Discrete Logarithm Problem, or DLP, is what makes much of public key cryptography work.
 
 \subsubsection{Group Theory}
 
@@ -68,14 +68,16 @@ Numbers modulo some fixed modulus form a group; you can multiply two of those nu
 
 We can do the group operation repeatedly some number of times on a single element of the set.  This is an abstraction of the idea of exponentiation, raising some number to a power.  And we can also try to reverse exponentiation; as with finite fields, this requires brute force, and makes public key cryptography safe.  But unlike with finite fields, we can do this with any group.  For a variety of technical reasons, we normally use elliptic curves as our group set, and elliptic curve addition as our group operation.
 
-Some elementss of a group, when exponentiated, will produce every element of the set exactly once.  These element are called generators.  The number of times you can do this exponentiation before returning to the same value is called the $order$ of a group.  Since exponentiation more times than the order of a group is cyclic, we use numbers modulo the group order for this operation as well.  These number are referred to as group scalars, to reflect this fact.
+Some elements of a group, when exponentiated, will produce every element of the set exactly once.  These elements are called generators.  The number of times you can do this exponentiation before returning to the same value is called the $order$ of a group.  Since exponentiation more times than the order of a group is cyclic, we use numbers modulo the group order for this operation as well.  These numbers are referred to as group scalars, to reflect this fact.
+
+If the order of a group is prime, then all elements of the group are generators.  
 
 \newpage
 \section{
   Notation
 }
 
-We will use lowercase variable names for group scalars ($x$), and uppercase for group elements ($X$).  Groups themselves will be denoted as $\mathbb{G}$, which we will also use for sets as in $\mathbb{S}$.  Though we will be expressing all of the math here in terms of exponentials, we borrow naming conventions from elliptic curves to make things explcit.  A public key $X$ is defined as $G^x$ for some generator $G$.
+We use lowercase variable names for group scalars ($x$), and uppercase for group elements ($X$).  Groups themselves will be denoted as $\mathbb{G}$, which we will also use for sets as in $\mathbb{S}$.  Though we will be expressing all of the math here in terms of exponentials, we borrow these naming conventions from elliptic curves to make things explicit.  A public key $X$ is defined as $G^x$ for some generator $G$ and some private key $x$.
 
 \section{
   Hashing
@@ -86,7 +88,7 @@ We define a hash function $H_n$ as a function that maps an unbounded list of arb
   H_n \coloneqq \Set{i_1, i_2, ...}{b \in \{0,1\}, k \in \mathbb{N}, i \in {b_1b_2...b_k}} \mapsto \Set{b_1b_2...b_n}{b \in \{0,1\}}\nonumber
 \end{align}
 
-When dealing with groups, we often want to hash some data, then convert the ouput bits to a group element or scalar.  This is trivial in the case of a scalar; simly hash to the same number of bits as the scalar, then reduce modulo the group order.  We denote this function as $H_s$.
+When dealing with groups, we often want to hash some data, then convert the ouput bits to a group element or scalar.  This is trivial in the case of a scalar; simply hash to the same number of bits as the scalar, then reduce modulo the group order.  We denote this function as $H_s$.
 
 And for some groups, like numbers modulo a prime, this works for the group elements as well.  But for other groups, like elliptic curve points, there is no direct way to convert the output bits to a group element.  So algorithms had to be developed for every useful group which take the hash output and convert it to a group element.  We denote this function $H_g$.
 
@@ -95,7 +97,7 @@ One trivial way of defining $H_g$ over some binary data $d$ would be to use a ge
   H_g(d) = G^{H_s(d)}
 \end{align}
 
-This is problematic, though, because now there is a well known discrete logarith for $H_g(d)$, namely $H_s(d)$.  The existence of this discrete logarithm breaks the assumptions needed to prove the security of algorithms that require $H_g$.  So we must use more complex algorithms; the details are out of scope for this document, but are well known and easily found.
+This is problematic, though, because now there is a well known discrete logarithm for $H_g(d)$, namely $H_s(d)$.  The existence of this discrete logarithm breaks the assumptions needed to prove the security of algorithms that require $H_g$.  So we must use more complex algorithms; the details are out of scope for this document, but are well known and easily found.
 
 \section{
   Schnorr Proofs and the Fiat Shamir Transform
@@ -125,11 +127,11 @@ We can use this derived expression for $r$ to expand $R$:
   R = G^r= G^{s + c x} = G^s G^{cx} = G^s G^{xc} = G^s (G^x)^c = G^s X^c
 \end{align}
 
-So if $R = G^s X^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $s$, allowing the equation to balance.  The tuple $(R,s)$ thus forms the proof of ownership of $X$.
+So if $R = G^s X^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $s$, allowing the equation to balance.  The tuple $(R,s)$ is thus a proof of ownership of $X$.
 
 \newpage
 \section{Digital Signatures}
-A Schnorr proof allows us to prove ownership of the private key $x$ for a public key $X = G^x$, but what if we want to use that key to sign some message $M$?  This message could be anything, such as an email or a cryptocurrency transaction, but generally will be hash of some data $D$.  We must tie the message to the proof in order to form a signagure.
+A Schnorr proof allows us to prove ownership of the private key $x$ for a public key $X = G^x$, but what if we want to use that key to sign some message $M$?  This message could be anything, such as an email or a cryptocurrency transaction, but generally will be the hash of some data $D$.  We must tie the message to the proof in order to form a signature.
 
 To do this, we simply add the message $M$ when constructing the hash $c$:
 \begin{align}
@@ -274,6 +276,58 @@ Now that we have $c_j$, we can calculate the $s_{j,k}$ as before:
 \end{align}
 
 The prover sends the same set of $(I, X_0, s_0, ..., X_{m-1}, s_{m-1}, c_0)$ as for LSAG, but each $y_i$ and $s_i$ is now a vector.  The verifier again calculates the full set of $c_i$, with corresponding $L_i$ and $R_i$, and checks that $c_0 = c_n$.
+
+
+\section{CryptoNote}
+
+CryptoNote \cite{cryptonote} is a privacy focused cryptocurrency system which implements many of the techniques explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but I will break with that to maintain consistency with the rest of the document, and use exponentials in this section.
+
+
+\subsection{One time addresses}
+
+A CryptoNote key consists of a pair of public keys $(A, B)$ with their associated private keys $(a, b)$.  To construct a one time address, the creator of a transaction starts with a transaction private key $r$, and an associated transaction public key $R$:
+\begin{align}
+  R=G^r
+\end{align}
+
+The creator then uses this, with the destination public key $(A, B)$, to construct the one time address $X$.  This address is a public key, with an associated private key $x$:
+\begin{align}
+  X = G^x = G^{H_s(rA)} B
+\end{align}
+
+The owner of the destination key $(A, B)$ can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key $(a, b)$ to attempt to recover the one time private key $x$:
+\begin{align}
+	x = H_s(Ra) + b
+\end{align}
+
+Then raise $g$ to this power to reconstruct the public key $y$:
+\begin{align}
+  G^x = G^{H_s(Ra)} G^b
+\end{align}
+
+If $y = G^x$, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key $x$, he is able to sign the key $y$ in a ring signature, allowing him to spend it.
+
+
+\subsection{View keys}
+
+One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, this can be problematic.  It would be preferable to allow a trusted node to do the scanning for the user, while preventing the node from being able to spend the output.
+
+To do this, the user can pass a tuple of his private key $a$ with his public key $B$:
+\begin{align}
+  V = (a, B)
+\end{align}
+
+The node can then look at each transaction, and use the view key with the transaction public key $R$ to attempt to reconstruct the one time public key $Y$:
+\begin{align}
+  Y = G^{H_s(Ra)} B
+\end{align}
+
+If $Y = X$, then the node knows that the one time key belongs to the user, and returns it.
+
+
+\subsection{Ring signatures}
+
+CryptoNote uses linkable ring signatures, with external data.  It defines a transaction prefix to be all of the transaction data except for the ring signatures themselves, which includes the input and output public keys, with the transaction public key and amounts.  The transaction prefix is serialized then hashed to create the signed message m.
 
 
 \section{Confidential Transactions}
@@ -479,16 +533,16 @@ If we expand the inner products, then start isolating prover and verifier terms,
 
 Since an inner product $\left<\textbf{a}, \textbf{b}\right>$ can be broken into a pairwise/inner product $\left<\textbf{1}^n, \textbf{a} \textbf{b}\right>$:
 \begin{align}
-  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber\\
-  \left<\textbf{a}_L, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right> + \left<\textbf{a}_L - z \cdot \textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber
+  z^2 \cdot \left<\textbf{a}_L, \textbf{2}^n\right> + z \cdot \left<\textbf{a}_L, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> + \left<\textbf{a}_L, \textbf{a}_R \circ \textbf{y}^n\right> &= z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right> + \left<\textbf{a}_L - z \cdot \textbf{1}^n, \textbf{a}_R \circ \textbf{y}^n\right> &= z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber
 \end{align}
 
 In order to merge the inner products via the first term, add $\left<-z \textbf{1}^n, z^2 \textbf{2}^n + z \textbf{y}^n\right>$:
 \begin{align}
-  \left<\textbf{a}_L - z \cdot \textbf{1}n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \cdot \textbf{1}^n, z2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\nonumber\\
-  \left<\textbf{a}_L - z \cdot \textbf{1}n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\nonumber\\
-  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z3 \cdot \left<\textbf{1}^n, \textbf{2}^n\right> - z^2 \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber\\
-  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> = z^2 v + (z - z^2) \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>\nonumber
+  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> &= z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> + \left<-z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> &= z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z \cdot \left<\textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> &= z^2 v + z \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \cdot \left<\textbf{1}^n, \textbf{2}^n\right> - z^2 \cdot \left<\textbf{1}^n, \textbf{y}^n\right>\nonumber\\
+  \left<\textbf{a}_L - z \cdot \textbf{1}^n, z^2 \cdot \textbf{2}^n + z \cdot \textbf{y}^n + \textbf{a}_R \circ \textbf{y}^n\right> &= z^2 v + (z - z^2) \cdot \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>\nonumber
 \end{align}
   
 Let $d(y,z) = (z - z^2) \left<\textbf{1}^n, \textbf{y}^n\right> - z^3 \left<\textbf{1}^n, \textbf{2}^n\right>$, and we get the final form:
@@ -566,61 +620,6 @@ Proving the blinded inner product range proof now depends on simply verifying th
   t_0 &= z^2 v + d(y,z)\\
   t(x) &= \left<l(x), r(x)\right> = t_0 + t_1 x + t_2 x^2
 \end{align}
-
-
-
-\section{CryptoNote}
-
-CryptoNote \cite{cryptonote} is a privacy focused cryptocurrency system which implements many of the techniques explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but I will break with that to maintain consistency with the rest of the document, and use exponentials in this section.
-
-
-\subsection{One time addresses}
-
-A CryptoNote key consists of a pair of public keys $(A, B)$ with their associated private keys $(a, b)$.  To construct a one time address, the creator of a transaction starts with a transaction private key $r$, and an associated transaction public key $R$:
-\begin{align}
-  R=G^r
-\end{align}
-
-The creator then uses this, with the destination public key $(A, B)$, to construct the one time address $X$.  This address is a public key, with an associated private key $x$:
-\begin{align}
-  X = G^x = G^{H_s(rA)} B
-\end{align}
-
-The owner of the destination key $(A, B)$ can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key $(a, b)$ to attempt to recover the one time private key $x$:
-\begin{align}
-	x = H_s(Ra) + b
-\end{align}
-
-Then raise $g$ to this power to reconstruct the public key $y$:
-\begin{align}
-  G^x = G^{H_s(Ra)} G^b
-\end{align}
-
-If $y = G^x$, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key $x$, he is able to sign the key $y$ in a ring signature, allowing him to spend it.
-
-
-\subsection{View keys}
-
-One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, this can be problematic.  It would be preferable to allow a trusted node to do the scanning for the user, while preventing the node from being able to spend the output.
-
-To do this, the user can pass a tuple of his private key $a$ with his public key $B$:
-\begin{align}
-  V = (a, B)
-\end{align}
-
-The node can then look at each transaction, and use the view key with the transaction public key $R$ to attempt to reconstruct the one time public key $Y$:
-\begin{align}
-  Y = G^{H_s(Ra)} B
-\end{align}
-
-If $Y = X$, then the node knows that the one time key belongs to the user, and returns it.
-
-
-\subsection{Ring signatures}
-
-CryptoNote uses linkable ring signatures, with external data.  It defines a transaction prefix to be all of the transaction data except for the ring signatures themselves, which includes the input and output public keys, with the transaction public key and amounts.  The transaction prefix is serialized then hashed to create the signed message m.
-
-
 
 \section{Monero}
 
@@ -728,7 +727,7 @@ This is only true $\forall m \in {0,1}$.  So if $c^{x-f} c_b = Com(0,zb)$, $m \i
 
 \subsection{One out of Many $\Sigma$-proofs}
 
-Ring signatures allow hiding a signature in a set of mixins.  But they grow in size linearly with the mixin set size.  So the mixin set must be limited, and cannot contain every transaction in the ledger.  Merkle proofs offer a logarithmic sized proof for ledger inclusion, but are not zero knowledge.  It would be ideal to be able to demonstrate both ownership and leder inclusion with a single proof.  One out of many proofs do this, in logarithmic size.  So every output in the ledger functions as a mixin, and the proof size scales logarithmically with the ledger size.
+Ring signatures allow hiding a signature in a set of mixins.  But they grow in size linearly with the mixin set size.  So the mixin set must be limited, and cannot contain every transaction in the ledger.  Merkle proofs offer a logarithmic sized proof for ledger inclusion, but are not zero knowledge.  It would be ideal to be able to demonstrate both ownership and ledger inclusion with a single proof.  One out of many proofs do this, in logarithmic size.  So every output in the ledger functions as a mixin, and the proof size scales logarithmically with the ledger size.
 
 Consider a set of $N$ commitments:
 \begin{align}
@@ -792,7 +791,7 @@ For all $j = (1, ..., n)$ with $k = j - 1$:
 
 The verifier responds with the challenge $x$, or it is generated via Fiat-Shamir.  Prover then uses $x$ as per the previous protocol to construct, $\forall j$:
 \begin{align}
-  f_j &= l_j + a_j\\
+  f_j &= l_j x + a_j\\
   z_{a_j} &= r_j x + s_j\\
   z_{b_j} &= r_j (x - f_j) + t_j
 \end{align}
@@ -829,7 +828,7 @@ If we simplify using $p_i(x)$ and expand we can see why this is true:
  
 Confidential Transactions are good at hiding amounts, but it is necessary to reveal the commitments themselves in order to prove that a transaction is balanced, i.e. that the sum of the inputs equals the sum of the outputs.  RingCT obfuscates the actual input commitments in a ring of mixins (with both addresses and commitments), but the data is still present and subject to analysis.  It would be better to be able to prove both input ownership and transaction balance without ever showing the input commitments.
 
-Lelantus accomplishes this via a two step process.  It establishes input ownership via a set of one out of many $\Sigma$-proofs, then uses elements of the $\Sigma$-proofs to to establish a balance proof.  At no time are the input commitments themselves revealed to the verifier.
+Lelantus accomplishes this via a two step process.  It establishes input ownership via a set of one out of many $\Sigma$-proofs, then uses elements of the $\Sigma$-proofs to establish a balance proof.  At no time are the input commitments themselves revealed to the verifier.
 
 To show how the balance proof arises from the elements of the $\Sigma$-proofs, consider the following values:
 \begin{align}
@@ -879,7 +878,7 @@ Consider a transaction with input commitments $C_i$ and output commitments $C_o$
   \frac{\prod C_i}{\prod C_o} = G^{s_i - s_o} = G^z = C_T
 \end{align}
 
-The transaction format is thus the set $(C_{i_1}, ..., C_{i_N}, C_{o_1}, ..., C_{o_M}, C_T)$, with a signature on CT to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:
+The transaction format is thus the set $(C_{i_1}, ..., C_{i_N}, C_{o_1}, ..., C_{o_M}, C_T)$, with a signature on $C_T$ to prove the balance.  Given this format, it is trivial to combine transactions; you can simply add the new input, output, and balance commitments to the existing set, and the balance check should still succeed with the combined sets:
 \begin{align}
   \prod (\frac{\prod C_i}{\prod C_o})_k= \prod (C_T)_k
 \end{align}

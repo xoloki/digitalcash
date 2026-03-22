@@ -56,13 +56,11 @@ This means that there is a fixed number of remainders for any field, and that we
 
 If we take a member of a finite field, and multiply it by itself repeatedly, this is what is called exponentiation.  Exponentiation can be reversed; rather than finding the result of repeated multiplication, we decipher how many times multiplication would need to be done to get a particular result.  This number is called a logarithm, and is the reverse of exponentiation.
 
-But while it is trivial to find logarithms in non-discrete math, it is not generally possible to find discrete logarithms without resorting to brute force.  The difficulty of this problem, called the Discrete Logarithm Problem, or DLP, is what makes much of public key cryptography work.
+But while it is trivial to find logarithms in non-discrete math, it is not generally possible to find discrete logarithms without resorting to brute force.  The difficulty of this problem, called the Discrete Logarithm Problem (DLP), is what makes much of public key cryptography secure.
 
 \subsubsection{Group Theory}
 
-Finite fields are usually represented by the remainders of numbers divides by some fixed modulus.  But this is not the only way to do such operations.
-
-Group theory is an abstraction of this idea, and can be applied to many contexts where we do not have numbers modulo some fixed modulus.  A group consists of a set, and a binary operation on pairs of elements of that set that returns another element of the set.  You can think of this operation as an abstract version of multiplication.  
+Group theory is a simplified abstraction of this idea, that can be used for constructs other than numbers modulo a prime modulus.  A group consists of a set, and a single binary operation on pairs of elements of that set that returns another element of the set.  You can think of this operation as an abstract version of multiplication.
 
 Numbers modulo some fixed modulus form a group; you can multiply two of those numbers, take the remainder modulo the modulus, and you will get another element of the same set.  But you can also use elliptic curves, polynomials, or even more exotic sets.
 
@@ -103,7 +101,7 @@ This is problematic, though, because now there is a well known discrete logarith
   Schnorr Proofs and the Fiat Shamir Transform
 }
 
-Schnorr proofs \cite{schnorr} allow the owner of a private key to demonstrate that ownership to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform \cite{fiatshamir}.  This allows the protocol to function as a signature.
+Schnorr proofs \cite{schnorr} allow the owner of a private key to prove knowledge of it to someone who knows the corresponding public key.  It is an interactive 3-move protocol, i.e. a Sigma protocol.  But like all Sigma protocols, it can be made non-interactive using the Fiat-Shamir transform \cite{fiatshamir}.  This allows the protocol to function as a signature.
 
 Let $G$ be a generator in a finite group $\mathbb{G}$ of prime order $p \in \mathbb{P}$, with private key $x \in \mathbb{Z}_p$, and public key $X = G^x$. The prover chooses a random $r \in Z_p$, then sets $R = G^r$.
 
@@ -127,7 +125,7 @@ We can use this derived expression for $r$ to expand $R$:
   R = G^r= G^{s + c x} = G^s G^{cx} = G^s G^{xc} = G^s (G^x)^c = G^s X^c
 \end{align}
 
-So if $R = G^s X^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $s$, allowing the equation to balance.  The tuple $(R,s)$ is thus a proof of ownership of $X$.
+So if $R = G^s X^c$, then the prover must have known $x$.  Otherwise the prover would not have been able to construct a proper $s$, allowing the equation to balance.  The tuple $(R,s)$ is thus proof of knowledge of $x$.
 
 \newpage
 \section{Digital Signatures}

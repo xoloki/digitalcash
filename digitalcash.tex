@@ -92,7 +92,7 @@ And for some groups, like numbers modulo a prime, this works for the group eleme
 
 One trivial way of defining $H_g$ over some binary data $d$ would be to use a generator $G$:
 \begin{align}
-  H_g(d) = G^{H_s(d)}
+  H_g(d) = G^{H_s(d)}\nonumber
 \end{align}
 
 This is problematic, though, because now there is a well known discrete logarithm for $H_g(d)$, namely $H_s(d)$.  The existence of this discrete logarithm breaks the assumptions needed to prove the security of algorithms that require $H_g$.  So we must use more complex algorithms; the details are out of scope for this document, but are well known and easily found.
@@ -112,7 +112,7 @@ In the interactive version of the protocol, the prover sends $R$ to the verifier
 
 The prover then defines the response $s$ as below, and calculates it from $(r, c, x)$:
 \begin{align}
-  s = r - cx
+  s = r - cx\nonumber
 \end{align}
  
 This is equivalent algebraically to
@@ -154,7 +154,7 @@ This is equivalent algebraically to:
 
 Now that the prover has $c_1$, $s_1$ is as before:
 \begin{align}
-  s_1 = r - c_1 x
+  s_1 = r - c_1 x\nonumber
 \end{align}
 
 The prover then sends $(X_1, s_1, c_1, X_2, s_2, c_2)$ to the verifier, who then calculates the hash
@@ -186,7 +186,7 @@ We then add a term to the hash for each $X$ that uses the key image $I$.  For th
   H_g(X)^r &= H_g(X)^{s + cx}\nonumber\\
          &= H_g(X)^s (H_g(X)^{xc}\nonumber\\
          &= H_g(X)^s (H_g(X)^x)^c\nonumber\\
-         &= H_g(X)^s I^c
+         &= H_g(X)^s I^c\nonumber
 \end{align}
 
 Putting the real $X_1$ first, the prover hash becomes:
@@ -197,7 +197,7 @@ Putting the real $X_1$ first, the prover hash becomes:
 We define $c$ as before, then solve for the hash:
 \begin{align}
   c_1 &= H_s(G^r, H_g(X_1)^r, G^{s_2} X_2^{c_2}, H_g(X_2)^{s_2} I^{c_2}, M) - c_2 \nonumber \\
-  c_1 + c_2 &= H_s(G^r, H_g(X_1)^r, G^{s_2} X_2^{c_2}, H_g(X_2)^{s_2} I^{c_2}, M)
+  c_1 + c_2 &= H_s(G^r, H_g(X_1)^r, G^{s_2} X_2^{c_2}, H_g(X_2)^{s_2} I^{c_2}, M)\nonumber
 \end{align}
 
 So as before, $\sum c$ is equal to the hash.  The prover now sends $(I, X_1, s_1, c_1, X_2, s_2, c_2)$ to the verifier, who can check that their hash is still equal to $\sum c$:
@@ -230,39 +230,35 @@ For the remaining $i \in \{j+1, …, n, …, j-1\}$ ($\mod{n}$ so $n$ goes to ze
 
 Now that we have $c_j$, we can define
 \begin{align}
-  s_j = r - c_j x
+  s_j = r - c_j x\nonumber
 \end{align}
 
-Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $r_j$ and $c_j$, and the values should be equal to the original $L_j$ and $R_j$ calculated using $v$. The prover now sends $(I, X_0, s_0, …, X_{n-1}, s_{n-1}, c_0)$ to the verifier.  The verifier can reconstruct all $(c_i, L_i, R_i)$ and then check that $c_0 = c_n$.
+Then we can calculate $L_j$ and $R_j$ as we did for all $L_i$ and $R_i$, using $r_j$ and $c_j$, and the values should be equal to the original $L_j$ and $R_j$ calculated using $r$. The prover now sends $(I, X_0, s_0, …, X_{n-1}, s_{n-1}, c_0)$ to the verifier.  The verifier can reconstruct all $(c_i, L_i, R_i)$ and then check that $c_0 = c_n$.
 
 
 \subsection{Multilayered LSAG Signatures}
 
-LSAG signatures allow a compact representation of a linked ring signature, but each real key needs its own signature, and there is no way to associate the real keys with interleaved data.
-
-The MLSAG solves this by using key vectors rather than single keys \cite{ringct}.  So key $X_i$ is instead a vector of $m$ keys
+LSAG signatures allow a compact representation of a linked ring signature, but if we need to sign $m$ keys each needs its own signature. MLSAG solves this by using vectors of size $m$ \cite{ringct}.  So $(I, X_i, s_i, r)$, are now:
 \begin{align}
-  X_i = (X_{i,0}, ..., X_{i,m-1})
+  I &= (I_{0}, ..., I_{m-1})\nonumber\\
+  X_i &= (X_{i,0}, ..., X_{i,m-1})\nonumber\\
+  s_i &= (s_{i,0}, ..., s_{i,m-1})\nonumber\\
+  r &= (r_{0}, ..., r_{m-1})\nonumber
 \end{align}
 
-As before, there exists a secret index $j$, for which we know the private keys to each public key.  Each $s_i$ is now also a vector, and
-\begin{align}
-  s_i = (s_{i,0}, ..., s_{i,m-1})
-\end{align}
+As before, there exists a secret index $j$, for which we know the private keys to each public key. $\forall i \ne j$, $s_i$ consists of random numbers.
 
-$\forall i \ne j$, $s_i$ consists of random numbers.
-
-The prover proceeds as with an LSAG, starting with index $j$.  $r$ is now a vector of $m$ elements.  The $L_{j,k}$ and $R_{j,k}$ entries are calculated in the same way, but using $X_{j,k}$ and $r_k$.  $c_{j+1}$ is calculated using all $L_{j,k}$ and $R_{j,k}$:
+The prover proceeds as with an LSAG, starting with index $j$.  The $L_{j,k}$ and $R_{j,k}$ entries are calculated in the same way, but using $X_{j,k}$ and $r_k$.  $c_{j+1}$ is calculated using $L_{j,k}$ and $R_{j,k}$ for all $k \in (0, ..., m-1)$:
 \begin{align}
   L_{j,k} &= G^{r_k}\\
   R_{j,k} &= H_g(X_{j,k})^{r_k}\\
   c_{j+1} &= H_s(L_{j,0}, R_{j,0}, ..., L_{j,m-1}, R_{j,m-1}, M)
 \end{align}
 
-As before, the prover calculates the remaining $L_i$ and $R_i$ using the corresponding $c_i$, $r_i$, and $I$, and the hash for $c_{i+1}$ contains the full set of $L_{i,k}$ and $R_{i,k}$:
+As before, the prover calculates the remaining $L_i$ and $R_i$ using the corresponding $c_i$, $s_i$, and $I$, and the hash for $c_{i+1}$ contains the full set of $L_{i,k}$ and $R_{i,k}$:
 \begin{align}
-  L_{i,k} &= G^{r_{i,k}} X_{i,k}^{c_i}\\
-  R_{i,k} &= H_g(y_i)^{r_{i,k}} I^{c_i}\\
+  L_{i,k} &= G^{s_{i,k}} X_{i,k}^{c_i}\\
+  R_{i,k} &= H_g(X_{i,k})^{s_{i,k}} I^{c_i}\\
   c_{i+1} &= H_s(L_{i,0}, R_{i,0}, ..., L_{i,m-1}, R_{i,m-1}, M) \\
   &... \\
   c_j &= H_s(L_{j-1,0}, R_{j-1,0}, ..., L_{j-1,m-1}, R_{j-1,m-1}, M) 
@@ -270,45 +266,45 @@ As before, the prover calculates the remaining $L_i$ and $R_i$ using the corresp
 
 Now that we have $c_j$, we can calculate the $s_{j,k}$ as before:
 \begin{align}
-  s_{j,k} = r_k - c_j x_k
+  s_{j,k} = r_k - c_j x_k\nonumber
 \end{align}
 
-The prover sends the same set of $(I, X_0, s_0, ..., X_{m-1}, s_{m-1}, c_0)$ as for LSAG, but each $y_i$ and $s_i$ is now a vector.  The verifier again calculates the full set of $c_i$, with corresponding $L_i$ and $R_i$, and checks that $c_0 = c_n$.
+The prover sends similar $(I, X_0, s_0, ..., X_{m-1}, s_{m-1}, c_0)$ as with LSAG, but each $X_i$ and $s_i$ is now a vector.  The verifier again calculates the full set of $c_i$, and checks that $c_0 = c_n$.
 
 
 \section{CryptoNote}
 
-CryptoNote \cite{cryptonote} is a privacy focused cryptocurrency system which implements many of the techniques explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but I will break with that to maintain consistency with the rest of the document, and use exponentials in this section.
+CryptoNote \cite{cryptonote} is a privacy focused cryptocurrency system which uses the linkable ring signatures explored above, plus a novel method for tying long term public keys to one time addresses.  CryptoNote is defined to use elliptic curves rather than exponentials, but we will break with that to maintain consistency with the rest of the document, and use exponentials in this section.
 
 
 \subsection{One time addresses}
 
-A CryptoNote key consists of a pair of public keys $(A, B)$ with their associated private keys $(a, b)$.  To construct a one time address, the creator of a transaction starts with a transaction private key $r$, and an associated transaction public key $R$:
+A CryptoNote key consists of a pair of public keys $(A, B)$ with their associated private keys $(a, b)$.  To construct a one time address, the creator of a transaction starts with a transaction private key $r$, and associated transaction public key $R$:
 \begin{align}
-  R=G^r
+  R=G^r\nonumber
 \end{align}
 
-The creator then uses this, with the destination public key $(A, B)$, to construct the one time address $X$.  This address is a public key, with an associated private key $x$:
+The creator then uses the transaction private key $r$ with the destination public key $(A, B)$ to construct the one time address $X$.  This address is a public key, with associated private key $x$:
 \begin{align}
   X = G^x = G^{H_s(rA)} B
 \end{align}
 
-The owner of the destination key $(A, B)$ can scan the transaction one time addresses to determine if he is the owner.  He first uses his private key $(a, b)$ to attempt to recover the one time private key $x$:
+A private key $(a, b)$ can then be used to scan one time address $X$ to determine if public key $(A, B)$ was the destination key.  First use $R$ and $(a, b)$ to recover the one time private key $y$:
 \begin{align}
-	x = H_s(Ra) + b
+  y = H_s(Ra) + b
 \end{align}
 
-Then raise $g$ to this power to reconstruct the public key $y$:
+Then raise $G$ to this power to reconstruct the public key $Y$:
 \begin{align}
-  G^x = G^{H_s(Ra)} G^b
+  Y = G^y = G^{H_s(Ra)} G^b
 \end{align}
 
-If $y = G^x$, then the destination key was the same one used to construct the one time address, and the key owner is the owner of the one time address.  Since the owner knows the private key $x$, he is able to sign the key $y$ in a ring signature, allowing him to spend it.
+If $Y = X$, then public key $(A, B)$ was the same one used to construct the one time address, and the key owner is the owner of the one time address.  The owner now knows the private key $x = y$, so he is able to sign with this key in a ring signature, allowing him to spend $X$.
 
 
 \subsection{View keys}
 
-One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, this can be problematic.  It would be preferable to allow a trusted node to do the scanning for the user, while preventing the node from being able to spend the output.
+One time addresses allow a user to find the transaction outputs which he owns.  But this requires the user to scan the entire blockchain, looking at every output.  For users with limited storage and bandwidth, such as mobile clients, this can be problematic.  Such users may preferable to allow a trusted node to do the scanning for the them, while preventing the node from being able to spend the output.
 
 To do this, the user can pass a tuple of his private key $a$ with his public key $B$:
 \begin{align}
@@ -325,7 +321,7 @@ If $Y = X$, then the node knows that the one time key belongs to the user, and r
 
 \subsection{Ring signatures}
 
-CryptoNote uses linkable ring signatures, with external data.  It defines a transaction prefix to be all of the transaction data except for the ring signatures themselves, which includes the input and output public keys, with the transaction public key and amounts.  The transaction prefix is serialized then hashed to create the signed message m.
+CryptoNote uses linkable ring signatures, which sign a transaction prefix.  This is defined to be all of the transaction data except for the ring signatures themselves, including the input and output public keys, amounts, and the transaction public key.  The transaction prefix is serialized then hashed to create the signed message $M$.
 
 
 \section{Confidential Transactions}

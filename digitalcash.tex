@@ -44,31 +44,28 @@ Much of mathematics deals with quantities that vary smoothly and fractionally be
 
 \subsubsection{Modular Arithmetic}
 
-Consider a crate of eggs that holds a dozen eggs.  Using discrete math, we could ask the question of how many dozens can be filled by a particular number of eggs, and how many were left over once we had fully filled as many as possible.
+Consider a crate of eggs that holds a fixed number of eggs.  Using discrete math, we could ask the question of how many crates can be filled by a particular number of eggs, and how many were left over once we had fully filled as many as possible.  If the number of eggs left over is zero, we say that the size of the crate $divides$ the number of eggs.
 
 Because the crates are filled one at a time, and the remainder cycles between zero and one less than the size of the crate, we call this kind of math modular arithmetic.  The crates are the modules; we in fact seldom care much about the number of crates filled, but rather the remainders.  We refer to the size of the crate as the modulus, and it determines how many remainders are possible.
 
-\subsubsection{Finite Fields}
+These remainders form a finite set, and we can do the basic mathematical operations of addition and multiplication on elements of this set. We can also take additive inverses, which allow us to do subtraction.  And crucially, if the modulus is prime, we can take multiplicative inverses, and division is thus also possible.
 
-Keeping with our egg crate example, as noted above the remainders cycle between zero and one less than the size of the crate, aka the modulus.  If the modulus is prime, we name these sets of remainders finite fields.
-
-This means that there is a fixed number of remainders for any field, and that we can do the basic mathematical operations of addition and multiplication on them. We can also take inverses, both additively and multiplicatively.  Subtraction and division are thus also possible, by taking inverses then applying the operation.
-
-If we take a member of a finite field, and multiply it by itself repeatedly, this is what is called exponentiation.  Exponentiation can be reversed; rather than finding the result of repeated multiplication, we decipher how many times multiplication would need to be done to get a particular result.  This number is called a logarithm, and is the reverse of exponentiation.
+If we take an element of such a set, and multiply it by itself repeatedly, this is what is called exponentiation.  Exponentiation can be reversed; rather than finding the result of repeated multiplication, we decipher how many times multiplication would need to be done to get a particular result.  This number is called a logarithm, and is the reverse of exponentiation.
 
 But while it is trivial to find logarithms in non-discrete math, it is not generally possible to find discrete logarithms without resorting to brute force.  The difficulty of this problem, called the Discrete Logarithm Problem (DLP), is what makes much of public key cryptography secure.
 
 \subsubsection{Group Theory}
 
-Group theory is a simplified abstraction of this idea, that can be used for constructs other than numbers modulo a prime modulus.  A group consists of a set, and a single binary operation on pairs of elements of that set that returns another element of the set.  You can think of this operation as an abstract version of multiplication.
+Group theory is an abstraction of arithmetic, that can be used for constructs other than discrete numbers.  A group consists of a set, and a single binary operation on elements of the set that returns another element of the set. You can think of this operation as an abstract version of multiplication.  There must also be an identity element, which when applied to any element will result in the element itself; and for every element, there must be an inverse, such that applying it to that element produces the identity.  For cryptography, we are generally only interested in finite groups, whose behavior is similar to modular arithmetic.
 
-Numbers modulo some fixed modulus form a group; you can multiply two of those numbers, take the remainder modulo the modulus, and you will get another element of the same set.  But you can also use elliptic curves, polynomials, or even more exotic sets.
+Numbers modulo some fixed modulus form a group; you can multiply two of those numbers, take the remainder modulo the modulus, and you will get another element of the same set.  But you can also use elliptic curves, polynomials, or even more exotic sets, with any operation you choose.
 
-We can do the group operation repeatedly some number of times on a single element of the set.  This is an abstraction of the idea of exponentiation, raising some number to a power.  And we can also try to reverse exponentiation; as with finite fields, this requires brute force, and makes public key cryptography safe.  But unlike with finite fields, we can do this with any group.  For a variety of technical reasons, we normally use elliptic curves as our group set, and elliptic curve addition as our group operation.
+We can do the group operation repeatedly some number of times on a single element of the set.  This is an abstraction of the idea of modular exponentiation, raising some number to a power.  And we can also reverse exponentiation, though as before, this requires brute force.  For a variety of technical reasons, we normally use elliptic curves as our group set, and elliptic curve addition as our group operation.
 
-Some elements of a group, when exponentiated, will produce every element of the set exactly once.  These elements are called generators.  The number of times you can do this exponentiation before returning to the same value is called the $order$ of a group.  Since exponentiation more times than the order of a group is cyclic, we use numbers modulo the group order for this operation as well.  These numbers are referred to as group scalars, to reflect this fact.
+For a finite group, the number of elements in the set is called the group $order$.  Each element also has an order, which is the number of times you can apply exponentiation before you return to the original element.  Elements whose order is equal to the group order are called $generators$, because exponentiating them will produce every element of the group; groups with at least one generator we call $cyclic$.  If the order of a group is prime, then all non-identity elements are generators.
 
-If the order of a group is prime, then all elements of the group are generators.  
+Since exponentiation in these groups is cyclic, there is no need for an exponent to be larger than the group order.  So we use numbers modulo the group order for this operation; these numbers we call group scalars.
+
 
 \newpage
 \section{
@@ -500,14 +497,14 @@ So if the prover can construct $(L, R, \textbf{a'}, \textbf{b'})$ such that $P' 
 
 Let $\textbf{a}_L$ be a vector with the $n$ bits of $v$.  Then the following must all be true:
 \begin{align}
-  \left<\textbf{a}_L, 2^n\right> = v ; \textbf{a}_L \circ  \textbf{a}_R = \textbf{0}^n ; \textbf{a}_R = \textbf{a}_L - \textbf{1}^n
+  \left<\textbf{a}_L, 2^n\right> = v ;\quad \textbf{a}_L \circ  \textbf{a}_R = \textbf{0}^n ;\quad \textbf{a}_R = \textbf{a}_L - \textbf{1}^n
 \end{align}
   
 $\textbf{a}_R$ is defined to be the negation of $\textbf{a}_L$: $0$ where $1$, and $-1$ where $0$.  So any pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$.
 
 Given a verifier chosen $y \in \mathbb{G}$, these relations are equivalent to:
 \begin{align}
-  \left<\textbf{a}_L, 2^n\right> = v ; \left<\textbf{a}_L, \textbf{a}_R \circ y^n\right> = 0 ; \left<\textbf{a}_L - \textbf{1}^n - \textbf{a}_R, \textbf{y}^n\right> = 0
+  \left<\textbf{a}_L, 2^n\right> = v ;\quad \left<\textbf{a}_L, \textbf{a}_R \circ y^n\right> = 0 ;\quad \left<\textbf{a}_L - \textbf{1}^n - \textbf{a}_R, \textbf{y}^n\right> = 0
 \end{align}
 
 As before, pairwise multiplication between $\textbf{a}_R$ and $\textbf{a}_L$ will be $0$, regardless of multiplying by $\textbf{y}^n$, and summing the dot product will likewise be $0$. And solving the third relation for $0$ gives us another dot product of $0$ with our new $\textbf{y}^n$.
@@ -626,24 +623,24 @@ The Monero implementation of confidential transactions is called RingCT \cite{ri
 
 To accomplish this, the MLSAG signature adds the corresponding commitments to the public key vectors, then passes them in the signature output:
 \begin{align}
-  y_i = ((y_{i,0}, C_{i,0}), ..., (y_{i,m-1}, C_{i,m-1}))
+  X_i = ((X_{i,0}, C_{i,0}), ..., (X_{i,m-1}, C_{i,m-1}))
 \end{align}
 
 When constructing the hashes, the prover signs a final term which is the sum of the input commitments minus the sum of the output commitments:
 \begin{align}
   G^z &= \frac{C_i}{C_o}\\
-  L_{j,m} &= G^{v_m}\\
+  L_{j,m} &= G^{r_m}\\
   c_{j+1} &= H_s(L_{j,0}, R_{j,0}, ... , L_{j,m-1}, R_{j, m-1}, L_{j,m})
 \end{align}
 
-As before, if this sum is a commitment to zero, then it will take the form of a public key $G^z$, where the user knows the private key $z$.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a $R_{j,m}$ term, or a key image.  It will be necessary to create a new $v_m$ and include an additional $r_{j,m}$ in the signature:
+As before, if this sum is a commitment to zero, then it will take the form of a public key $G^z$, where the user knows the private key $z$.  So it can be signed like any other public key in a ring signature.  Since the commitment does not need to be linkable, it is not necessary to include a $R_{j,m}$ term, or a key image.  It will be necessary to create a new $r_m$ and include an additional $s_{j,m}$ in the signature:
 \begin{align}
-  r_{j,m} = v_m - c_j z
+  s_{j,m} = r_m - c_j z
 \end{align}
 
 The verifier uses this additional $r_{j,m}$ and $c_j$ to build a standard Schnorr term:
 \begin{align}
-  c_{j+1} = H_s(L_{j,0}, L_{j,0}, ... , L_{j,0}, L_{j,0}, G^{r_{j,m}} y^{c_j})
+  c_{j+1} = H_s(L_{j,0}, L_{j,0}, ... , L_{j,0}, L_{j,0}, G^{s_{j,m}} X^{c_j})
 \end{align}
 
 As before, if the sum was a commitment to zero, then this term will be the same in the prover and verifier hashes.
